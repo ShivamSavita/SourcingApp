@@ -2106,6 +2106,21 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                     editText.setError(null);
                 }
                 break;
+
+            case R.id.tietSpouseFName:
+                if (Utils.getSpinnerStringValue((Spinner)findViewById(R.id.spinLoanAppPersonalMarritalStatus)).equals("Married"))
+                {
+                    if (editText.getText().toString().trim().length() < 1) {
+                        editText.setError("Please Enter Spouse Name");
+                        retVal = false;
+
+                    } else {
+                        retVal = true;
+                        editText.setError(null);
+                    }
+
+                }
+                break;
         }
         return retVal;
     }
@@ -2284,6 +2299,7 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
         retVal &= validateControls(tietDrivingLic, tietDrivingLic.getText().toString());
         retVal &= validateControls(tietMotherFName, tietMotherFName.getText().toString());
         retVal &= validateControls(tietFatherFName, tietFatherFName.getText().toString());
+        retVal &= validateControls(tietSpouseFName, tietSpouseFName.getText().toString());
         return retVal;
     }
 
