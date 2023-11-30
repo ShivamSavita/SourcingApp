@@ -298,6 +298,15 @@ public class FragmentBorrowerFinance extends AbsFragment implements View.OnClick
                             checkBankAccountNuber.setEnabled(false);
                             isAccountVerify="V";
                             UpdatefiVerificationDocName();
+                        }else  if(!response.body().get("data").getAsJsonObject().get("account_exists").getAsBoolean() &&( Utils.getNotNullText(tvBankName).toLowerCase().contains("co-operative") || Utils.getNotNullText(tvBankName).toLowerCase().contains("uco") )){
+                            tilBankAccountName.setVisibility(View.VISIBLE);
+                            tilBankAccountName.setText("COOPERATIVE BANK OR UCO");
+                            //tilBankAccountName.setTextColor(getResources().getColor(R.color.green));
+                            checkBankAccountNuber.setBackground(getResources().getDrawable(R.drawable.check_sign_ic_green));
+                            checkBankAccountNuber.setEnabled(false);
+                            isAccountVerify="V";
+                            UpdatefiVerificationDocName();
+
                         }else{
                             isAccountVerify="N";
                             etBankAccount.setText("");

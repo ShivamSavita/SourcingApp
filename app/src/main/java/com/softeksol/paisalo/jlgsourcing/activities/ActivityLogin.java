@@ -402,7 +402,6 @@ public class ActivityLogin extends AppCompatActivity implements View.OnClickList
                     case 10:
                         btnShareDeviceID.setEnabled(true);
                         checkBtnShareIDStatus(true);
-
                         break;
                 }
                 if (validateInputs()) {
