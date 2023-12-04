@@ -11,11 +11,13 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.AppCompatSpinner;
 import androidx.fragment.app.Fragment;
 
@@ -298,31 +300,18 @@ public class FragmentBorrowerFinance extends AbsFragment implements View.OnClick
                             checkBankAccountNuber.setEnabled(false);
                             isAccountVerify="V";
                             UpdatefiVerificationDocName();
-                        }else  if(!response.body().get("data").getAsJsonObject().get("account_exists").getAsBoolean() &&( Utils.getNotNullText(tvBankName).toLowerCase().contains("co-operative") || Utils.getNotNullText(tvBankName).toLowerCase().contains("uco") )){
+                        }else {
+                            showDialog(etBankAccount);
                             tilBankAccountName.setVisibility(View.VISIBLE);
-                            tilBankAccountName.setText("COOPERATIVE BANK OR UCO");
+                            tilBankAccountName.setText("BANK not Verify");
                             //tilBankAccountName.setTextColor(getResources().getColor(R.color.green));
-                            checkBankAccountNuber.setBackground(getResources().getDrawable(R.drawable.check_sign_ic_green));
-                            checkBankAccountNuber.setEnabled(false);
-                            isAccountVerify="V";
-                            UpdatefiVerificationDocName();
 
-                        }else{
-                            isAccountVerify="N";
-                            etBankAccount.setText("");
-                            tilBankAccountName.setVisibility(View.VISIBLE);
-                            tilBankAccountName.setText("Account Holder Name Not Found");
-                            tilBankAccountName.setTextColor(getResources().getColor(R.color.red));
-                            checkBankAccountNuber.setBackground(getResources().getDrawable(R.drawable.check_sign_ic));
-                            checkBankAccountNuber.setEnabled(true);
+
                         }
                     }catch (Exception e){
-                        isAccountVerify="N";
+                        showDialog(etBankAccount);
                         tilBankAccountName.setVisibility(View.VISIBLE);
-                        tilBankAccountName.setText("Name Not Found");
-                        checkBankAccountNuber.setBackground(getResources().getDrawable(R.drawable.check_sign_ic));
-                        checkBankAccountNuber.setEnabled(true);
-                        etBankAccount.setText("");
+                        tilBankAccountName.setText("BANK API not Working");
 
                     }
                     progressDialog.cancel();
@@ -332,7 +321,6 @@ public class FragmentBorrowerFinance extends AbsFragment implements View.OnClick
 
             @Override
             public void onFailure(Call<JsonObject> call, Throwable t) {
-
                 tilBankAccountName.setText(t.getMessage());
                     progressDialog.cancel();
                     checkBankAccountNuber.setBackground(getResources().getDrawable(R.drawable.check_sign_ic));
@@ -341,6 +329,54 @@ public class FragmentBorrowerFinance extends AbsFragment implements View.OnClick
 
             }
         });
+    }
+
+    private void showDialog(EditText editText) {
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getContext());
+        LayoutInflater inflater = getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.dialog_input, null);
+        dialogBuilder.setView(dialogView);
+        EditText editTextInput = dialogView.findViewById(R.id.editTextInput);
+        Button buttonSubmit = dialogView.findViewById(R.id.buttonSubmit);
+        ImageButton buttonClose = dialogView.findViewById(R.id.buttonClose);
+        AlertDialog dialog = dialogBuilder.create();
+        dialog.show();
+        editText.setVisibility(View.GONE);
+        // Button click listener to retrieve the entered text
+        buttonSubmit.setOnClickListener(view -> {
+            String userInput = editTextInput.getText().toString().trim();
+            if (!userInput.isEmpty()) {
+                if (userInput.trim().equals(editText.getText().toString().trim())){
+                    Toast.makeText(activity, "Account Number Matched!!", Toast.LENGTH_SHORT).show();
+                     dialog.dismiss();
+                     editText.setVisibility(View.VISIBLE);
+                     checkBankAccountNuber.setBackground(getResources().getDrawable(R.drawable.check_sign_ic_green));
+                     checkBankAccountNuber.setEnabled(false);
+                     isAccountVerify="V";
+                     UpdatefiVerificationDocName();
+                }else{
+                    Toast.makeText(activity, "Account Number Did not Match. Please Enter Again!!", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                Toast.makeText(getContext(), "Please Enter Account number", Toast.LENGTH_SHORT).show();
+            }
+        });
+        buttonClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+                editText.setVisibility(View.VISIBLE);
+                isAccountVerify="N";
+                checkBankAccountNuber.setBackground(getResources().getDrawable(R.drawable.check_sign_ic));
+
+            }
+        });
+
+
+
+
+        // Close button click listener to dismiss the dialog
+
     }
     private JsonObject getJsonOfString(String id, String bankIfsc) {
         JsonObject jsonObject=new JsonObject();
@@ -366,6 +402,7 @@ public class FragmentBorrowerFinance extends AbsFragment implements View.OnClick
             }
         });
     }
+
     private JsonObject getJsonOfKyCLogs(String id, String type,String bankIfsc,String userDOB) {
         JsonObject jsonObject=new JsonObject();
         jsonObject.addProperty("Type",type);

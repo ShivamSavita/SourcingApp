@@ -23,15 +23,10 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="777f62d9-0b07-46ca-b68d-a5630df9eb8e" name="Changes" comment="28-11-2023-2 Ver38">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_03-08-2023_17_13__Changes_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_03-08-2023_17_13__Changes_.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_12-06-2023_10_43__Changes_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_12-06-2023_10_43__Changes_.xml" afterDir="false" />
+    <list default="true" id="777f62d9-0b07-46ca-b68d-a5630df9eb8e" name="Changes" comment="30-11-2023">
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/layout/dialog_input.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/app/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/softeksol/paisalo/jlgsourcing/activities/ActivityLogin.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/softeksol/paisalo/jlgsourcing/activities/ActivityLogin.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/softeksol/paisalo/jlgsourcing/fragments/FragmentBorrowerFinance.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/softeksol/paisalo/jlgsourcing/fragments/FragmentBorrowerFinance.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/local.properties" beforeDir="false" afterPath="$PROJECT_DIR$/local.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -81,6 +76,7 @@
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
     <option name="SIGN_OFF_COMMIT" value="true" />
+    <option name="UPDATE_TYPE" value="REBASE" />
   </component>
   <component name="GitSEFilterConfiguration">
     <file-type-list>
@@ -112,6 +108,7 @@
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="cidr.known.project.marker" value="true" />
     <property name="dart.analysis.tool.window.visible" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/app/src/main/res/layout" />
     <property name="show.migrate.to.gradle.popup" value="false" />
   </component>
   <component name="PsdUISettings">
@@ -152,11 +149,11 @@
       <recent name="com.softeksol.paisalo.dealers" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\LiveSourcingApp\app\src\main\res\layout" />
       <recent name="D:\Modified-Paisalo-Loan-App\app\src\main\java\com\softeksol\paisalo\jlgsourcing\entities" />
       <recent name="D:\Modified-Paisalo-Loan-App\app\libs" />
       <recent name="D:\Modified-Paisalo-Loan-App\app\src\main\res\layout" />
       <recent name="D:\Modified-Paisalo-Loan-App\app\src\main\java\com\softeksol\paisalo\jlgsourcing\adapters" />
-      <recent name="D:\Modified-Paisalo-Loan-App\app\src\main\java\com\softeksol\paisalo\jlgsourcing\activities" />
     </key>
     <key name="android.template.1436590464">
       <recent name="com.softeksol.paisalo.dealers" />
@@ -256,13 +253,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1677736548092</updated>
-    </task>
-    <task id="LOCAL-00025" summary="Geo tracking done and also with installation of geo tracking app">
-      <created>1681820250256</created>
-      <option name="number" value="00025" />
-      <option name="presentableId" value="LOCAL-00025" />
-      <option name="project" value="LOCAL" />
-      <updated>1681820250256</updated>
     </task>
     <task id="LOCAL-00026" summary="Geo tracking done and also with installation of geo tracking app">
       <created>1681821334497</created>
@@ -600,7 +590,14 @@
       <option name="project" value="LOCAL" />
       <updated>1697721508351</updated>
     </task>
-    <option name="localTasksCounter" value="74" />
+    <task id="LOCAL-00074" summary="30-11-2023">
+      <created>1701349578990</created>
+      <option name="number" value="00074" />
+      <option name="presentableId" value="LOCAL-00074" />
+      <option name="project" value="LOCAL" />
+      <updated>1701349578990</updated>
+    </task>
+    <option name="localTasksCounter" value="75" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -680,7 +677,6 @@
     <ignored-roots>
       <path value="$PROJECT_DIR$" />
     </ignored-roots>
-    <MESSAGE value="Sep-19-03-2023 aadhar OCR" />
     <MESSAGE value="Sep-20-03-2023 aadhar OCR" />
     <MESSAGE value="Sep-22-03-2023 aadhar OCR" />
     <MESSAGE value="Sep-22-03-2023 latestUpdate Age" />
@@ -705,7 +701,8 @@
     <MESSAGE value="06-11-2023-2 Ver35" />
     <MESSAGE value="16-11-2023-2 Ver38" />
     <MESSAGE value="28-11-2023-2 Ver38" />
-    <option name="LAST_COMMIT_MESSAGE" value="28-11-2023-2 Ver38" />
+    <MESSAGE value="30-11-2023" />
+    <option name="LAST_COMMIT_MESSAGE" value="30-11-2023" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
