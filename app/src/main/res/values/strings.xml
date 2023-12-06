@@ -175,4 +175,15 @@ Contact Email <i>DELHI@PAISALO.IN</i>
     <string name="report.9"> यह सुनिचित करें कि आवेदित राशि ऋण के उदेश्य के अनुकूल है।</string>
 
     <string name="imageTitle">आवेदक के साथ घर की तस्वीर खींचें</string>
+
+
+    <array name="emiReasons">
+        <item>"Medical Issue"</item>
+        <item>"Door Closed"</item>
+        <item>"Family Expense"</item>
+        <item>"Pay Tomorrow"</item>
+        <item>"Call not Received"</item>
+        <item>"Don't have money"</item>
+        <item>"Others"</item>
+    </array>
 </resources>

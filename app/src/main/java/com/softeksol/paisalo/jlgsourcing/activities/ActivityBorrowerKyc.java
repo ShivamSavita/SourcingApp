@@ -1613,9 +1613,9 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
         }else{
             if (decodedData.get(6-inc).startsWith("S/O:") ||decodedData.get(6-inc).startsWith("D/O:") ||decodedData.get(6-inc).startsWith("W/O:")){
                 borrower.setGuardianNames(decodedData.get(6-inc).split(":")[1].trim());
-
+            }else if (decodedData.get(6-inc).startsWith("S/O,") ||decodedData.get(6-inc).startsWith("D/O,") ||decodedData.get(6-inc).startsWith("W/O,")){
+                borrower.setGuardianNames(decodedData.get(6-inc).split(",")[1].trim());
             }else{
-
                 borrower.setGuardianNames(decodedData.get(6-inc));
             }
             if (decodedData.get(6-inc).startsWith("S/O:") ||decodedData.get(6-inc).startsWith("D/O:")){
@@ -1624,7 +1624,6 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
             }else if (decodedData.get(6-inc).startsWith("W/O:")){
                 Utils.setSpinnerPosition(acspRelationship, "Husband", false);
                 acspRelationship.setEnabled(false);
-
             }
         }
 

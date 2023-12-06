@@ -5,35 +5,34 @@
 
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
-<TextView
-    android:layout_width="match_parent"
-    android:text="Reason for not Paying EMI"
-    android:gravity="center_vertical"
-    android:textSize="15dp"
-    android:paddingStart="8dp"
-    android:textStyle="bold"
-    android:background="@color/colorPrimary"
-    android:textColor="@color/white"
-    android:layout_height="40dp"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:text="Reason for not Paying EMI"
+        android:gravity="center_vertical"
+        android:textSize="15dp"
+        android:paddingStart="8dp"
+        android:textStyle="bold"
+        android:background="@color/colorPrimary"
+        android:textColor="@color/white"
+        android:layout_height="40dp"/>
     <LinearLayout
         android:layout_marginTop="5dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="5dp"
+
+
+
+        android:layout_margin="5dp"
         android:orientation="vertical">
-        <EditText
-            android:id="@+id/editText"
+        <Spinner
+            android:id="@+id/spinEMIReasons"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:gravity="top"
-            android:hint="Enter Reason"
-            android:background="#FFE2E2"
-            android:layout_marginBottom="5dp"
-            android:singleLine="false"
-            android:inputType="text"
-            android:padding="3dp"/>
+            android:background="@drawable/spinner_bg"
+            android:entries="@array/emiReasons"
+            android:layout_height="50dp"/>
 
         <LinearLayout
+            android:layout_marginTop="5dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">

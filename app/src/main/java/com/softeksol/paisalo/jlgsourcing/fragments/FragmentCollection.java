@@ -25,6 +25,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioGroup;
 import android.widget.SearchView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -186,7 +187,7 @@ public class FragmentCollection extends AbsCollectionFragment {
         View dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_layout_notpay_emi, null);
 
         // Initialize views from the layout
-        EditText editText = dialogView.findViewById(R.id.editText);
+        Spinner spinEMIReasons=dialogView.findViewById(R.id.spinEMIReasons);
         ImageView imgViewCal = dialogView.findViewById(R.id.imgViewCal);
         TextInputEditText tietPromisingDate = dialogView.findViewById(R.id.tietPromisingDate);
         Button saveDataForEMINOTPAY=dialogView.findViewById(R.id.saveDataForEMINOTPAY);
@@ -225,10 +226,7 @@ public class FragmentCollection extends AbsCollectionFragment {
         saveDataForEMINOTPAY.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (editText.getText().length()<1){
-                    Toast.makeText(context, "Please Enter Some reason", Toast.LENGTH_SHORT).show();
-                    editText.setError("Please Enter Some reason");
-                }else if(tietPromisingDate.getText().length()<1){
+                if(tietPromisingDate.getText().length()<1){
                     Toast.makeText(context, "Please Choose date on Calender Icon Click", Toast.LENGTH_SHORT).show();
                     tietPromisingDate.setError("Please Choose date on Calender Icon Click");
                 }else{
@@ -244,8 +242,8 @@ public class FragmentCollection extends AbsCollectionFragment {
                             .client(httpClient.build())
                             .build();
                     ApiInterface apiInterface=retrofit.create(ApiInterface.class);
-                    Log.d("TAG", "onClick: "+getRCPromisToPayJson(Utils.getNotNullText(tietPromisingDate),editText.getText().toString(),dueData.getCreator(),dueData.getCustName(),dueData.getCaseCode(),dueData.getMobile(),dueData.getAadhar()));
-                    Call<JsonObject> call=apiInterface.insertRcPromiseToPay(getRCPromisToPayJson(Utils.getNotNullText(tietPromisingDate),editText.getText().toString(),dueData.getCreator(),dueData.getCustName(),dueData.getCaseCode(),dueData.getMobile(),dueData.getAadhar()));
+                    Log.d("TAG", "onClick: "+getRCPromisToPayJson(Utils.getNotNullText(tietPromisingDate),spinEMIReasons.getSelectedItem().toString(),dueData.getCreator(),dueData.getCustName(),dueData.getCaseCode(),dueData.getMobile(),dueData.getAadhar()));
+                    Call<JsonObject> call=apiInterface.insertRcPromiseToPay(getRCPromisToPayJson(Utils.getNotNullText(tietPromisingDate),spinEMIReasons.getSelectedItem().toString(),dueData.getCreator(),dueData.getCustName(),dueData.getCaseCode(),dueData.getMobile(),dueData.getAadhar()));
                     call.enqueue(new Callback<JsonObject>() {
                         @Override
                         public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
@@ -276,11 +274,6 @@ public class FragmentCollection extends AbsCollectionFragment {
         });
         dialog.show();
     }
-
-
-
-
-
 
 
 
