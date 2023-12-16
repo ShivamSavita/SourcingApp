@@ -24,22 +24,13 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="777f62d9-0b07-46ca-b68d-a5630df9eb8e" name="Changes" comment="06-11-2023">
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/softeksol/paisalo/jlgsourcing/activities/QrPayments.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_qr_payments.xml" afterDir="false" />
+    <list default="true" id="777f62d9-0b07-46ca-b68d-a5630df9eb8e" name="Changes" comment="16-12-2023">
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/softeksol/paisalo/jlgsourcing/adapters/QrDataListAdapter.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/softeksol/paisalo/jlgsourcing/models/QrDataModel.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/layout/qypayment_itemview.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/softeksol/paisalo/jlgsourcing/Utilities/CameraUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/softeksol/paisalo/jlgsourcing/Utilities/CameraUtils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/softeksol/paisalo/jlgsourcing/activities/ActivityBorrowerEntry.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/softeksol/paisalo/jlgsourcing/activities/ActivityBorrowerEntry.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/softeksol/paisalo/jlgsourcing/activities/ActivityBorrowerKyc.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/softeksol/paisalo/jlgsourcing/activities/ActivityBorrowerKyc.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/softeksol/paisalo/jlgsourcing/activities/ActivityGuarantorEntry.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/softeksol/paisalo/jlgsourcing/activities/ActivityGuarantorEntry.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/softeksol/paisalo/jlgsourcing/activities/ActivityOperationSelect.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/softeksol/paisalo/jlgsourcing/activities/ActivityOperationSelect.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/softeksol/paisalo/jlgsourcing/activities/KYC_Form_New.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/softeksol/paisalo/jlgsourcing/activities/KYC_Form_New.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/softeksol/paisalo/jlgsourcing/fragments/FragmentBorrowerAadhar.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/softeksol/paisalo/jlgsourcing/fragments/FragmentBorrowerAadhar.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/softeksol/paisalo/jlgsourcing/fragments/FragmentKycScanning.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/softeksol/paisalo/jlgsourcing/fragments/FragmentKycScanning.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/softeksol/paisalo/jlgsourcing/homevisit/SecondPage.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/softeksol/paisalo/jlgsourcing/homevisit/SecondPage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/menu/activity_main_drawer.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/menu/activity_main_drawer.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/values/strings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/values/strings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/softeksol/paisalo/jlgsourcing/activities/QrPayments.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/softeksol/paisalo/jlgsourcing/activities/QrPayments.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_qr_payments.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_qr_payments.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -121,7 +112,7 @@
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="cidr.known.project.marker" value="true" />
     <property name="dart.analysis.tool.window.visible" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/app/src/main/res/layout" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/app/src/main/java/com/softeksol/paisalo/jlgsourcing/models" />
     <property name="show.migrate.to.gradle.popup" value="false" />
   </component>
   <component name="PsdUISettings">
@@ -162,11 +153,11 @@
       <recent name="com.softeksol.paisalo.dealers" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\LiveSourcingApp\app\src\main\java\com\softeksol\paisalo\jlgsourcing\models" />
+      <recent name="D:\LiveSourcingApp\app\src\main\java\com\softeksol\paisalo\jlgsourcing\adapters" />
       <recent name="D:\LiveSourcingApp\app\src\main\res\layout" />
       <recent name="D:\Modified-Paisalo-Loan-App\app\src\main\java\com\softeksol\paisalo\jlgsourcing\entities" />
       <recent name="D:\Modified-Paisalo-Loan-App\app\libs" />
-      <recent name="D:\Modified-Paisalo-Loan-App\app\src\main\res\layout" />
-      <recent name="D:\Modified-Paisalo-Loan-App\app\src\main\java\com\softeksol\paisalo\jlgsourcing\adapters" />
     </key>
     <key name="android.template.1436590464">
       <recent name="com.softeksol.paisalo.dealers" />
@@ -269,13 +260,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1677736548092</updated>
-    </task>
-    <task id="LOCAL-00028" summary="Geo tracking done and also with installation of geo tracking app">
-      <created>1681821458373</created>
-      <option name="number" value="00028" />
-      <option name="presentableId" value="LOCAL-00028" />
-      <option name="project" value="LOCAL" />
-      <updated>1681821458373</updated>
     </task>
     <task id="LOCAL-00029" summary="Geo tracking done and also with installation of geo tracking app">
       <created>1682427335950</created>
@@ -613,7 +597,14 @@
       <option name="project" value="LOCAL" />
       <updated>1701838027650</updated>
     </task>
-    <option name="localTasksCounter" value="77" />
+    <task id="LOCAL-00077" summary="16-12-2023">
+      <created>1702701758423</created>
+      <option name="number" value="00077" />
+      <option name="presentableId" value="LOCAL-00077" />
+      <option name="project" value="LOCAL" />
+      <updated>1702701758423</updated>
+    </task>
+    <option name="localTasksCounter" value="78" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -693,7 +684,6 @@
     <ignored-roots>
       <path value="$PROJECT_DIR$" />
     </ignored-roots>
-    <MESSAGE value="Sep-22-03-2023 latestUpdate Age" />
     <MESSAGE value="Home Visit Api added on saturday" />
     <MESSAGE value="Home Visit Api added on saturday 25-09-2023" />
     <MESSAGE value="Home Visit Api added on saturday add EMI 25-09-2023" />
@@ -718,7 +708,8 @@
     <MESSAGE value="30-11-2023" />
     <MESSAGE value="04-11-2023" />
     <MESSAGE value="06-11-2023" />
-    <option name="LAST_COMMIT_MESSAGE" value="06-11-2023" />
+    <MESSAGE value="16-12-2023" />
+    <option name="LAST_COMMIT_MESSAGE" value="16-12-2023" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
