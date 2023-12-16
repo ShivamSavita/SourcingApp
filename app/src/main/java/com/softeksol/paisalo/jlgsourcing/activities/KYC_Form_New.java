@@ -347,9 +347,9 @@ TextView textViewTotalAnnualIncome;
                 acspLoanAppFinanceLoanAmount.setError("Please Enter Loan Amount Less than "+maxLoanAmtStr+" and Greater than 5 thousand");
                 Utils.showSnakbar(findViewById(android.R.id.content),"Please enter Loan Amount Less than "+maxLoanAmtStr+" and Greater than 5 thousand");
             }
-            if(((Double.parseDouble(tietIncomeMonthly.getText().toString().trim())))<(0.10*Double.parseDouble(acspLoanAppFinanceLoanAmount.getText().toString().trim()))){
-                tietIncomeMonthly.setError("Income should be greater than 10% of Loan Amount");
-                Utils.showSnakbar(findViewById(android.R.id.content),"Income should be greater than 10% of Loan Amount");
+            if(((Double.parseDouble(tietIncomeMonthly.getText().toString().trim())))<(0.20*Double.parseDouble(acspLoanAppFinanceLoanAmount.getText().toString().trim()))){
+                tietIncomeMonthly.setError("Income should be greater than 20% of Loan Amount");
+                Utils.showSnakbar(findViewById(android.R.id.content),"Income should be greater than 20% of Loan Amount");
             }
             else{
 

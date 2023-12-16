@@ -423,7 +423,7 @@ public class ActivityBorrowerEntry extends AppCompatActivity implements View.OnC
                     if (borrower != null) {
                         (new File(this.uriPicture.getPath())).delete();
                         try {
-                            File croppedImage = CameraUtils.moveCachedImage2Storage(this, tempCroppedImage, true);
+                            File croppedImage = CameraUtils.moveCachedImage2Storage(this, tempCroppedImage, true,1);
                             borrower.setPicture(croppedImage.getPath());
                             borrower.Oth_Prop_Det = null;
                             borrower.save();

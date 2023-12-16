@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -19,7 +20,9 @@ import com.journeyapps.barcodescanner.Size;
 import com.softeksol.paisalo.jlgsourcing.fragments.FragmentKycScanning;
 import com.theartofdev.edmodo.cropper.CropImage;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 import jp.wasabeef.glide.transformations.GrayscaleTransformation;
@@ -195,10 +198,77 @@ public class CameraUtils {
                 .into(new FileTarget(imageUri.getPath(), MaxDimention, MaxDimention));
     }*/
 
-    public static File moveCachedImage2Storage(Context context, File cachedImage, boolean deleteSource) throws IOException {
+    public static File moveCachedImage2Storage(Context context, File cachedImage, boolean deleteSource,int type) throws IOException {
         File croppedImage = CameraUtils.createImageFile(context);
         Utils.copyFile(cachedImage, croppedImage);
         if (deleteSource) cachedImage.delete();
+        if (croppedImage.exists()) {
+            long fileSizeInBytes = croppedImage.length();
+            long fileSizeInKB = fileSizeInBytes / 1024; // Convert bytes to KB
+
+            Log.d("FileSize", "File size: " + fileSizeInKB + " KB");
+        } else {
+            Log.e("FileSize", "File doesn't exist");
+        }
+        if (type==1){
+            croppedImage=compressToTargetSize(croppedImage.getPath(),70);
+            if (croppedImage.exists()) {
+                long fileSizeInBytes = croppedImage.length();
+                long fileSizeInKB = fileSizeInBytes / 1024; // Convert bytes to KB
+
+                Log.d("FileSize", "File size: " + fileSizeInKB + " KB");
+            } else {
+                Log.e("FileSize", "File doesn't exist");
+            }
+        }
+
         return croppedImage;
+    }
+
+
+
+    public static File compressToTargetSize(String imagePath, int targetFileSizeInKB) {
+        File compressedFile = null;
+        try {
+            // Load the original image
+            Bitmap originalBitmap = BitmapFactory.decodeFile(imagePath);
+
+            // Define the desired width and height
+            int desiredWidth = originalBitmap.getWidth(); // Set your desired width
+            int desiredHeight = originalBitmap.getHeight(); // Set your desired height
+
+            // Calculate the target file size in bytes
+            int targetFileSize = targetFileSizeInKB * 1024; // Convert KB to bytes
+
+            // Resize the original bitmap
+            Bitmap resizedBitmap = Bitmap.createScaledBitmap(originalBitmap, desiredWidth, desiredHeight, true);
+
+            // Initialize variables for compression
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            int compressionQuality = 95; // Initial quality
+
+            // Compress the image multiple times with decreasing quality until it reaches the target file size
+            resizedBitmap.compress(Bitmap.CompressFormat.JPEG, compressionQuality, byteArrayOutputStream);
+
+            while (byteArrayOutputStream.toByteArray().length > targetFileSize && compressionQuality > 0) {
+                byteArrayOutputStream.reset();
+                compressionQuality -= 5; // Adjust decrement as needed
+
+                resizedBitmap.compress(Bitmap.CompressFormat.JPEG, compressionQuality, byteArrayOutputStream);
+            }
+
+            // Create a file to save the compressed image
+            compressedFile = new File(imagePath);
+
+            // Save the compressed image to the file
+            FileOutputStream fileOutputStream = new FileOutputStream(compressedFile);
+            fileOutputStream.write(byteArrayOutputStream.toByteArray());
+            fileOutputStream.flush();
+            fileOutputStream.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return compressedFile;
     }
 }

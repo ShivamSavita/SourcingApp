@@ -390,7 +390,7 @@ public class FragmentBorrowerAadhar extends AbsFragment implements View.OnClickL
 //
 //                                    ImageString = bitmapToBase64(bitmap);
 
-                                    File croppedImage = CameraUtils.moveCachedImage2Storage(getContext(), tempCroppedImage, true);
+                                    File croppedImage = CameraUtils.moveCachedImage2Storage(getContext(), tempCroppedImage, true,1);
 //                                    if (android.os.Build.VERSION.SDK_INT >= 29) {
 //                                        bitmap = ImageDecoder.decodeBitmap(ImageDecoder.createSource(this.getActivity().getContentResolver(), imageUri));
 //                                    } else {
@@ -442,11 +442,8 @@ public class FragmentBorrowerAadhar extends AbsFragment implements View.OnClickL
     }
 
     private void showPicture(Borrower borrower) {
-
-
 //        Log.e("CHeckingNewCondition",borrower.getPictureborrower()+"");
         if (borrower != null) {
-
             Log.d("TAG", "showPicture: "+borrower.toString());
 //            if (borrower.getPictureborrower()!=null){
 //                imageView.setImageBitmap(StringToBitmap(borrower.getPictureborrower()));

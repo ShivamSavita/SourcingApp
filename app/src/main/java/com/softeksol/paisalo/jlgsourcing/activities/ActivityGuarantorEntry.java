@@ -529,7 +529,7 @@ public class ActivityGuarantorEntry extends AppCompatActivity implements View.On
 //
 //                                    ImageString = bitmapToBase64(bitmap);
 
-                                        File croppedImage = CameraUtils.moveCachedImage2Storage(this, tempCroppedImage, true);
+                                        File croppedImage = CameraUtils.moveCachedImage2Storage(this, tempCroppedImage, true,1);
                                         Log.e("croppedImageGRN",croppedImage.getAbsolutePath()+"");
                                         Log.e("croppedImageGRN1",croppedImage.getPath()+"");
                                         guarantor.setPicture(croppedImage.getPath());

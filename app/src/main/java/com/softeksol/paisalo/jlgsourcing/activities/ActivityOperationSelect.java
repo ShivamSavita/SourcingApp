@@ -344,7 +344,13 @@ public class ActivityOperationSelect extends AppCompatActivity implements Naviga
                 intentDevice.putExtra("UserID",IglPreferences.getPrefString(this, SEILIGL.USER_ID, ""));
                 startActivity(intentDevice);
                 break;
+            case R.id.qrpayment:
+                Intent intentQrPayments = new Intent(ActivityOperationSelect.this,QrPayments.class);
+                intentQrPayments.putExtra("UserID",IglPreferences.getPrefString(this, SEILIGL.USER_ID, ""));
+                startActivity(intentQrPayments);
 
+
+                break;
 
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.my_drawer_layout);

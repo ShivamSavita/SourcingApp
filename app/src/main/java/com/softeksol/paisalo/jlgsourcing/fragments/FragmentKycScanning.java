@@ -328,7 +328,7 @@ FragmentKycScanning extends AbsFragment implements AdapterView.OnItemClickListen
 
                                                                 File croppedImage = null;
                                                                 try {
-                                                                    croppedImage = CameraUtils.moveCachedImage2Storage(getContext(), tempCroppedImage, true);
+                                                                    croppedImage = CameraUtils.moveCachedImage2Storage(getContext(), tempCroppedImage, true,0);
                                                                     Log.e("CroppedImageFile2", croppedImage.getPath() + "");
 
                                                                     //bitmap = BitmapFactory.decodeFile(croppedImage.getAbsolutePath());
@@ -355,7 +355,7 @@ FragmentKycScanning extends AbsFragment implements AdapterView.OnItemClickListen
 
                                                                     File croppedImage = null;
                                                                     try {
-                                                                        croppedImage = CameraUtils.moveCachedImage2Storage(getContext(), tempCroppedImage, true);
+                                                                        croppedImage = CameraUtils.moveCachedImage2Storage(getContext(), tempCroppedImage, true,0);
                                                                         Log.e("CroppedImageFile2", croppedImage.getPath() + "");
 
                                                                         //bitmap = BitmapFactory.decodeFile(croppedImage.getAbsolutePath());
@@ -387,7 +387,7 @@ FragmentKycScanning extends AbsFragment implements AdapterView.OnItemClickListen
                                                             IglPreferences.setSharedPref(activity, SEILIGL.DOBAadhar, ocrResponseModel.getData().getDob());
                                                             File croppedImage = null;
                                                             try {
-                                                                croppedImage = CameraUtils.moveCachedImage2Storage(getContext(), tempCroppedImage, true);
+                                                                croppedImage = CameraUtils.moveCachedImage2Storage(getContext(), tempCroppedImage, true,0);
                                                                 Log.e("CroppedImageFile2", croppedImage.getPath() + "");
 
                                                                 //bitmap = BitmapFactory.decodeFile(croppedImage.getAbsolutePath());
@@ -413,7 +413,7 @@ FragmentKycScanning extends AbsFragment implements AdapterView.OnItemClickListen
 
                                                             File croppedImage = null;
                                                             try {
-                                                                croppedImage = CameraUtils.moveCachedImage2Storage(getContext(), tempCroppedImage, true);
+                                                                croppedImage = CameraUtils.moveCachedImage2Storage(getContext(), tempCroppedImage, true,0);
                                                                 Log.e("CroppedImageFile2", croppedImage.getPath() + "");
 
                                                                 //bitmap = BitmapFactory.decodeFile(croppedImage.getAbsolutePath());
@@ -477,7 +477,7 @@ FragmentKycScanning extends AbsFragment implements AdapterView.OnItemClickListen
                                 }else{
                                     File croppedImage = null;
                                     try {
-                                        croppedImage = CameraUtils.moveCachedImage2Storage(getContext(), tempCroppedImage, true);
+                                        croppedImage = CameraUtils.moveCachedImage2Storage(getContext(), tempCroppedImage, true,0);
                                         Log.e("CroppedImageFile2", croppedImage.getPath() + "");
 
                                         //bitmap = BitmapFactory.decodeFile(croppedImage.getAbsolutePath());

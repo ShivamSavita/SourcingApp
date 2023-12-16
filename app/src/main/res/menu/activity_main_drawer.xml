@@ -30,14 +30,15 @@
             android:title="@string/old_borrower_re_ekyc" />
     </group>
 
-    <item android:title="Communicate">
+    <item android:title="QR Payments">
         <menu>
             <item
-                android:icon="@drawable/share"
-                android:title="Share" />
-            <item
+                android:id="@+id/qrpayment"
+                android:icon="@drawable/submit_files"
+                android:title="Payment Details" />
+           <!-- <item
                 android:icon="@drawable/send"
-                android:title="Send" />
+                android:title="Send" />-->
 
         </menu>
     </item>

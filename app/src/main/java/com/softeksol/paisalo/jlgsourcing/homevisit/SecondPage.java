@@ -1338,7 +1338,7 @@ public class SecondPage extends AppCompatActivity {
 //
 //                                    ImageString = bitmapToBase64(bitmap);
 
-                                    File croppedImage = CameraUtils.moveCachedImage2Storage(this, tempCroppedImage, true);
+                                    File croppedImage = CameraUtils.moveCachedImage2Storage(this, tempCroppedImage, true,1);
 //                                    if (android.os.Build.VERSION.SDK_INT >= 29) {
 //                                        bitmap = ImageDecoder.decodeBitmap(ImageDecoder.createSource(this.getActivity().getContentResolver(), imageUri));
 //                                    } else {
