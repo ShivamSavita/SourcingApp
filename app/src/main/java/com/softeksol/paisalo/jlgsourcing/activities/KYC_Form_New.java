@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.gson.JsonObject;
@@ -38,10 +39,16 @@ import com.softeksol.paisalo.jlgsourcing.retrofit.ApiInterface;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.concurrent.TimeUnit;
+
 import cz.msebera.android.httpclient.Header;
+import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class KYC_Form_New extends AppCompatActivity {
 TextInputEditText tietAgricultureIncome,tietFutureIncome,tietExpenseMonthly,tietIncomeMonthly,tietOtherIncome,EditEarningMemberIncome,tietPensionIncome,tietInterestIncome;
@@ -55,6 +62,7 @@ Intent i;
 String FatherFName, FatherLName,FatherMName, MotherFName,MotherLName, MotherMName,SpouseLName,SpouseMName,SpouseFName;
 String VoterIdName="",tilPAN_Name="",tilDL_Name="",tietName="";
 TextView textViewTotalAnnualIncome;
+    String schemeNameForVH;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,7 +83,7 @@ TextView textViewTotalAnnualIncome;
         tilDL_Name=i.getStringExtra("DLName").length()<1?"":i.getStringExtra("DLName");
         tietName=i.getStringExtra("AadharName").length()<1?"":i.getStringExtra("AadharName");
 
-
+        schemeNameForVH=i.getStringExtra(Global.SCHEME_TAG);
 
 
 
@@ -347,9 +355,9 @@ TextView textViewTotalAnnualIncome;
                 acspLoanAppFinanceLoanAmount.setError("Please Enter Loan Amount Less than "+maxLoanAmtStr+" and Greater than 5 thousand");
                 Utils.showSnakbar(findViewById(android.R.id.content),"Please enter Loan Amount Less than "+maxLoanAmtStr+" and Greater than 5 thousand");
             }
-            if(((Double.parseDouble(tietIncomeMonthly.getText().toString().trim())))<(0.20*Double.parseDouble(acspLoanAppFinanceLoanAmount.getText().toString().trim()))){
-                tietIncomeMonthly.setError("Income should be greater than 20% of Loan Amount");
-                Utils.showSnakbar(findViewById(android.R.id.content),"Income should be greater than 20% of Loan Amount");
+            if(((Double.parseDouble(tietIncomeMonthly.getText().toString().trim())))<(0.15*Double.parseDouble(acspLoanAppFinanceLoanAmount.getText().toString().trim()))){
+                tietIncomeMonthly.setError("Income should be greater than 15% of Loan Amount");
+                Utils.showSnakbar(findViewById(android.R.id.content),"Income should be greater than 15% of Loan Amount");
             }
             else{
 
@@ -439,7 +447,9 @@ TextView textViewTotalAnnualIncome;
                                     };
                                     Log.d("TAG", "onSuccess: "+WebOperations.convertToJson(borrower));
                                     (new WebOperations()).postEntity(KYC_Form_New.this, "posfi", "updatefi", WebOperations.convertToJson(borrower), dataAsyncResponseHandlerUpdateFI);
-
+                                    if (schemeNameForVH.length()>1){
+                                        saveFIWithSchemeName(manager.Creator,FiCode);
+                                    }
 
                                     AlertDialog.Builder builder = new AlertDialog.Builder(KYC_Form_New.this);
                                     builder.setTitle("Borrower KYC");
@@ -561,5 +571,47 @@ TextView textViewTotalAnnualIncome;
         jsonObject.addProperty("fiCode",fiCode+"");
         jsonObject.addProperty("creator",creator);
         return jsonObject;
+    }
+
+    private void saveFIWithSchemeName(String creator, long fiCode) {
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+        httpClient.connectTimeout(1, TimeUnit.MINUTES);
+        httpClient.readTimeout(1,TimeUnit.MINUTES);
+        httpClient.addInterceptor(logging);
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://erpservice.paisalo.in:980/PDL.Mobile.API/api/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(httpClient.build())
+                .build();
+
+        JsonObject jsonObject=new JsonObject();
+        jsonObject.addProperty("FiCode",String.valueOf(fiCode));
+        jsonObject.addProperty("Creator",creator);
+        jsonObject.addProperty("SchemeCode",schemeNameForVH);
+        ApiInterface apiInterface=retrofit.create(ApiInterface.class);
+        Call<JsonObject> call=apiInterface.saveSchemeForVH(jsonObject);
+        call.enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                if (response.isSuccessful()){
+                    if (response.body().get("statusCode").getAsInt()==200){
+                        Toast.makeText(KYC_Form_New.this, response.body().get("message").getAsString(), Toast.LENGTH_SHORT).show();
+                    }else{
+                        Toast.makeText(KYC_Form_New.this, "Something went wrong!!\nScheme VH", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                Toast.makeText(KYC_Form_New.this, "Failure!!\nScheme VH", Toast.LENGTH_SHORT).show();
+
+            }
+        });
+
+
+
     }
 }

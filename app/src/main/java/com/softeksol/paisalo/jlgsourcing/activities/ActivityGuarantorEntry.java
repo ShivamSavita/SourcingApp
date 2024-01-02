@@ -20,11 +20,13 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatSpinner;
+import androidx.cardview.widget.CardView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.Target;
@@ -123,6 +125,9 @@ public class ActivityGuarantorEntry extends AppCompatActivity implements View.On
     protected static final int VTC_INDEX = 15;
     protected int emailMobilePresent, imageStartIndex, imageEndIndex;
     ImageView imgViewCal;
+    CardView cardView_MotherFirstName,cardView_FatherFirstName;
+    LinearLayout linearLayout4,linearLayout5;
+    Button voterIdCheckSign,panCheckSign;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -145,6 +150,19 @@ public class ActivityGuarantorEntry extends AppCompatActivity implements View.On
         btnAdd.setVisibility(guarantor == null ? View.VISIBLE : View.GONE);
         /*btnUpdate.setVisibility(guarantor!=null?View.VISIBLE:View.GONE);
         btnDelete.setVisibility(guarantor!=null?View.VISIBLE:View.GONE);*/
+
+
+        panCheckSign = findViewById(R.id.panCheckSign);
+        linearLayout5 = findViewById(R.id.linearLayout5);
+        linearLayout4 = findViewById(R.id.linearLayout4);
+        cardView_MotherFirstName = findViewById(R.id.cardView_MotherFirstName);
+        cardView_FatherFirstName = findViewById(R.id.cardView_FatherFirstName);
+        voterIdCheckSign = findViewById(R.id.voterIdCheckSign);
+        panCheckSign.setVisibility(View.GONE);
+        voterIdCheckSign.setVisibility(View.GONE);
+        cardView_FatherFirstName.setVisibility(View.GONE);
+        cardView_MotherFirstName.setVisibility(View.GONE);
+
 
         ArrayList<RangeCategory> genders = new ArrayList<>();
         genders.add(new RangeCategory("Female", "Gender"));

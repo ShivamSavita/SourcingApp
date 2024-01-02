@@ -196,6 +196,7 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
     String ResponseforVerification="";
     boolean panaadharDOBMatched=false;
     boolean isgetPanwithOCR=false;
+    String schemeNameForVH;
 
     @Override
     public boolean onSupportNavigateUp() {
@@ -233,6 +234,7 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                 SQLite.select().from(RangeCategory.class).where(RangeCategory_Table.cat_key.eq("marrital_status")).queryList(), false);
         spinnerMarritalStatus = (Spinner) findViewById(R.id.spinLoanAppPersonalMarritalStatus);
         spinnerMarritalStatus.setAdapter(rlaMarritalStatus);
+        schemeNameForVH=getIntent().getStringExtra(Global.SCHEME_TAG);
 
         //  Log.d("TAG", "onCreate233: "+DocumentStore.getFiData(222333));
         ActionBar actionBar = getSupportActionBar();
@@ -289,7 +291,7 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
         linearLayout433.setVisibility(View.GONE);
         panCheckSign = findViewById(R.id.panCheckSign);
         dLCheckSign = findViewById(R.id.dLCheckSign);
-
+        
         voterIdCheckSign = findViewById(R.id.voterIdCheckSign);
         acspGender = findViewById(R.id.acspGender);
         tilPAN_Name = findViewById(R.id.tilPAN_Name);
@@ -321,7 +323,8 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
         acspAadharState.setAdapter(new AdapterListRange(this, RangeCategory.getRangesByCatKey("state", "DescriptionEn", true), false));
 
         tietName = findViewById(R.id.tietName);
-        tietName.addTextChangedListener(new MyTextWatcher(tietName) {
+        tietName.setEnabled(false);
+        tietName.addTextChangedListener(new MyTextWatcher(tietName){
             @Override
             public void validate(EditText editText, String text) {
                 validateControls(editText, text);
@@ -1890,6 +1893,7 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                     intent.putExtra("AadharName", tietName.getText().toString());
                     intent.putExtra("manager", manager);
                     intent.putExtra("borrower", borrower);
+                    intent.putExtra(Global.SCHEME_TAG, schemeNameForVH);
                     startActivity(intent);
 
                 }else{
@@ -1914,6 +1918,7 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                 intent.putExtra("AadharName", tietName.getText().toString());
                 intent.putExtra("manager", manager);
                 intent.putExtra("borrower", borrower);
+                intent.putExtra(Global.SCHEME_TAG, schemeNameForVH);
                 startActivity(intent);
 
             }else{

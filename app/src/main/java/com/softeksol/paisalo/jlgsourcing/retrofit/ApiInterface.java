@@ -9,6 +9,7 @@ import com.softeksol.paisalo.jlgsourcing.entities.HomeVisitListModel;
 import com.softeksol.paisalo.jlgsourcing.entities.ProcessingEmiData;
 import com.softeksol.paisalo.jlgsourcing.entities.dto.OCRResponseModel;
 import com.softeksol.paisalo.jlgsourcing.homevisit.FIDataModel;
+import com.softeksol.paisalo.jlgsourcing.models.AccountDetails_Model;
 
 import java.util.Calendar;
 import java.util.List;
@@ -128,6 +129,21 @@ public interface ApiInterface {
 
     @POST("PDL.Mobile.API/api/Crif/GetBREDetails")
     Call<BREResponse> getBREStatus(@Query("creator") String creator, @Query("ficode") String ficode);
+
+
+    @GET("PDL.FIService.API/api/InstCollection/GetQrPaymentsBySmcode")
+    Call<AccountDetails_Model> getQrPaymentsBySmcode(
+            @Query("SmCode") String smCode,
+            @Query("userid") String userId,
+            @Query("type") String type,
+            @Header("Authorization") String authorizationHeader
+    );
+
+
+    @POST("LiveTrack/FiForUdhan")
+    Call<JsonObject> saveSchemeForVH(@Body JsonObject jsonObject);
+
+
 
 /*
     @Field("ficode") String fiCode, @Field("full_name") String fullName, @Field("dob") String dob,

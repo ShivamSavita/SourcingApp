@@ -21,6 +21,7 @@ public class Global {
     public static final int MAX_PASSBOOK_IMAGE_SIDE = 1500;
 
     public static final String OPTION_ITEM = "OPTIONITEM";
+    public static final String SCHEME_TAG = "VHSCHEME";
 
     public static String Password;
 

@@ -40,5 +40,9 @@
         <item>@string/brother</item>
         <item>@string/sister</item>
     </string-array>
+    <string-array name="shemeArray">
+        <item>"UDAAN"</item>
+
+    </string-array>
 
     </resources>

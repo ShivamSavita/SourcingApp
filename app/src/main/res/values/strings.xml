@@ -176,6 +176,8 @@ Contact Email <i>DELHI@PAISALO.IN</i>
 
     <string name="imageTitle">आवेदक के साथ घर की तस्वीर खींचें</string>
 
+    <string name="choose_scheme_prompt">Choose a Scheme</string>
+    <string name="apply">Apply Scheme</string>
 
     <array name="emiReasons">
         <item>"Medical Issue"</item>

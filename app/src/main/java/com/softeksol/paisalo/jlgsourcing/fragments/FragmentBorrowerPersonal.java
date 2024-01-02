@@ -365,7 +365,7 @@ public class FragmentBorrowerPersonal extends AbsFragment implements AdapterView
     }
 
     private void getDataFromView(View v) {
-            borrower.Income = Integer.parseInt(Utils.getSpinnerStringValue((Spinner) v.findViewById(R.id.spinLoanAppPersonalIncomeMonthly)));
+           // borrower.Income = Integer.parseInt(Utils.getSpinnerStringValue((Spinner) v.findViewById(R.id.spinLoanAppPersonalIncomeMonthly)));
             borrower.Cast = Utils.getSpinnerStringValue((Spinner) v.findViewById(R.id.spinLoanAppPersonalCaste));
             borrower.Religion = Utils.getSpinnerStringValue((Spinner) v.findViewById(R.id.spinLoanAppPersonalReligion));
             borrower.House_Owner = Utils.getSpinnerStringValue((Spinner) v.findViewById(R.id.spinLoanAppPersonalPresentResidenceOwner));
@@ -377,7 +377,7 @@ public class FragmentBorrowerPersonal extends AbsFragment implements AdapterView
         }
         borrower.FAmily_member = Utils.getSpinnerIntegerValue((Spinner) v.findViewById(R.id.spinLoanAppPersonalFamilyMembers));
 
-        borrowerExtra.FutureIncome = Utils.getSpinnerIntegerValue((Spinner) v.findViewById(R.id.spinLoanAppExtraIncomeFuture));
+       // borrowerExtra.FutureIncome = Utils.getSpinnerIntegerValue((Spinner) v.findViewById(R.id.spinLoanAppExtraIncomeFuture));
         borrowerExtra.OtherDependents = Utils.getSpinnerIntegerValue((Spinner) v.findViewById(R.id.spinLoanAppExtraDependentAdults));
         borrowerExtra.NoOfChildren = Utils.getSpinnerIntegerValue((Spinner) v.findViewById(R.id.spinLoanAppExtraChildren));
 
@@ -393,7 +393,7 @@ public class FragmentBorrowerPersonal extends AbsFragment implements AdapterView
         borrowerExtra.SpendOnChildren = Utils.getSpinnerIntegerValue((Spinner) v.findViewById(R.id.spinLoanAppExtraChildrenSpending));
 
         borrowerExtra.FamIncomeSource = Utils.getSpinnerStringValue((Spinner) v.findViewById(R.id.spinLoanAppExtraEarningMember));
-        borrowerExtra.FamMonthlyIncome = Utils.getSpinnerIntegerValue((Spinner) v.findViewById(R.id.spinLoanAppExtraIncome));
+       // borrowerExtra.FamMonthlyIncome = Utils.getSpinnerIntegerValue((Spinner) v.findViewById(R.id.spinLoanAppExtraIncome));
         borrowerExtra.FamOccupation = Utils.getSpinnerStringValue((Spinner) v.findViewById(R.id.spinLoanAppExtraOccupationType));
 
         borrowerExtra.FamJobCompType = Utils.getSpinnerStringValue((Spinner) v.findViewById(R.id.spinLoanAppExtraEmployerType));

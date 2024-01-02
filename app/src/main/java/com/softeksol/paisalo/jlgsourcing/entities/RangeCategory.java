@@ -97,6 +97,7 @@ public class RangeCategory extends BaseModel {
             }
         };
         (new WebOperations()).getEntity(context, "POSDB", "GetRangeCategories", (String) null, dataAsyncHttpResponseHandler);
+
     }
 
     @Override
