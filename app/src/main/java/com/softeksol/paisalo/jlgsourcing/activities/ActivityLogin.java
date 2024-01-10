@@ -142,7 +142,7 @@ public class ActivityLogin extends AppCompatActivity implements View.OnClickList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        getSupportActionBar().setTitle(getString(R.string.appname) + " (" + BuildConfig.VERSION_NAME + ")");
+        getSupportActionBar().setTitle("Paisalo Digital (" + BuildConfig.VERSION_NAME + ")");
 
         listCReatorInteraction=ActivityLogin.this;
 //        boolean isAppInstalled = appInstalledOrNot(this,"com.plcoding.backgroundlocationtracking");

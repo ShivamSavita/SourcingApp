@@ -106,6 +106,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -197,6 +198,7 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
     boolean panaadharDOBMatched=false;
     boolean isgetPanwithOCR=false;
     String schemeNameForVH;
+    String AddressREGX="^[0-9A-Za-z\\s]+$";
 
     @Override
     public boolean onSupportNavigateUp() {
@@ -863,7 +865,7 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
         borrower.setNames(Utils.getNotNullText(tietName));
         borrower.Age = Utils.getNotNullInt(tietAge);
         borrower.DOB = myCalendar.getTime();
-        borrower.setGuardianNames(Utils.getNotNullText(tietGuardian));
+        borrower.setGuardianNames(Utils.getNotNullText(tietGuardian).replace("S/O:","").replace("D/O:","").replace("W/O:",""));
         borrower.P_Add1 = Utils.getNotNullText(tietAddress1);
         borrower.P_add2 = Utils.getNotNullText(tietAddress2);
         borrower.P_add3 = Utils.getNotNullText(tietAddress3);
@@ -1202,7 +1204,7 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                                     String[] address1 = response.body().get("data").getAsJsonArray().get(0).getAsJsonObject().get("address1").getAsString().split(",");
                                     for (int i = 0; i < address1.length; i++) {
                                         if (address1[i].toUpperCase().contains("S/O") || address1[i].toUpperCase().contains("D/O") || address1[i].toUpperCase().contains("W/O")){
-                                            borrower.setGuardianNames(address1[i]);
+                                            borrower.setGuardianNames(address1[i].replace("S/O:","").replace("D/O:","").replace("W/O:",""));
                                             continue;
                                         }
                                         borrower.P_Add1 = borrower.P_Add1 + address1[i];
@@ -1229,6 +1231,26 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                                                     break;
                                             }
 
+                                        }if (address1[i].startsWith("S/O:") || address1[i].startsWith("D/O:")){
+                                            String[] fatherName=address1[i].split(" ");
+                                            switch (fatherName.length){
+                                                case 2:
+                                                    tietFatherFName.setText(fatherName[1]);
+                                                    break;
+                                                case 3:
+                                                    tietFatherFName.setText(fatherName[1]);
+                                                    tietFatherLName.setText(fatherName[2]);
+
+                                                    break;
+                                                case 4:
+                                                    tietFatherFName.setText(fatherName[1]);
+                                                    tietFatherMName.setText(fatherName[2]);
+                                                    tietFatherLName.setText(fatherName[3]);
+                                                    break;
+                                                default:
+                                                    tietFatherFName.setText(response.body().get("data").getAsJsonArray().get(0).getAsJsonObject().get("address1").getAsString().split(",")[0].toUpperCase().replace("S/O","").replace("D/O","").replace("W/O",""));
+                                                    break;
+                                            }
                                         }
 
 
@@ -1265,10 +1287,8 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                                 }
                             }else{
                                 Utils.alert(ActivityBorrowerKyc.this,"Please capture PAN image again!!");
-
                                 Toast.makeText(ActivityBorrowerKyc.this, "Please capture PAN image again!!", Toast.LENGTH_SHORT).show();
                             }
-
                             progressBar.dismiss();
                         }
 
@@ -1346,7 +1366,7 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
             borrower.DOB = aadharData.DOB;
             borrower.Age = aadharData.Age;
             borrower.Gender = aadharData.Gender;
-            borrower.setGuardianNames(aadharData.GurName==null?"":aadharData.GurName);
+            borrower.setGuardianNames(aadharData.GurName==null?"":aadharData.GurName.replace("S/O:","").replace("D/O:","").replace("W/O:",""));
             borrower.P_city = aadharData.City;
             borrower.p_pin = aadharData.Pin;
             borrower.P_Add1 = aadharData.Address1;
@@ -1568,21 +1588,21 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
         Log.e("Parts======2======> ","part data =====> "+decodedData.toString());
         //emailMobilePresent = Integer.parseInt(decodedData[0]);
 
-        Log.e("Parts======3======> ","part data =====> "+decodedData.get(1));
-        Log.e("Parts======3======> ","part data =====> "+decodedData.get(2));
-        Log.e("Parts======3======> ","part data =====> "+decodedData.get(3));
-        Log.e("Parts======3======> ","part data =====> "+decodedData.get(4));
-        Log.e("Parts======3======> ","part data =====> "+decodedData.get(5));
-        Log.e("Parts======3======> ","part data =====> "+decodedData.get(6));
-        Log.e("Parts======3======> ","part data =====> "+decodedData.get(7));
-        Log.e("Parts======3======> ","part data =====> "+decodedData.get(8));
-        Log.e("Parts======3======> ","part data =====> "+decodedData.get(14));
-        Log.e("Parts======3======> ","part data =====> "+decodedData.get(10));
-        Log.e("Parts======3======> ","part data =====> "+decodedData.get(11));
-        Log.e("Parts======3======> ","part data =====> "+decodedData.get(12));
-        Log.e("Parts======3======> ","part data =====> "+decodedData.get(13));
-        Log.e("Parts======3======> ","part data =====> "+decodedData.get(14));
-        Log.e("Parts======3======> ","part data =====> "+decodedData.get(15));
+        Log.d("part data =====> ","Parts======2======> "+decodedData.get(1));
+        Log.d("part data =====> ","Parts======3======> "+decodedData.get(2));
+        Log.d("part data =====> ","Parts======4======> "+decodedData.get(3));
+        Log.d("part data =====> ","Parts======5======> "+decodedData.get(4));
+        Log.d("part data =====> ","Parts======6======> "+decodedData.get(5));
+        Log.d("part data =====> ","Parts======7======> "+decodedData.get(6));
+        Log.d("part data =====> ","Parts======8======> "+decodedData.get(7));
+        Log.d("part data =====> ","Parts======9======> "+decodedData.get(8));
+        Log.d("part data =====> ","Parts======10=====> "+decodedData.get(9));
+        Log.d("part data =====> ","Parts======11=====> "+decodedData.get(10));
+        Log.d("part data =====> ","Parts======12=====> "+decodedData.get(11));
+        Log.d("part data =====> ","Parts======13=====> "+decodedData.get(12));
+        Log.d("part data =====> ","Parts======14=====> "+decodedData.get(13));
+        Log.d("part data =====> ","Parts======15=====> "+decodedData.get(14));
+        Log.d("part data =====> ","Parts======16=====> "+decodedData.get(15));
 
         int inc=0;
         Log.d("TAG", "decodeData: "+decodedData.get(0).startsWith("V")+"/////"+decodedData.get(0));
@@ -1641,7 +1661,7 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
 
         }else{
             if (decodedData.get(6-inc).startsWith("S/O:") ||decodedData.get(6-inc).startsWith("D/O:") ||decodedData.get(6-inc).startsWith("W/O:")){
-                borrower.setGuardianNames(decodedData.get(6-inc).split(":")[1].trim());
+                borrower.setGuardianNames(decodedData.get(6-inc).split(":")[1].replace("S/O:","").replace("D/O:","").replace("W/O:","").trim());
                 if (decodedData.get(6-inc).toUpperCase().startsWith("W/O:")){
                     Utils.setSpinnerPosition(spinnerMarritalStatus, "Married", false);
                     String[] spouseName=decodedData.get(6-inc).split(" ");
@@ -1667,15 +1687,78 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
             }else if (decodedData.get(6-inc).startsWith("S/O,") ||decodedData.get(6-inc).startsWith("D/O,") ||decodedData.get(6-inc).startsWith("W/O,")){
                 borrower.setGuardianNames(decodedData.get(6-inc).split(",")[1].trim());
             }else{
-                borrower.setGuardianNames(decodedData.get(6-inc));
+                borrower.setGuardianNames(decodedData.get(6-inc).replace("S/O:","").replace("D/O:","").replace("W/O:",""));
+
+            }
+            if (decodedData.get(6-inc).startsWith("S/O:") ||decodedData.get(6-inc).startsWith("D/O:") ||decodedData.get(6-inc).startsWith("W/O:")){
+                borrower.setGuardianNames(decodedData.get(6-inc).split(":")[1].replace("S/O:","").replace("D/O:","").replace("W/O:","").trim());
+                if (decodedData.get(6-inc).toUpperCase().startsWith("W/O:")){
+                    Utils.setSpinnerPosition(spinnerMarritalStatus, "Married", false);
+                    String[] spouseName=decodedData.get(6-inc).split(" ");
+                    switch (spouseName.length){
+                        case 2:
+                            tietSpouseFName.setText(spouseName[1]);
+                            break;
+                        case 3:
+                            tietSpouseFName.setText(spouseName[1]);
+                            tietSpouseLName.setText(spouseName[2]);
+                            break;
+                        case 4:
+                            tietSpouseFName.setText(spouseName[1]);
+                            tietSpouseMName.setText(spouseName[2]);
+                            tietSpouseLName.setText(spouseName[3]);
+                            break;
+                        default:
+                            tietSpouseFName.setText(decodedData.get(6-inc));
+                            break;
+                    }
+
+                }
+            }else if (decodedData.get(6-inc).startsWith("S/O,") ||decodedData.get(6-inc).startsWith("D/O,") ||decodedData.get(6-inc).startsWith("W/O,")){
+                borrower.setGuardianNames(decodedData.get(6-inc).split(",")[1].trim());
+            }else{
+                borrower.setGuardianNames(decodedData.get(6-inc).replace("S/O:","").replace("D/O:","").replace("W/O:",""));
 
             }
             if (decodedData.get(6-inc).startsWith("S/O:") ||decodedData.get(6-inc).startsWith("D/O:")){
                 Utils.setSpinnerPosition(acspRelationship, "Father", false);
                 acspRelationship.setEnabled(false);
+                String[] fatherNames =decodedData.get(6-inc).split(":");
+                String[] newFatherName=fatherNames[1].split(" ");
+                if (newFatherName.length>2){
+                    String fatherFirstName="";
+                    for (int a=1;a<newFatherName.length-1;a++){
+                        fatherFirstName= fatherFirstName+" "+newFatherName[a];
+                    }
+                    tietFatherFName.setText(fatherFirstName);
+                    tietFatherFName.setEnabled(false);
+                    tietFatherLName.setText(newFatherName[newFatherName.length-1]);
+                    tietFatherLName.setEnabled(false);
+
+                }else{
+                    tietFatherFName.setText(decodedData.get(6-inc).split(":")[1]);
+                    tietFatherFName.setEnabled(false);
+                }
             }else if (decodedData.get(6-inc).startsWith("W/O:")){
                 Utils.setSpinnerPosition(acspRelationship, "Husband", false);
                 acspRelationship.setEnabled(false);
+                String[] spouseNames =decodedData.get(6-inc).split(":");
+                String[] newSpouseName=spouseNames[1].split(" ");
+                if (newSpouseName.length>2){
+                    String spouseFirstName="";
+                    for (int a=1;a<newSpouseName.length-1;a++){
+                        spouseFirstName= spouseFirstName+" "+newSpouseName[a];
+                    }
+                    tietSpouseFName.setText(spouseFirstName);
+                    tietSpouseFName.setEnabled(false);
+                    tietSpouseLName.setText(newSpouseName[newSpouseName.length-1]);
+                    tietSpouseLName.setEnabled(false);
+
+                }else{
+                    tietSpouseFName.setText(decodedData.get(6-inc).split(":")[1]);
+                    tietSpouseFName.setEnabled(false);
+                }
+
             }
         }
 
@@ -1691,24 +1774,90 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
         }
 
 
-        if (decodedData.get(10-inc).equals("")||decodedData.get(10-inc).equals(null)){
-            //  tietAddress3.setEnabled(true);
-        }else{
-            borrower.P_add3 = decodedData.get(10-inc);
-        }
+   /* if (decodedData.get(10-inc).equals("")||decodedData.get(10-inc).equals(null)){
+        //  tietAddress3.setEnabled(true);
+    }else{
+        borrower.P_add3 = decodedData.get(10-inc);
+    }
 
-        try{
-            if (decodedData.get(9-inc).equals("")||decodedData.get(9-inc).equals(null)){
-                tietAddress2.setEnabled(true);
-            }else{
-
-                borrower.P_Add1 = decodedData.get(9-inc);
-                borrower.P_add2 = decodedData.get(14-inc);
-            }
-        }catch (Exception e){
+    try{
+        if (decodedData.get(9-inc).equals("")||decodedData.get(9-inc).equals(null)){
             tietAddress2.setEnabled(true);
+        }else{
+            borrower.P_Add1 = decodedData.get(9-inc);
+            borrower.P_add2 = decodedData.get(14-inc);
         }
+    }catch (Exception e){
+        tietAddress2.setEnabled(true);
 
+        9,10,11,13,15,16
+    }*/
+
+        Log.e("part data =====> ","Add2 "+decodedData.get(8-inc));
+        Log.e("part data =====> ","Add3 "+decodedData.get(9-inc));
+        Log.e("part data =====> ","Add3 "+decodedData.get(10-inc));
+        Log.e("part data =====> ","Add3 "+decodedData.get(12-inc));
+        Log.e("part data =====> ","Add5 "+decodedData.get(14-inc));
+        Log.e("part data =====> ","Add5 "+decodedData.get(15-inc));
+
+
+
+        StringBuilder joinedStringBuilder = new StringBuilder();
+        appendIfNotNullOrEmpty(joinedStringBuilder, decodedData.get(8-inc));
+        appendIfNotNullOrEmpty(joinedStringBuilder, decodedData.get(9-inc));
+        appendIfNotNullOrEmpty(joinedStringBuilder, decodedData.get(10-inc));
+        appendIfNotNullOrEmpty(joinedStringBuilder, decodedData.get(12-inc));
+        appendIfNotNullOrEmpty(joinedStringBuilder, decodedData.get(14-inc));
+        appendIfNotNullOrEmpty(joinedStringBuilder, decodedData.get(15-inc));
+
+        String joinedString = joinedStringBuilder.toString();
+        Log.e("part data =====> ","joinedString "+joinedString);
+
+        // Loop to remove dots before commas and consecutive commas until condition is true
+        boolean changesMade;
+        do {
+            String previousString = joinedString;
+
+            // Remove dots before commas and consecutive commas
+            joinedString = joinedString.replaceAll(",+", ",");
+
+            // Check if any changes were made in this iteration
+            changesMade = !previousString.equals(joinedString);
+        } while (changesMade);
+
+        Log.d("aAadhaar", "joined   " + joinedString);
+
+
+        if(!joinedString.contains(",")){
+            borrower.P_Add1= joinedString;
+        }else {
+            // Separate the string by commas
+            String[] separatedStrings = joinedString.split(",");
+            Log.d("aAadhaar", "separated   " + Arrays.toString(separatedStrings));
+
+            // Divide the strings into A, B, and C
+            int totalStrings = separatedStrings.length;
+
+            if(totalStrings < 3) {
+                borrower.P_Add1 = concatenateStrings(separatedStrings, 0, 1);
+                borrower.P_add2 = concatenateStrings(separatedStrings, 1, 2);
+                Log.e("part data =====> ", "P_Add1: " + borrower.P_Add1);
+                Log.e("part data =====> ", "P_add2: " + borrower.P_add2);
+                Log.e("part data =====> ", "P_add3: " + borrower.P_add3);
+            } else {
+                int stringsInA = totalStrings / 3;
+                int stringsInB = (totalStrings - stringsInA) / 2;
+                int stringsInC = totalStrings - stringsInA - stringsInB;
+
+                borrower.P_Add1 = concatenateStrings(separatedStrings, 0, stringsInA);
+                borrower.P_add2 = concatenateStrings(separatedStrings, stringsInA, stringsInA + stringsInB);
+                borrower.P_add3 = concatenateStrings(separatedStrings, stringsInA + stringsInB, totalStrings);
+
+                Log.e("part data =====> ", "P_Add1: " + borrower.P_Add1);
+                Log.e("part data =====> ", "P_add2: " + borrower.P_add2);
+                Log.e("part data =====> ", "P_add3: " + borrower.P_add3);
+            }
+        }
 
         //borrower.P_city = decodedData.get(7);
 
@@ -1724,6 +1873,26 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
         acspGender.setEnabled(false);
 
 
+    }
+
+    private String concatenateStrings(String[] strings, int startIndex, int endIndex) {
+        StringBuilder result = new StringBuilder();
+        for (int i = startIndex; i < endIndex; i++) {
+            if (i > startIndex) {
+                result.append(",");
+            }
+            result.append(strings[i]);
+        }
+        return result.toString();
+    }
+
+    private void appendIfNotNullOrEmpty(StringBuilder stringBuilder, String str) {
+        if (str != null && !str.isEmpty()) {
+            if (stringBuilder.length() > 0) {
+                stringBuilder.append(",");
+            }
+            stringBuilder.append(str);
+        }
     }
 
     protected void decodeMobileEmail(byte[] decompressedData){
@@ -1895,7 +2064,6 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                     intent.putExtra("borrower", borrower);
                     intent.putExtra(Global.SCHEME_TAG, schemeNameForVH);
                     startActivity(intent);
-
                 }else{
                     Utils.alert(ActivityBorrowerKyc.this,"Verify any one ID from PAN|DL|Voter ID");
                 }
@@ -2082,11 +2250,17 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                 break;
             case R.id.tietAddress1:
                 String character=editText.getText().toString().trim();
-                if (editText.getText().toString().trim().length() < 1) {
+                if (editText.getText().toString().trim().length() < 4) {
                     editText.setError("Should be more than 2 Characters");
                     Utils.alert(this,"Address 1 should be more than 2 Characters");
                     retVal = false;
                 }else{
+                    /*if (!Pattern.matches(AddressREGX, character)) {
+                        editText.setError("Special Char. not allowed.");
+                        retVal = false;
+                    } else {
+
+                    }*/
                     try {
                         int intValue = Integer.parseInt(character);
                         tietAddress1.setEnabled(true);
@@ -2099,6 +2273,21 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                     }
 
                 }
+                break;
+            case R.id.tietAddress2:
+                String character1=editText.getText().toString().trim();
+                if (editText.getText().toString().trim().length() < 1) {
+                    editText.setError("Should be more than 2 Characters");
+                    Utils.alert(this,"Address 1 should be more than 2 Characters");
+                    retVal = false;
+                }/*else{
+                    if (!Pattern.matches(AddressREGX, character1)) {
+                        editText.setError("Special Char. not allowed.");
+                        retVal = false;
+                    } else {
+                        retVal = true;
+                    }
+                }*/
                 break;
             case R.id.tietCity:
                 if (editText.getText().toString().trim().length() < 1) {

@@ -43,6 +43,7 @@ import com.softeksol.paisalo.jlgsourcing.Utilities.IglPreferences;
 import com.softeksol.paisalo.jlgsourcing.Utilities.Utils;
 import com.softeksol.paisalo.jlgsourcing.WebOperations;
 import com.softeksol.paisalo.jlgsourcing.adapters.AdapterListManager;
+import com.softeksol.paisalo.jlgsourcing.adapters.SchemeAdapter;
 import com.softeksol.paisalo.jlgsourcing.entities.BankAccountData;
 import com.softeksol.paisalo.jlgsourcing.entities.Manager;
 import com.softeksol.paisalo.jlgsourcing.entities.RangeCategory;
@@ -70,6 +71,13 @@ public class ActivityManagerSelect extends AppCompatActivity implements View.OnC
     Intent intent;
     EditText edt_tvSearchGroup;
     //Manager manager;
+
+    String[] schemName={"UMEED","PRAGATI","VIKAS","UDAAN"};
+    String[] schemtags={"(1st time borrower)","(2st time borrower)"," (3st time borrower)",""};
+    String[] schemVH={"UDAAN"};
+    String[] schemVHTag={""};
+    String selectedSchemeName="";
+
 
     @Override
     public boolean onSupportNavigateUp() {
@@ -166,7 +174,7 @@ public class ActivityManagerSelect extends AppCompatActivity implements View.OnC
         }
     }
 
-    private void schemeDialogVH(Manager manager) {        // Inflate the custom dialog layout
+    private void schemeDialogVH(Manager manager,int type) {        // Inflate the custom dialog layout
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View customDialogView = inflater.inflate(R.layout.choose_scheme_dialog, null);
 
@@ -174,15 +182,42 @@ public class ActivityManagerSelect extends AppCompatActivity implements View.OnC
         Spinner spinnerScheme = customDialogView.findViewById(R.id.spinnerScheme);
         Button btnApply = customDialogView.findViewById(R.id.btnApply);
 
-        // Populate the spinner with data (replace with your data)
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
-                this,
-                R.array.shemeArray,  // Replace with your array resource
-                android.R.layout.simple_spinner_item
-        );
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerScheme.setAdapter(adapter);
+        if(type==1){
+            SchemeAdapter customAdapter=new SchemeAdapter(getApplicationContext(),schemVH,schemVHTag);
+            spinnerScheme.setAdapter(customAdapter);
+            /*ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
+                    this,
+                    R.array.shemeArray,  // Replace with your array resource
+                    android.R.layout.simple_spinner_item);
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            spinnerScheme.setAdapter(adapter);*/
+        }else{
+            SchemeAdapter customAdapter=new SchemeAdapter(getApplicationContext(),schemName,schemtags);
+            spinnerScheme.setAdapter(customAdapter);
+            /*ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
+                    this,
+                    R.array.shemeArrayABF,  // Replace with your array resource
+                    android.R.layout.simple_spinner_item);
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            spinnerScheme.setAdapter(adapter);*/
+        }
 
+        spinnerScheme.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if(type==1){
+                    selectedSchemeName= schemVH[position];
+                    Toast.makeText(getApplicationContext(), schemVH[position], Toast.LENGTH_LONG).show();
+                }else{
+                    selectedSchemeName= schemName[position];
+                    Toast.makeText(getApplicationContext(), schemName[position], Toast.LENGTH_LONG).show();
+                }
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
         // Create the AlertDialog
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setView(customDialogView);
@@ -191,7 +226,7 @@ public class ActivityManagerSelect extends AppCompatActivity implements View.OnC
             public void onClick(View view) {
                 intent = new Intent(ActivityManagerSelect.this, ActivityBorrowerKyc.class);
                 intent.putExtra(Global.MANAGER_TAG, manager);
-                intent.putExtra(Global.SCHEME_TAG, spinnerScheme.getSelectedItem().toString());
+                intent.putExtra(Global.SCHEME_TAG, selectedSchemeName);
                 startActivity(intent);
             }
         });
@@ -208,12 +243,10 @@ public class ActivityManagerSelect extends AppCompatActivity implements View.OnC
         switch (operationItem.getId()) {
             case 1:
                 if (manager.Creator.startsWith("VH")){
-                    schemeDialogVH(manager);
+                    schemeDialogVH(manager,1);
                 }else{
-                    intent = new Intent(ActivityManagerSelect.this, ActivityBorrowerKyc.class);
-                    intent.putExtra(Global.MANAGER_TAG, manager);
-                    intent.putExtra(Global.SCHEME_TAG, "");
-                    startActivity(intent);
+                    schemeDialogVH(manager,2);
+
 
                 }
                 break;

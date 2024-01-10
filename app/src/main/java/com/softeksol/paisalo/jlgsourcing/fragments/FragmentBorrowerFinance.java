@@ -100,6 +100,7 @@ public class FragmentBorrowerFinance extends AbsFragment implements View.OnClick
     TextView tvBankName,tvBankBranch;
     public String[] restrictBanks={"PAYTM","AIRTEL","ADITYA","FINO","JIO","ISG"};
     String isAccountVerify="N";
+    private static final String IFSC_REGEX = "^[A-Z]{4}0[A-Z0-9]{6}$";
     public FragmentBorrowerFinance() {
         // Required empty public constructor
     }
@@ -289,10 +290,10 @@ public class FragmentBorrowerFinance extends AbsFragment implements View.OnClick
         call.enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                ResponseforVerification= String.valueOf(response.body().get("data"));
-                saveVerficationLogs(IglPreferences.getPrefString(getContext(), SEILIGL.USER_ID, ""),"Bank Account",requestforVerification,ResponseforVerification);
                 try {
-                        if(response.body().get("data").getAsJsonObject().get("account_exists").getAsBoolean()){
+                    ResponseforVerification= String.valueOf(response.body().get("data"));
+                    saveVerficationLogs(IglPreferences.getPrefString(getContext(), SEILIGL.USER_ID, ""),"Bank Account",requestforVerification,ResponseforVerification);
+                    if(response.body().get("data").getAsJsonObject().get("account_exists").getAsBoolean()){
                             tilBankAccountName.setVisibility(View.VISIBLE);
                             tilBankAccountName.setText(response.body().get("data").getAsJsonObject().get("full_name").getAsString());
                             //tilBankAccountName.setTextColor(getResources().getColor(R.color.green));

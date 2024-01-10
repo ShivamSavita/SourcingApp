@@ -1035,7 +1035,7 @@ public class Borrower extends BaseModel implements Serializable {
             messages.put("Bank Account", "Verify Bank Account");
         }
 
-        if (this.Income<1){
+        if (this.Income<100){
             messages.put("Income", "Please Enter borrower's monthly income");
 
         }
@@ -1058,10 +1058,6 @@ public class Borrower extends BaseModel implements Serializable {
             }
         }
 
-        if (this.Expense<1){
-            messages.put("Expense", "Please Enter borrower's monthly Expense");
-
-        }
 
         if (!this.getPictureUpdated()) {
             if (this.getPicture() == null) {

@@ -5,7 +5,7 @@
     android:orientation="vertical"
     >
 <TextView
-    android:text="Please Select a Scheme"
+    android:text="Select a Scheme"
     android:textAlignment="center"
     android:textSize="16dp"
     android:padding="6dp"

@@ -144,6 +144,7 @@ public class FragmentBorrowerPendingVhData extends AbsFragment implements View.O
         linearLayout=v.findViewById(R.id.maritalstatusHide);
         MARITAL_STATUS = new AdapterListRange(this.getContext(),
                 SQLite.select().from(RangeCategory.class).where(RangeCategory_Table.cat_key.eq("marrital_status")).queryList(), false);
+
         spinMARITAL_STATUS.setAdapter(MARITAL_STATUS);
         spinMARITAL_STATUS.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -261,14 +262,14 @@ public class FragmentBorrowerPendingVhData extends AbsFragment implements View.O
 
 
         String isMarried = borrower.isMarried;
-        if(isMarried.equals("Unmarried")){
+        if(isMarried.equals("U")){
             v.findViewById(R.id.maritalstatusHide).setVisibility(View.GONE);
         }else{
             v.findViewById(R.id.maritalstatusHide).setVisibility(View.VISIBLE);
         }
 
-        Utils.setSpinnerPosition((Spinner) v.findViewById(R.id.spinLoanAppPersonalMarritalStatus),isMarried,false);
-
+        Utils.setSpinnerPosition((Spinner) v.findViewById(R.id.spinLoanAppPersonalMarritalStatus),isMarried,true);
+        v.findViewById(R.id.spinLoanAppPersonalMarritalStatus).setEnabled(false);
         //Utils.setSpinnerPosition((Spinner) v.findViewById(R.id.spinLoanAppPersonalMarritalStatus),borrowerExtra.MARITAL_STATUS);
         Utils.setSpinnerPosition((Spinner) v.findViewById(R.id.acspOccupation),borrowerExtra.OCCUPATION_TYPE);
         Utils.setSpinnerPosition((Spinner) v.findViewById(R.id.acspBusinessDetail),borrower.Business_Detail);
@@ -312,8 +313,8 @@ public class FragmentBorrowerPendingVhData extends AbsFragment implements View.O
        // borrowerExtra.AGRICULTURAL_INCOME=Utils.getSpinnerStringValue((Spinner) view.findViewById(R.id.spinAgriIncome));
         borrowerExtra.ANNUAL_INCOME=String.valueOf(Utils.getNotNullInt((TextInputEditText) view.findViewById(R.id.tietIncomeMonthly))*12);
         borrowerExtra.MARITAL_STATUS=Utils.getSpinnerStringValue((Spinner) view.findViewById(R.id.spinLoanAppPersonalMarritalStatus));
-        borrowerExtra.OCCUPATION_TYPE=Utils.getSpinnerStringValue((Spinner) view.findViewById(R.id.acspOccupation));
-        borrower.Business_Detail=Utils.getSpinnerStringValue((Spinner) view.findViewById(R.id.acspBusinessDetail));
+       // borrowerExtra.OCCUPATION_TYPE=Utils.getSpinnerStringValue((Spinner) view.findViewById(R.id.acspOccupation));
+       // borrower.Business_Detail=Utils.getSpinnerStringValue((Spinner) view.findViewById(R.id.acspBusinessDetail));
         borrowerExtra.FamIncomeSource=Utils.getSpinnerStringValue((Spinner) view.findViewById(R.id.earningMemberTypeSpin));
         borrowerExtra.FamMonthlyIncome=Utils.getNotNullInt((TextInputEditText) view.findViewById(R.id.EditEarningMemberIncome));
         borrowerExtra.FutureIncome=Utils.getNotNullInt((TextInputEditText) view.findViewById(R.id.tietFutureIncome));
@@ -335,6 +336,7 @@ public class FragmentBorrowerPendingVhData extends AbsFragment implements View.O
         borrowerExtra.FATHER_FIRST_NAME=Utils.getNotNullText((TextInputEditText) view.findViewById(R.id.tietFatherFName));
         borrowerExtra.FATHER_MIDDLE_NAME=Utils.getNotNullText((TextInputEditText) view.findViewById(R.id.tietFatherMName));
         borrowerExtra.FATHER_LAST_NAME=Utils.getNotNullText((TextInputEditText) view.findViewById(R.id.tietFatherLName));
+        borrower.isMarried=Utils.getSpinnerStringValue((Spinner) view.findViewById(R.id.spinLoanAppPersonalMarritalStatus)).substring(0,1).toUpperCase();
        Log.d("TAG", "getDataFromView: yha tk chal rha h 1");
         borrowerExtra.save();
         borrower.save();

@@ -45,4 +45,13 @@
 
     </string-array>
 
+
+    <string-array name="shemeArrayABF">
+        <item>"UMEED (1st time borrower)"</item>
+        <item>"PRAGATI  (2st time borrower)"</item>
+        <item>"VIKAS  (2st time borrower)"</item>
+        <item>"UDAAN"</item>
+
+    </string-array>
+
     </resources>

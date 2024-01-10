@@ -43,7 +43,7 @@ public class ActivityLoanApplication extends AppCompatActivity implements
         //FragmentBorrowerExtra.OnFragmentBorrowerExtraInteractionListener,
         FragmentBorrowerGuarantors.OnListFragmentBorrowerGuarantorsInteractionListener,
         FragmentKycScanning.OnListFragmentKycScanInteractionListener {
-    TabLayout tabLayout;
+        TabLayout tabLayout;
     private long borrower_id;
     private Borrower borrower;
     private View.OnClickListener navOnClikListner;
@@ -160,7 +160,7 @@ public class ActivityLoanApplication extends AppCompatActivity implements
         fragments.add(FragmentBorrowerAadhar.newInstance(borrower_id));
         fragments.add(FragmentBorrowerPersonal.newInstance(borrower_id));
         fragments.add(FragmentBorrowerPendingVhData.newInstance(borrower_id));
-//        fragments.add(FragmentBorrowerPersonal_Additional.newInstance(borrower_id));
+       // fragments.add(FragmentBorrowerPersonal_Additional.newInstance(borrower_id));
         fragments.add(FragmentBorrowerFinance.newInstance(borrower_id));
         //fragments.add(FragmentBorrowerExtra.newInstance(borrower_id));
         if (BuildConfig.APPLICATION_ID.equals("net.softeksol.seil.groupfin")
