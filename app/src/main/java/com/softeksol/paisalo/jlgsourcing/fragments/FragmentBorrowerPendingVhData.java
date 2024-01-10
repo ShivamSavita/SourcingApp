@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -15,6 +16,7 @@ import android.widget.Spinner;
 
 import androidx.fragment.app.Fragment;
 
+import com.google.android.gms.common.api.internal.GoogleApiManager;
 import com.google.android.material.textfield.TextInputEditText;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 import com.softeksol.paisalo.jlgsourcing.Global;
@@ -32,6 +34,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -146,7 +149,23 @@ public class FragmentBorrowerPendingVhData extends AbsFragment implements View.O
         OCCUPATION_TYPE = new AdapterListRange(this.getContext(),
                 SQLite.select().from(RangeCategory.class).where(RangeCategory_Table.cat_key.eq("other_employment")).queryList(), false);
         spinOCCUPATION_TYPE.setAdapter(OCCUPATION_TYPE);
+        spinMARITAL_STATUS.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                if (Utils.getSpinnerStringValue(spinMARITAL_STATUS).toUpperCase().equals("UNMARRIED")){
+                    v.findViewById(R.id.linearLayout433).setVisibility(View.GONE);
+                    v.findViewById(R.id.layoutSpouseFName).setVisibility(View.GONE);
+                }else{
+                    v.findViewById(R.id.linearLayout433).setVisibility(View.VISIBLE);
+                    v.findViewById(R.id.layoutSpouseFName).setVisibility(View.VISIBLE);
+                }
+            }
 
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
 
         Spinner earningMemberTypeSpin=v.findViewById(R.id.earningMemberTypeSpin);
         earningMemberTypeSpin.setAdapter(rlaEarningMember);
@@ -239,7 +258,12 @@ public class FragmentBorrowerPendingVhData extends AbsFragment implements View.O
 
     private void setDataToView(View v) {
 
-        Utils.setSpinnerPosition((Spinner) v.findViewById(R.id.spinLoanAppPersonalMarritalStatus),borrowerExtra.MARITAL_STATUS);
+        if (borrower.isMarried.equals("U")){
+            v.findViewById(R.id.linearLayout433).setVisibility(View.GONE);
+            v.findViewById(R.id.layoutSpouseFName).setVisibility(View.GONE);
+        }
+        v.findViewById(R.id.spinLoanAppPersonalMarritalStatus).setEnabled(false);
+        Utils.setSpinnerPosition((Spinner) v.findViewById(R.id.spinLoanAppPersonalMarritalStatus),borrower.isMarried,true);
         Utils.setSpinnerPosition((Spinner) v.findViewById(R.id.acspOccupation),borrowerExtra.OCCUPATION_TYPE);
         Utils.setSpinnerPosition((Spinner) v.findViewById(R.id.acspBusinessDetail),borrower.Business_Detail);
 
@@ -278,6 +302,7 @@ public class FragmentBorrowerPendingVhData extends AbsFragment implements View.O
     private void getDataFromView(View view) {
         borrower.Expense=Utils.getNotNullInt((TextInputEditText) view.findViewById(R.id.tietExpenseMonthly));
         borrower.Income=Utils.getNotNullInt((TextInputEditText) view.findViewById(R.id.tietIncomeMonthly));
+        borrower.isMarried=Utils.getSpinnerStringValue((Spinner) view.findViewById(R.id.spinLoanAppPersonalMarritalStatus)).substring(0,1).toUpperCase();
         borrowerExtra.AGRICULTURAL_INCOME=Utils.getNotNullText((TextInputEditText) view.findViewById(R.id.tietAgricultureIncome));;
        // borrowerExtra.AGRICULTURAL_INCOME=Utils.getSpinnerStringValue((Spinner) view.findViewById(R.id.spinAgriIncome));
         borrowerExtra.ANNUAL_INCOME=String.valueOf(Utils.getNotNullInt((TextInputEditText) view.findViewById(R.id.tietIncomeMonthly))*12);

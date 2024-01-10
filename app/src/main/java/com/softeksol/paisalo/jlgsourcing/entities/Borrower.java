@@ -696,7 +696,8 @@ public class Borrower extends BaseModel implements Serializable {
         //if ((fiGuarantors == null || fiGuarantors.isEmpty())) {
         fiGuarantors = SQLite.select()
                 .from(Guarantor.class)
-                .where(Guarantor_Table.borrowerForeignKeyContainer_FiID.eq(FiID))
+                .where(Guarantor_Table.fi_Code.eq(Code))
+                .and(Guarantor_Table.Creator.eq(Creator))
                 .orderBy(Guarantor_Table.GrNo, true)
                 .queryList();
         //}

@@ -23,8 +23,16 @@
         app:showAsAction="always">
         <menu>
             <item
-                android:title="Update App."
-                android:id="@+id/action_update" />
+                android:title="Update Sourcing App"
+                android:id="@+id/action_sourcing_update" />
+
+            <item
+                android:title="Update NSDL App"
+                android:id="@+id/action_nsdl_update" />
+            <item
+                android:title="Update RD Service App"
+                android:id="@+id/action_rdSer_update" />
+
 
 
 

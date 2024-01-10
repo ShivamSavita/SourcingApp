@@ -198,10 +198,10 @@ public class ActivityFinancing extends AppCompatActivity
                 fab.setVisibility(View.VISIBLE);
                 fab.setImageResource(android.R.drawable.ic_popup_sync);
                 displaySelectedScreen(id);
-            case R.id.nav_loan_submit_kyc:
-                fab.setVisibility(View.VISIBLE);
-                fab.setImageResource(android.R.drawable.ic_popup_sync);
-                displaySelectedScreen(id);
+//            case R.id.nav_loan_submit_kyc:
+//                fab.setVisibility(View.VISIBLE);
+//                fab.setImageResource(android.R.drawable.ic_popup_sync);
+//                displaySelectedScreen(id);
             case R.id.nav_loan_home:
                 fab.setVisibility(View.GONE);
                 displaySelectedScreen(id);
@@ -229,9 +229,9 @@ public class ActivityFinancing extends AppCompatActivity
             case R.id.nav_loan_submit_application:
                 fragment = FragmentLoanAppSubmitList.newInstance();
                 break;
-            case R.id.nav_loan_submit_kyc:
-                fragment = FragmentKycSubmit.newInstance(0);
-                break;
+//            case R.id.nav_loan_submit_kyc:
+//                fragment = FragmentKycSubmit.newInstance(0);
+//                break;
             case R.id.nav_loan_submitted_applications:
                 fragment = FragmentSubmittedApplications.newInstance();
                 break;

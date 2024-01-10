@@ -150,7 +150,7 @@ public class ActivityLoanDetails extends AppCompatActivity implements View.OnCli
         UnsignedDocRequest unsignedDocRequest = new UnsignedDocRequest();
         unsignedDocRequest.FiCreator = eSignBorrower.Creator;
         unsignedDocRequest.FiCode = eSignBorrower.FiCode;
-        unsignedDocRequest.DocName = BuildConfig.DOC_NAME + (IglPreferences.getPrefString(this, SEILIGL.IS_ACTUAL, "").equals("Y") ? "_sample" : "");
+        unsignedDocRequest.DocName = "SBINEWDOC";//BuildConfig.DOC_NAME + (IglPreferences.getPrefString(this, SEILIGL.IS_ACTUAL, "").equals("Y") ? "_sample" : "");
         unsignedDocRequest.UserID = IglPreferences.getPrefString(this, SEILIGL.USER_ID, "");
         Log.d("TAG", "downloadUnsignedDoc: "+WebOperations.convertToJson(unsignedDocRequest));
         ( new WebOperations()).postEntityESign(this, "DocsESignPvn", "downloadunsigneddoc", WebOperations.convertToJson(unsignedDocRequest), fileAsyncResponseHandler);

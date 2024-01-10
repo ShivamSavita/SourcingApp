@@ -444,7 +444,7 @@ public class ActivityLogin extends AppCompatActivity implements View.OnClickList
         DatabaseName.add(new RangeCategory("SBI COLENDING", "Database"));
         DatabaseName.add(new RangeCategory("PDL OWN", "Database"));
         DatabaseName.add(new RangeCategory("GROUP FINANCE", "Database"));
-        // DatabaseName.add(new RangeCategory("SBI PDL", "Database"));
+         DatabaseName.add(new RangeCategory("SBI PDL", "Database"));
         // DatabaseName.add(new RangeCategory("PNB COLENDING", "Database"));
 
         database.setAdapter(new AdapterListRange(this, R.layout.spinner_card_orange,DatabaseName));
@@ -521,12 +521,27 @@ public class ActivityLogin extends AppCompatActivity implements View.OnClickList
                 IglPreferences.setLanguage(getApplicationContext(), "hi");
                 reStartApplication();
                 break;
-            case R.id.action_update:
+            case R.id.action_sourcing_update:
                 retVal = true;
-                String url = "https://drive.google.com/file/d/1-soWJt08-n1now6-8kZMnajHQYoJPXvF/view?usp=sharing";
+                String url = "https://erpservice.paisalo.in:980/PDL.Mobile.Api/api/ApkApp/paisaloSourcingApp";
                 Intent i = new Intent(Intent.ACTION_VIEW);
                 i.setData(Uri.parse(url));
                 startActivity(i);
+                break;
+            case R.id.action_nsdl_update:
+                retVal = true;
+                String url1 = "https://erpservice.paisalo.in:980/PDL.Mobile.Api/api/ApkApp/AndroidNSDL";
+                Intent i1 = new Intent(Intent.ACTION_VIEW);
+                i1.setData(Uri.parse(url1));
+                startActivity(i1);
+                break;
+
+            case R.id.action_rdSer_update:
+                retVal = true;
+                String url2 = "https://erpservice.paisalo.in:980/PDL.Mobile.Api/api/ApkApp/AndroidRDService";
+                Intent i2 = new Intent(Intent.ACTION_VIEW);
+                i2.setData(Uri.parse(url2));
+                startActivity(i2);
                 break;
 
             default:

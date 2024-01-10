@@ -175,7 +175,8 @@ Contact Email <i>DELHI@PAISALO.IN</i>
     <string name="report.9"> यह सुनिचित करें कि आवेदित राशि ऋण के उदेश्य के अनुकूल है।</string>
 
     <string name="imageTitle">आवेदक के साथ घर की तस्वीर खींचें</string>
-
+    <string name="choose_scheme_prompt">Choose a Scheme</string>
+    <string name="apply">Apply Scheme</string>
 
     <array name="emiReasons">
         <item>"Medical Issue"</item>

@@ -4,6 +4,7 @@ import static com.softeksol.paisalo.jlgsourcing.Global.ESIGN_TYPE_TAG;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
@@ -12,12 +13,16 @@ import android.os.Environment;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -28,6 +33,7 @@ import com.google.gson.reflect.TypeToken;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.RequestParams;
 import com.raizlabs.android.dbflow.config.FlowManager;
+import com.raizlabs.android.dbflow.list.IFlowCursorIterator;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 import com.softeksol.paisalo.ESign.activities.ActivityESingList;
 import com.softeksol.paisalo.jlgsourcing.BuildConfig;
@@ -108,7 +114,7 @@ public class ActivityManagerSelect extends AppCompatActivity implements View.OnC
         mla = new AdapterListManager(this, R.layout.manager_list_card, SQLite.select().from(Manager.class).queryList());
         listViewFM.setAdapter(mla);
         listViewFM.setOnItemClickListener(this);
-        if (SQLite.selectCountOf().from(RangeCategory.class).count() <= 0)
+        //if (SQLite.selectCountOf().from(RangeCategory.class).count() <= 0)
             RangeCategory.updateOptions(this);
         if (SQLite.selectCountOf().from(BankAccountData.class).count() <= 0)
             BankAccountData.updateBankAccounts(this);
@@ -169,9 +175,16 @@ public class ActivityManagerSelect extends AppCompatActivity implements View.OnC
         Intent intent = null;
         switch (operationItem.getId()) {
             case 1:
-                intent = new Intent(ActivityManagerSelect.this, ActivityBorrowerKyc.class);
-                intent.putExtra(Global.MANAGER_TAG, manager);
-                startActivity(intent);
+                if (manager.Creator.startsWith("VH")){
+                    schemeDialogVH(manager);
+                }else{
+                    intent = new Intent(ActivityManagerSelect.this, ActivityBorrowerKyc.class);
+                    intent.putExtra(Global.MANAGER_TAG, manager);
+                    intent.putExtra(Global.SCHEME_TAG, "");
+                    startActivity(intent);
+
+                }
+
                 break;
             case 2:
                 intent = new Intent(ActivityManagerSelect.this, ActivityFinancing.class);
@@ -229,6 +242,42 @@ public class ActivityManagerSelect extends AppCompatActivity implements View.OnC
 
     }
 
+
+
+    private void schemeDialogVH(Manager manager) {        // Inflate the custom dialog layout
+        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View customDialogView = inflater.inflate(R.layout.choose_scheme_dialog, null);
+
+        // Initialize views
+        Spinner spinnerScheme = customDialogView.findViewById(R.id.spinnerScheme);
+        Button btnApply = customDialogView.findViewById(R.id.btnApply);
+
+        // Populate the spinner with data (replace with your data)
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
+                this,
+                R.array.shemeArray,  // Replace with your array resource
+                android.R.layout.simple_spinner_item
+        );
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerScheme.setAdapter(adapter);
+
+        // Create the AlertDialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setView(customDialogView);
+        btnApply.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                intent = new Intent(ActivityManagerSelect.this, ActivityBorrowerKyc.class);
+                intent.putExtra(Global.MANAGER_TAG, manager);
+                intent.putExtra(Global.SCHEME_TAG, spinnerScheme.getSelectedItem().toString());
+                startActivity(intent);
+            }
+        });
+
+        // Show the AlertDialog
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
     @Override
     public void onBackPressed() {
         super.onBackPressed();

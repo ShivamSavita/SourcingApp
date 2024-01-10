@@ -2,6 +2,7 @@ package com.softeksol.paisalo.jlgsourcing.retrofit;
 
 
 import com.google.gson.JsonObject;
+import com.softeksol.paisalo.jlgsourcing.entities.AccountDetails_Model;
 import com.softeksol.paisalo.jlgsourcing.entities.BREResponse;
 import com.softeksol.paisalo.jlgsourcing.entities.CreatorModel;
 import com.softeksol.paisalo.jlgsourcing.entities.HomeVisitFiList;
@@ -128,6 +129,17 @@ public interface ApiInterface {
 
     @POST("PDL.Mobile.API/api/Crif/GetBREDetails")
     Call<BREResponse> getBREStatus(@Query("creator") String creator, @Query("ficode") String ficode);
+
+    @GET("PDL.FIService.API/api/InstCollection/GetQrPaymentsBySmcode")
+    Call<AccountDetails_Model> getQrPaymentsBySmcode(
+            @Query("SmCode") String smCode,
+            @Query("userid") String userId,
+            @Query("type") String type,
+            @Header("Authorization") String authorizationHeader);
+
+    @POST("LiveTrack/FiForUdhan")
+    Call<JsonObject> saveSchemeForVH(@Body JsonObject jsonObject);
+
 
 /*
     @Field("ficode") String fiCode, @Field("full_name") String fullName, @Field("dob") String dob,

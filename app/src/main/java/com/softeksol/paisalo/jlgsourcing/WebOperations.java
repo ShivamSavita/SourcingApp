@@ -36,6 +36,8 @@ import cz.msebera.android.httpclient.message.BasicHeader;
  * Created by sachindra on 2016-10-07.
  */
 public class WebOperations {
+    private static String deviceId="2234514145687247";
+//9106498575477244
     public static <E> String convertToJson(E object) {
         String jsonString;
         Gson gson = new GsonBuilder().serializeNulls().setExclusionStrategies(new DbFlowExclusionStrategy()).excludeFieldsWithoutExposeAnnotation().create();
@@ -149,13 +151,13 @@ public class WebOperations {
         // client.addHeader("imeino","8639350502262");
         Log.e("DeviceId","CheckingOnHttpheader: "+IglPreferences.getPrefString(context, SEILIGL.DEVICE_ID, "0")+"");
 
-        client.addHeader("devid", IglPreferences.getPrefString(context, SEILIGL.DEVICE_ID, "0"));
-        // client.addHeader("devid","1963593535696247");
+        client.addHeader("devid",  deviceId.length()>1?deviceId: IglPreferences.getPrefString(context, SEILIGL.DEVICE_ID, "0"));
+//         client.addHeader("devid",deviceId);
         // my client.addHeader("devid","4374793985786243");
         client.addHeader("userid", IglPreferences.getPrefString(context, SEILIGL.USER_ID, ""));
         client.addHeader("procname", BuildConfig.PROC_NAME);
         client.addHeader("srcappver", "111");
-        client.addHeader("dbname", IglPreferences.getPrefString(context, SEILIGL.DATABASE_NAME, BuildConfig.DATABASE_NAME));
+        client.addHeader("dbname", IglPreferences.getPrefString(context, SEILIGL.DATABASE_NAME, ""));
         client.setTimeout(700000);
     }
     public static void setHttpHeaders(Context context, AsyncHttpClient client, Boolean setBearer) {
@@ -173,12 +175,12 @@ public class WebOperations {
          client.addHeader("imeino",IglPreferences.getPrefString(context, SEILIGL.DEVICE_IMEI, "0"));
         // client.addHeader("imeino","8639350502262");
         Log.e("DeviceId","CheckingOnHttpheader: "+IglPreferences.getPrefString(context, SEILIGL.DEVICE_ID, "0")+"");
-        client.addHeader("devid", IglPreferences.getPrefString(context, SEILIGL.DEVICE_ID, "0"));
-       // client.addHeader("devid","1963593535696247");
+        client.addHeader("devid",deviceId.length()>1?deviceId: IglPreferences.getPrefString(context, SEILIGL.DEVICE_ID, "0"));
+//        client.addHeader("devid",deviceId);
         // my client.addHeader("devid","2239713985787243");
         client.addHeader("userid", IglPreferences.getPrefString(context, SEILIGL.USER_ID, ""));
         client.addHeader("procname", BuildConfig.PROC_NAME);
-        client.addHeader("dbname", IglPreferences.getPrefString(context, SEILIGL.DATABASE_NAME, BuildConfig.DATABASE_NAME));
+        client.addHeader("dbname", IglPreferences.getPrefString(context, SEILIGL.DATABASE_NAME, ""));
         client.setTimeout(700000);
     }
 
@@ -196,9 +198,9 @@ public class WebOperations {
         client.addHeader("Content-Encoding", "gzip,deflate,compress");
         client.addHeader("imeino", IglPreferences.getPrefString(context, SEILIGL.DEVICE_IMEI, "0"));
        // client.addHeader("imeino", "8639350502262");
-        client.addHeader("devid", IglPreferences.getPrefString(context, SEILIGL.DEVICE_ID, "0"));
-      //  client.addHeader("devid","1963593535696247");
-        client.addHeader("dbname", IglPreferences.getPrefString(context, SEILIGL.DATABASE_NAME, BuildConfig.DATABASE_NAME));
+        client.addHeader("devid",deviceId.length()>1?deviceId: IglPreferences.getPrefString(context, SEILIGL.DEVICE_ID, "0"));
+//        client.addHeader("devid",deviceId);
+        client.addHeader("dbname", IglPreferences.getPrefString(context, SEILIGL.DATABASE_NAME, ""));
         client.setTimeout(70000);
     }
 
@@ -215,8 +217,8 @@ public class WebOperations {
         headers.add(new BasicHeader("Content-Encoding", "gzip,deflate,compress"));
         headers.add(new BasicHeader("imeino", IglPreferences.getPrefString(context, SEILIGL.DEVICE_IMEI, "0")));
         //headers.add(new BasicHeader("imeino", "8639350502262"));
-        headers.add(new BasicHeader("devid", IglPreferences.getPrefString(context, SEILIGL.DEVICE_ID, "0")));
-       // headers.add(new BasicHeader("devid","1963593535696247"));
+        headers.add(new BasicHeader("devid", deviceId.length()>1?deviceId: IglPreferences.getPrefString(context, SEILIGL.DEVICE_ID, "0")));
+//        headers.add(new BasicHeader("devid",deviceId));
         headers.add(new BasicHeader("dbname", IglPreferences.getPrefString(context, SEILIGL.DATABASE_NAME, "")));
         headers.add(new BasicHeader("userid", IglPreferences.getPrefString(context, SEILIGL.USER_ID, "")));
         headers.add(new BasicHeader("procname", BuildConfig.PROC_NAME));
@@ -267,7 +269,7 @@ public class WebOperations {
             params.add("grant_type", "password");
             params.add("username", userId);
             params.add("password", password);
-            String url = "https://agra.seil.in:8444/ESignSBIAV1/" + "token";
+            String url = "https://agra.paisalo.in:8444/ESignSBIAV1Test/" + "token";
             client.post(url, params, dataAsyncResponseHandler);
             Log.d("CheckBaseUrl",url+"////"+userId+"////"+password+"////"+"base URL :"+IglPreferences.getPrefString(context, SEILIGL.BASE_URL, ""));
         } catch (Exception e) {
@@ -288,7 +290,7 @@ public class WebOperations {
     public void postEntityESignSubmit(Context context, String controller, String method, String jsonString, ResponseHandlerInterface responseHandler) {
         try {
             //Log.d("Json Data", jsonString);
-            String url = "https://agra.seil.in:8444/ESignSBIAV1/" + "api/" + controller + "/" + method;
+            String url = "https://agra.paisalo.in:8444/ESignSBIAV1Test/" + "api/" + controller + "/" + method;
             StringEntity entity = new StringEntity(jsonString);
             AsyncHttpClient client = new AsyncHttpClient();
             client.setThreadPool(Executors.newSingleThreadExecutor());
@@ -321,9 +323,9 @@ public class WebOperations {
     public void postEntityESign(Context context, String controller, String method, String jsonString, ResponseHandlerInterface responseHandler) {
         try {
             //Log.d("Json Data",jsonString);
-            String url = "https://agra.seil.in:8444/ESignSBIAV1/" + "api/" + controller + "/" + method;
-//            String url = "https://agra.seil.in:8444/ESignSBIAV1Test/" + "api/" + controller + "/" + method;
-            Log.d("TAG", "postEntity: "+ "https://agra.seil.in:8444/ESignSBIAV1/" + "api/" + controller + "/" + method);
+            String url = "https://agra.paisalo.in:8444/ESignSBIAV1Test/" + "api/" + controller + "/" + method;
+//            String url = "https://agra.paisalo.in:8444/ESignSBIAV1TestTest/" + "api/" + controller + "/" + method;
+            Log.d("TAG", "postEntity: "+ "https://agra.paisalo.in:8444/ESignSBIAV1Test/" + "api/" + controller + "/" + method);
             StringEntity entity = new StringEntity(Utils.cleanTextContent(jsonString));
             AsyncHttpClient client = new AsyncHttpClient();
             client.setThreadPool(Executors.newSingleThreadExecutor());
@@ -503,7 +505,7 @@ public class WebOperations {
 
     public void getEntityESign(Context context, String controller, String method, RequestParams params, ResponseHandlerInterface responseHandler) {
         try {
-            String url = "https://agra.seil.in:8444/ESignSBIAV1/"+ "api/" + controller + "/" + method;
+            String url = "https://agra.paisalo.in:8444/ESignSBIAV1Test/"+ "api/" + controller + "/" + method;
             AsyncHttpClient client = new AsyncHttpClient();
             client.setThreadPool(Executors.newSingleThreadExecutor());
             setHttpHeadersESign(context, client, true);

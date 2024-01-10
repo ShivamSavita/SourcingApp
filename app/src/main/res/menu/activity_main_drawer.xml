@@ -15,10 +15,10 @@
             android:id="@+id/nav_loan_submit_application"
             android:icon="@drawable/submit_loan_app"
             android:title="@string/loan_application_submit" />
-        <item
-            android:id="@+id/nav_loan_submit_kyc"
-            android:icon="@drawable/submit_kyc"
-            android:title="@string/loan_application_submit_kyc" />
+<!--        <item-->
+<!--            android:id="@+id/nav_loan_submit_kyc"-->
+<!--            android:icon="@drawable/submit_kyc"-->
+<!--            android:title="@string/loan_application_submit_kyc" />-->
         <item
             android:id="@+id/nav_loan_submitted_applications"
             android:icon="@drawable/submit_files"
