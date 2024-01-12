@@ -293,7 +293,7 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
         linearLayout433.setVisibility(View.GONE);
         panCheckSign = findViewById(R.id.panCheckSign);
         dLCheckSign = findViewById(R.id.dLCheckSign);
-        
+
         voterIdCheckSign = findViewById(R.id.voterIdCheckSign);
         acspGender = findViewById(R.id.acspGender);
         tilPAN_Name = findViewById(R.id.tilPAN_Name);
@@ -535,9 +535,23 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                 validateControls(editText, text);
             }
         });
-
         tietAddress2 = findViewById(R.id.tietAddress2);
         tietAddress3 = findViewById(R.id.tietAddress3);
+        tietAddress2.addTextChangedListener(new MyTextWatcher(tietAddress2) {
+            @Override
+            public void validate(EditText editText, String text) {
+                validateControls(editText, text);
+            }
+        });
+
+        tietAddress3.addTextChangedListener(new MyTextWatcher(tietAddress3) {
+            @Override
+            public void validate(EditText editText, String text) {
+                validateControls(editText, text);
+            }
+        });
+
+
         tietCity = findViewById(R.id.tietCity);
         tietCity.addTextChangedListener(new MyTextWatcher(tietCity) {
             @Override
@@ -770,7 +784,7 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
             }
         }
 //        tietAadharId.removeTextChangedListener(aadharTextChangeListner);
-          tietAadharId.setText(borrower.aadharid);
+        tietAadharId.setText(borrower.aadharid);
 //        tietAadharId.addTextChangedListener(aadharTextChangeListner);
 
 
@@ -865,7 +879,7 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
         borrower.setNames(Utils.getNotNullText(tietName));
         borrower.Age = Utils.getNotNullInt(tietAge);
         borrower.DOB = myCalendar.getTime();
-        borrower.setGuardianNames(Utils.getNotNullText(tietGuardian).replace("S/O:","").replace("D/O:","").replace("W/O:",""));
+        borrower.setGuardianNames(Utils.getNotNullText(tietGuardian).replace("S/O:","").replace("D/O:","").replace("W/O:","").replace("S/O","").replace("D/O","").replace("W/O",""));
         borrower.P_Add1 = Utils.getNotNullText(tietAddress1);
         borrower.P_add2 = Utils.getNotNullText(tietAddress2);
         borrower.P_add3 = Utils.getNotNullText(tietAddress3);
@@ -1049,7 +1063,7 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                                 e.printStackTrace();
                             }
                         }
-                }
+                    }
 
                 }else{
 
@@ -1061,7 +1075,7 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                         Bitmap myBitmap = BitmapFactory.decodeFile(croppedImage.getAbsolutePath());
                         //ImageView myImage = (ImageView) findViewById(R.id.imageviewTest);
                         if (myBitmap!=null) {
-                           // Toast.makeText(activity, "Bitmap: "+myBitmap+"", Toast.LENGTH_SHORT).show();
+                            // Toast.makeText(activity, "Bitmap: "+myBitmap+"", Toast.LENGTH_SHORT).show();
                             if (ImageType==1){
                                 //adharFrontImg.setImageBitmap(myBitmap);
                                 setDataOfAdhar(croppedImage,"aadharfront","aadhar");
@@ -1204,12 +1218,75 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                                     String[] address1 = response.body().get("data").getAsJsonArray().get(0).getAsJsonObject().get("address1").getAsString().split(",");
                                     for (int i = 0; i < address1.length; i++) {
                                         if (address1[i].toUpperCase().contains("S/O") || address1[i].toUpperCase().contains("D/O") || address1[i].toUpperCase().contains("W/O")){
-                                            borrower.setGuardianNames(address1[i].replace("S/O:","").replace("D/O:","").replace("W/O:",""));
+                                            borrower.setGuardianNames(address1[i].replace("S/O:","").replace("D/O:","").replace("W/O:","").replace("S/O","").replace("D/O","").replace("W/O",""));
+                                            if (address1[i].toUpperCase().contains("S/O") || address1[i].toUpperCase().contains("D/O")){
+                                                String[] fatherName=address1[i].split(" ");
+                                                switch (fatherName.length){
+                                                    case 2:
+                                                        tietFatherFName.setText(fatherName[1]);
+                                                        break;
+                                                    case 3:
+                                                        tietFatherFName.setText(fatherName[1]);
+                                                        tietFatherLName.setText(fatherName[2]);
+
+                                                        break;
+                                                    case 4:
+                                                        tietFatherFName.setText(fatherName[1]);
+                                                        tietFatherMName.setText(fatherName[2]);
+                                                        tietFatherLName.setText(fatherName[3]);
+                                                        break;
+                                                    default:
+                                                        tietFatherFName.setText(response.body().get("data").getAsJsonArray().get(0).getAsJsonObject().get("address1").getAsString().split(",")[0].toUpperCase().replace("S/O","").replace("S/O:","").replace("D/O","").replace("D/O:",""));
+                                                        break;
+                                                }
+
+
+                                            }else{
+                                                if (address1[i].startsWith("W/O")){
+                                                    String[] spouseName=address1[i].split(" ");
+                                                    switch (spouseName.length){
+                                                        case 2:
+                                                            tietSpouseFName.setText(spouseName[1]);
+                                                            break;
+                                                        case 3:
+                                                            tietSpouseFName.setText(spouseName[1]);
+                                                            tietSpouseLName.setText(spouseName[2]);
+
+                                                            break;
+                                                        case 4:
+                                                            tietSpouseFName.setText(spouseName[1]);
+                                                            tietSpouseMName.setText(spouseName[2]);
+                                                            tietSpouseLName.setText(spouseName[3]);
+                                                            break;
+                                                        default:
+                                                            tietSpouseFName.setText(address1[i].toUpperCase().replace("W/O","").replace("W/O:",""));
+                                                            break;
+                                                    }
+
+                                                }
+                                            }
                                             continue;
                                         }
                                         borrower.P_Add1 = borrower.P_Add1 + address1[i];
-                                     /* ----------Add 15-12-23----------------------------------*/
-                                        if (address1[i].startsWith("W/O:")){
+
+//                                        if (containsOnlyAllowedCharacters(borrower.P_Add1)){
+//                                            borrower.P_Add1="";
+//                                            tietAddress1.setEnabled(true);
+//                                        }
+//
+//
+//
+//                                        if (containsOnlyAllowedCharacters(borrower.P_add2)){
+//                                            borrower.P_add2="";
+//                                            tietAddress2.setEnabled(true);
+//                                        }
+//
+//                                        if (containsOnlyAllowedCharacters(borrower.P_add3)){
+//                                            borrower.P_add3="";
+//                                            tietAddress3.setEnabled(true);
+//                                        }
+                                        /* ----------Add 15-12-23----------------------------------*/
+                                        if (address1[i].startsWith("W/O")){
                                             Utils.setSpinnerPosition(spinnerMarritalStatus, "Married", false);
                                             String[] spouseName=address1[i].split(" ");
                                             switch (spouseName.length){
@@ -1231,7 +1308,7 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                                                     break;
                                             }
 
-                                        }if (address1[i].startsWith("S/O:") || address1[i].startsWith("D/O:")){
+                                        }if (address1[i].startsWith("S/O") || address1[i].startsWith("D/O")){
                                             String[] fatherName=address1[i].split(" ");
                                             switch (fatherName.length){
                                                 case 2:
@@ -1273,12 +1350,12 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                         }else if(imageData.equals("pan")){
                             if (response.body().get("data").getAsJsonArray().size()>0){
                                 if (response.body().get("data").getAsJsonArray().get(0).getAsJsonObject().get("panno").getAsString().length()>1 && !response.body().get("data").getAsJsonArray().get(0).getAsJsonObject().get("panno").getAsString().equals("NA")) {
-                                       isgetPanwithOCR=true;
-                                        borrower.PanNO = response.body().get("data").getAsJsonArray().get(0).getAsJsonObject().get("panno").getAsString();
-                                        borrower.isAadharVerified="O";
-                                        panaadharDOBMatched=true;
-                                        borrower.save();
-                                        setDataToView(activity.findViewById(android.R.id.content).getRootView());
+                                    isgetPanwithOCR=true;
+                                    borrower.PanNO = response.body().get("data").getAsJsonArray().get(0).getAsJsonObject().get("panno").getAsString();
+                                    borrower.isAadharVerified="O";
+                                    panaadharDOBMatched=true;
+                                    borrower.save();
+                                    setDataToView(activity.findViewById(android.R.id.content).getRootView());
 
                                 }else {
                                     Toast.makeText(ActivityBorrowerKyc.this, "Please capture PAN Card on behalf sample", Toast.LENGTH_SHORT).show();
@@ -1310,6 +1387,18 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
 
 
 
+
+    }
+
+    public static boolean containsOnlyAllowedCharacters(String input) {
+        String A = "[,:./]";
+        String allowedCharactersRegex = "[a-zA-Z0-9 ,:./\\-]+";
+
+        return ( input.matches(allowedCharactersRegex) && !(input.startsWith(".") ||input.startsWith(":") || input.startsWith("/") ||input.startsWith("-") ||input.startsWith(",")));
+
+    }
+    private boolean containsNumbers(String text) {
+        return text != null && text.matches("^[a-zA-Z ]+$");
 
     }
 
@@ -1366,7 +1455,7 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
             borrower.DOB = aadharData.DOB;
             borrower.Age = aadharData.Age;
             borrower.Gender = aadharData.Gender;
-            borrower.setGuardianNames(aadharData.GurName==null?"":aadharData.GurName.replace("S/O:","").replace("D/O:","").replace("W/O:",""));
+            borrower.setGuardianNames(aadharData.GurName==null?"":aadharData.GurName.replace("S/O:","").replace("D/O:","").replace("W/O:","").replace("S/O","").replace("D/O","").replace("W/O",""));
             borrower.P_city = aadharData.City;
             borrower.p_pin = aadharData.Pin;
             borrower.P_Add1 = aadharData.Address1;
@@ -1661,7 +1750,7 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
 
         }else{
             if (decodedData.get(6-inc).startsWith("S/O:") ||decodedData.get(6-inc).startsWith("D/O:") ||decodedData.get(6-inc).startsWith("W/O:")){
-                borrower.setGuardianNames(decodedData.get(6-inc).split(":")[1].replace("S/O:","").replace("D/O:","").replace("W/O:","").trim());
+                borrower.setGuardianNames(decodedData.get(6-inc).split(":")[1].replace("S/O:","").replace("D/O:","").replace("W/O:","").replace("S/O","").replace("D/O","").replace("W/O","").trim());
                 if (decodedData.get(6-inc).toUpperCase().startsWith("W/O:")){
                     Utils.setSpinnerPosition(spinnerMarritalStatus, "Married", false);
                     String[] spouseName=decodedData.get(6-inc).split(" ");
@@ -1687,11 +1776,11 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
             }else if (decodedData.get(6-inc).startsWith("S/O,") ||decodedData.get(6-inc).startsWith("D/O,") ||decodedData.get(6-inc).startsWith("W/O,")){
                 borrower.setGuardianNames(decodedData.get(6-inc).split(",")[1].trim());
             }else{
-                borrower.setGuardianNames(decodedData.get(6-inc).replace("S/O:","").replace("D/O:","").replace("W/O:",""));
+                borrower.setGuardianNames(decodedData.get(6-inc).replace("S/O:","").replace("D/O:","").replace("W/O:","").replace("S/O","").replace("D/O","").replace("W/O",""));
 
             }
             if (decodedData.get(6-inc).startsWith("S/O:") ||decodedData.get(6-inc).startsWith("D/O:") ||decodedData.get(6-inc).startsWith("W/O:")){
-                borrower.setGuardianNames(decodedData.get(6-inc).split(":")[1].replace("S/O:","").replace("D/O:","").replace("W/O:","").trim());
+                borrower.setGuardianNames(decodedData.get(6-inc).split(":")[1].replace("S/O:","").replace("D/O:","").replace("W/O:","").replace("S/O","").replace("D/O","").replace("W/O","").trim());
                 if (decodedData.get(6-inc).toUpperCase().startsWith("W/O:")){
                     Utils.setSpinnerPosition(spinnerMarritalStatus, "Married", false);
                     String[] spouseName=decodedData.get(6-inc).split(" ");
@@ -1717,46 +1806,60 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
             }else if (decodedData.get(6-inc).startsWith("S/O,") ||decodedData.get(6-inc).startsWith("D/O,") ||decodedData.get(6-inc).startsWith("W/O,")){
                 borrower.setGuardianNames(decodedData.get(6-inc).split(",")[1].trim());
             }else{
-                borrower.setGuardianNames(decodedData.get(6-inc).replace("S/O:","").replace("D/O:","").replace("W/O:",""));
+                borrower.setGuardianNames(decodedData.get(6-inc).replace("S/O:","").replace("D/O:","").replace("W/O:","").replace("S/O","").replace("D/O","").replace("W/O",""));
 
             }
-            if (decodedData.get(6-inc).startsWith("S/O:") ||decodedData.get(6-inc).startsWith("D/O:")){
+            if (decodedData.get(6-inc).startsWith("S/O") ||decodedData.get(6-inc).startsWith("D/O")){
                 Utils.setSpinnerPosition(acspRelationship, "Father", false);
                 acspRelationship.setEnabled(false);
-                String[] fatherNames =decodedData.get(6-inc).split(":");
+                String[] fatherNames =decodedData.get(6-inc).contains(":")?decodedData.get(6-inc).split(":"):decodedData.get(6-inc).split("/O");
                 String[] newFatherName=fatherNames[1].split(" ");
                 if (newFatherName.length>2){
                     String fatherFirstName="";
                     for (int a=1;a<newFatherName.length-1;a++){
                         fatherFirstName= fatherFirstName+" "+newFatherName[a];
                     }
-                    tietFatherFName.setText(fatherFirstName);
+                    tietFatherFName.setText(fatherFirstName.trim());
                     tietFatherFName.setEnabled(false);
-                    tietFatherLName.setText(newFatherName[newFatherName.length-1]);
+                    tietFatherLName.setText(newFatherName[newFatherName.length-1].trim());
                     tietFatherLName.setEnabled(false);
 
                 }else{
-                    tietFatherFName.setText(decodedData.get(6-inc).split(":")[1]);
-                    tietFatherFName.setEnabled(false);
+                    if (decodedData.get(6-inc).contains(":")){
+
+                        tietFatherFName.setText(decodedData.get(6-inc).split(":")[1].trim());
+                        tietFatherFName.setEnabled(false);
+                    }else{
+                        tietFatherFName.setText(decodedData.get(6-inc).split("/O")[1].trim());
+                        tietFatherFName.setEnabled(false);
+                    }
+
                 }
-            }else if (decodedData.get(6-inc).startsWith("W/O:")){
+            }else if (decodedData.get(6-inc).startsWith("W/O")){
                 Utils.setSpinnerPosition(acspRelationship, "Husband", false);
                 acspRelationship.setEnabled(false);
-                String[] spouseNames =decodedData.get(6-inc).split(":");
+                String[] spouseNames =decodedData.get(6-inc).contains(":")?decodedData.get(6-inc).split(":"):decodedData.get(6-inc).split("/O");
                 String[] newSpouseName=spouseNames[1].split(" ");
                 if (newSpouseName.length>2){
                     String spouseFirstName="";
                     for (int a=1;a<newSpouseName.length-1;a++){
                         spouseFirstName= spouseFirstName+" "+newSpouseName[a];
                     }
-                    tietSpouseFName.setText(spouseFirstName);
+                    tietSpouseFName.setText(spouseFirstName.trim());
                     tietSpouseFName.setEnabled(false);
-                    tietSpouseLName.setText(newSpouseName[newSpouseName.length-1]);
+                    tietSpouseLName.setText(newSpouseName[newSpouseName.length-1].trim());
                     tietSpouseLName.setEnabled(false);
 
                 }else{
-                    tietSpouseFName.setText(decodedData.get(6-inc).split(":")[1]);
-                    tietSpouseFName.setEnabled(false);
+
+                    if (decodedData.get(6-inc).contains(":")){
+                        tietSpouseFName.setText(decodedData.get(6-inc).split(":")[1].trim());
+                        tietSpouseFName.setEnabled(false);
+                    }else{
+                        tietSpouseFName.setText(decodedData.get(6-inc).split("/O")[1].trim());
+                        tietSpouseFName.setEnabled(false);
+                    }
+
                 }
 
             }
@@ -2004,28 +2107,28 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                                 if (tilPAN_Name.getText().toString().trim().equals("") && tilVoterId_Name.getText().toString().trim().equals("") && tilDL_Name.getText().toString().trim().equals("")){
                                     Toast.makeText(activity, "Please Verify PAN Card, Voter ID and Driving License", Toast.LENGTH_SHORT).show();
                                 }else{
-                                        sendingDataToNewPage();
+                                    sendingDataToNewPage();
                                 }
                             }else{
                                 if(!tilPAN_Name.getText().toString().trim().equals("") ||!tilVoterId_Name.getText().toString().trim().equals("") ||!tilDL_Name.getText().toString().trim().equals("") ){
-                                        sendingDataToNewPage();
+                                    sendingDataToNewPage();
                                 }else if (!tietPanNo.getText().toString().equals("")){
                                     if (tilPAN_Name.getText().toString().trim().equals("")){
                                         Toast.makeText(activity, "Please Verify the PAN Card", Toast.LENGTH_SHORT).show();
                                     }else {
-                                            sendingDataToNewPage();
+                                        sendingDataToNewPage();
                                     }
                                 }
                                 else if(!tietVoterId.getText().toString().equals("")){
-                                           sendingDataToNewPage();
+                                    sendingDataToNewPage();
 
                                 }
                                 else if(!tietDrivingLic.getText().toString().equals("")){
                                     if (tilDL_Name.getText().toString().trim().equals("")){
                                         Toast.makeText(activity, "Please Verify the Driving License ", Toast.LENGTH_SHORT).show();
                                     }else{
-                                            sendingDataToNewPage();
-                                        }
+                                        sendingDataToNewPage();
+                                    }
 
 
 
@@ -2045,28 +2148,28 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
 
     private void sendingDataToNewPage() {
         if(isgetPanwithOCR){
-                if(isPanverify==1 || isDLverify==1 || isVoterverify==1){
-                    Intent intent = new Intent(ActivityBorrowerKyc.this, KYC_Form_New.class);
-                    intent.putExtra("FatherFName", tietFatherFName.getText().toString());
-                    intent.putExtra("FatherLName", tietFatherLName.getText().toString());
-                    intent.putExtra("FatherMName", tietFatherMName.getText().toString());
-                    intent.putExtra("MotherFName", tietMotherFName.getText().toString());
-                    intent.putExtra("MotherLName", tietMotherLName.getText().toString());
-                    intent.putExtra("MotherMName", tietMotherMName.getText().toString());
-                    intent.putExtra("SpouseLName", tietSpouseLName.getText().toString());
-                    intent.putExtra("SpouseMName", tietSpouseMName.getText().toString());
-                    intent.putExtra("SpouseFName", tietSpouseFName.getText().toString());
-                    intent.putExtra("VoterIdName", tilVoterId_Name.getText().toString());
-                    intent.putExtra("PANName", tilPAN_Name.getText().toString());
-                    intent.putExtra("DLName", tilDL_Name.getText().toString());
-                    intent.putExtra("AadharName", tietName.getText().toString());
-                    intent.putExtra("manager", manager);
-                    intent.putExtra("borrower", borrower);
-                    intent.putExtra(Global.SCHEME_TAG, schemeNameForVH);
-                    startActivity(intent);
-                }else{
-                    Utils.alert(ActivityBorrowerKyc.this,"Verify any one ID from PAN|DL|Voter ID");
-                }
+            if(isPanverify==1 || isDLverify==1 || isVoterverify==1){
+                Intent intent = new Intent(ActivityBorrowerKyc.this, KYC_Form_New.class);
+                intent.putExtra("FatherFName", tietFatherFName.getText().toString());
+                intent.putExtra("FatherLName", tietFatherLName.getText().toString());
+                intent.putExtra("FatherMName", tietFatherMName.getText().toString());
+                intent.putExtra("MotherFName", tietMotherFName.getText().toString());
+                intent.putExtra("MotherLName", tietMotherLName.getText().toString());
+                intent.putExtra("MotherMName", tietMotherMName.getText().toString());
+                intent.putExtra("SpouseLName", tietSpouseLName.getText().toString());
+                intent.putExtra("SpouseMName", tietSpouseMName.getText().toString());
+                intent.putExtra("SpouseFName", tietSpouseFName.getText().toString());
+                intent.putExtra("VoterIdName", tilVoterId_Name.getText().toString());
+                intent.putExtra("PANName", tilPAN_Name.getText().toString());
+                intent.putExtra("DLName", tilDL_Name.getText().toString());
+                intent.putExtra("AadharName", tietName.getText().toString());
+                intent.putExtra("manager", manager);
+                intent.putExtra("borrower", borrower);
+                intent.putExtra(Global.SCHEME_TAG, schemeNameForVH);
+                startActivity(intent);
+            }else{
+                Utils.alert(ActivityBorrowerKyc.this,"Verify any one ID from PAN|DL|Voter ID");
+            }
 
         }else{
             if(isPanverify==1 || isDLverify==1 || isVoterverify==1){
@@ -2219,12 +2322,28 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                 }
                 break;
             case R.id.tietDob:
-            case R.id.tietGuardian:
-            case R.id.tietName:
-                if (editText.length() < 3) {
+                if (editText.length() < 10) {
                     editText.setError("Should be more than 3 Characters");
-                    Utils.alert(this,"Name,Age and Guardian name should be more than 3 Characters");
+                    Utils.alert(this,"Age should be more than 3 Characters");
 
+                    retVal = false;
+                }
+                break;
+            case R.id.tietGuardian:
+                if (!containsNumbers(tietGuardian.getText().toString())) {
+                    // Show error: Invalid name (contains numbers)
+                    tietGuardian.setError("Invalid name. Please remove numbers.");
+                    editText.setEnabled(true);
+                    retVal = false;
+
+                }
+                break;
+
+            case R.id.tietName:
+                Log.d("naam","naam"+tietName.getText().toString());
+                Log.d("naam","naam"+editText.length());
+                if (editText.length() < 3 || !containsNumbers(tietName.getText().toString())) {
+                    editText.setError("Invalid Name");
                     retVal = false;
                 }
                 break;
@@ -2235,24 +2354,21 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                     int age = Integer.parseInt(text);
                     if (age < 21) {
                         editText.setError("Age should be greater than 17");
-                        Utils.alert(this,"Age should be greater than 17");
                         retVal = false;
                     } else if (age > 57) {
                         editText.setError("Age should be less than 66");
-                        Utils.alert(this,"Age should be less than 6");
                         retVal = false;
                     }
                     tietDob.setEnabled(retVal);
                 }catch (Exception e){
                     editText.setError("");
-                    Utils.alert(this,"Age should be greater than 17");
                 }
                 break;
             case R.id.tietAddress1:
                 String character=editText.getText().toString().trim();
-                if (editText.getText().toString().trim().length() < 4) {
-                    editText.setError("Should be more than 2 Characters");
-                    Utils.alert(this,"Address 1 should be more than 2 Characters");
+                if (editText.getText().toString().trim().length() < 3 || !containsOnlyAllowedCharacters(character)) {
+                    editText.setError("Should be more than 2 Characters or correct");
+                    editText.setEnabled(true);
                     retVal = false;
                 }else{
                     /*if (!Pattern.matches(AddressREGX, character)) {
@@ -2276,9 +2392,28 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                 break;
             case R.id.tietAddress2:
                 String character1=editText.getText().toString().trim();
-                if (editText.getText().toString().trim().length() < 1) {
-                    editText.setError("Should be more than 2 Characters");
-                    Utils.alert(this,"Address 1 should be more than 2 Characters");
+                Log.d("TAG", "validateControls: "+character1);
+                if (editText.getText().toString().trim().length() < 1 || !containsOnlyAllowedCharacters(character1)) {
+                    editText.setError("Should be more than 2 Characters or Address correct");
+                    editText.setEnabled(true);
+
+                    retVal = false;
+                }/*else{
+                    if (!Pattern.matches(AddressREGX, character1)) {
+                        editText.setError("Special Char. not allowed.");
+                        retVal = false;
+                    } else {
+                        retVal = true;
+                    }
+                }*/
+                break;
+
+            case R.id.tietAddress3:
+                String character3=editText.getText().toString().trim();
+                if (!containsOnlyAllowedCharacters(character3)) {
+                    editText.setError("Address should be correct");
+                    editText.setEnabled(true);
+
                     retVal = false;
                 }/*else{
                     if (!Pattern.matches(AddressREGX, character1)) {
@@ -2290,16 +2425,19 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                 }*/
                 break;
             case R.id.tietCity:
-                if (editText.getText().toString().trim().length() < 1) {
+                String city=editText.getText().toString();
+                if (city.trim().length() < 1 || !containsOnlyAllowedCharacters(city)) {
                     editText.setError("Should be more than 2 Characters");
-                    Utils.alert(this,"City name should be more than 2 Characters");
+                    editText.setEnabled(true);
+
                     retVal = false;
                 }
                 break;
             case R.id.tietPinCode:
                 if (editText.getText().toString().trim().length() != 6) {
                     editText.setError("Should be of 6 digits");
-                    Utils.alert(this,"Pin code should be of 6 digits");
+                    editText.setEnabled(true);
+
                     retVal = false;
                 }
                 break;
@@ -2308,7 +2446,8 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                 if (editText.getText().toString().trim().length() > 0) {
                     if (editText.getText().toString().trim().length() < 1) {
                         editText.setError("Enter Driving License");
-                        Utils.alert(this,"Enter Driving License");
+                        editText.setEnabled(true);
+
                         retVal = false;
                     }
                 } else {
@@ -2320,6 +2459,7 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                 if (editText.getText().toString().trim().length() > 0) {
                     if (editText.getText().toString().trim().replace(" ","").length() < 10) {
                         editText.setError("Should be more than 9 Characters");
+                        editText.setEnabled(true);
 
                         retVal = false;
                     }
@@ -2332,7 +2472,8 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                 if (editText.getText().toString().trim().length() > 0) {
                     if (editText.getText().toString().trim().replace(" ","").length() != 10) {
                         editText.setError("Should be of 10 digits");
-                        Utils.alert(this,"Mobile number should be of 10 digits");
+                        editText.setEnabled(true);
+
                         retVal = false;
                     }
                 } else {
@@ -2340,11 +2481,11 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                     editText.setError(null);
                 }
                 break;
-
             case R.id.tietMotherFName:
-                if (editText.getText().toString().trim().length() < 1) {
-                    editText.setError("Please Enter Mother Name");
-                    Utils.alert(this,"Please Enter Mother Name");
+                if (editText.getText().toString().trim().length() < 1 ||!containsNumbers(tietMotherFName.getText().toString())) {
+                    editText.setError("Please Enter Correct Mother Name");
+                    editText.setEnabled(true);
+
                     retVal = false;
 
                 } else {
@@ -2354,9 +2495,10 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                 break;
 
             case R.id.tietFatherFName:
-                if (editText.getText().toString().trim().length() < 1) {
-                    editText.setError("Please Enter Father Name");
-                    Utils.alert(this,"Please Enter Father Name");
+                if (editText.getText().toString().trim().length() < 1|| !containsNumbers(tietFatherFName.getText().toString())) {
+                    editText.setError("Please Enter Correct Father Name");
+                    editText.setEnabled(true);
+
                     retVal = false;
 
                 } else {
@@ -2368,10 +2510,10 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
             case R.id.tietSpouseFName:
                 if (Utils.getSpinnerStringValue((Spinner)findViewById(R.id.spinLoanAppPersonalMarritalStatus)).equals("Married"))
                 {
-                    if (editText.getText().toString().trim().length() < 1) {
-                        editText.setError("Please Enter Spouse Name");
+                    if (editText.getText().toString().trim().length() < 1 ||!containsNumbers(tietSpouseFName.getText().toString())) {
+                        editText.setError("Please Enter Correct Spouse Name");
+                        editText.setEnabled(true);
 
-                        Utils.alert(this,"Please Enter Spouse Name");
                         retVal = false;
 
                     } else {
@@ -2381,9 +2523,12 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
 
                 }
                 break;
+
         }
         return retVal;
     }
+
+
 
     private void cardValidate(String id,String type,String bankIfsc,String dob) {
         ProgressDialog progressDialog = new ProgressDialog(this);
@@ -2553,6 +2698,8 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
         retVal &= validateControls(tietAge, tietAge.getText().toString());
         retVal &= validateControls(tietDob, tietDob.getText().toString());
         retVal &= validateControls(tietAddress1, tietAddress1.getText().toString());
+        retVal &= validateControls(tietAddress2, tietAddress2.getText().toString());
+        retVal &= validateControls(tietAddress3, tietAddress3.getText().toString());
         retVal &= validateControls(tietCity, tietCity.getText().toString());
         retVal &= validateControls(tietPinCode, tietPinCode.getText().toString());
         retVal &= validateControls(tietMobile, tietMobile.getText().toString());
