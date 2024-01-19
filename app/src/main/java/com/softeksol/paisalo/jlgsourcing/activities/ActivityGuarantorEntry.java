@@ -405,7 +405,7 @@ public class ActivityGuarantorEntry extends AppCompatActivity implements View.On
         guarantor.setAge(Utils.getNotNullInt(tietAge));
         guarantor.setDOB(myCalendar.getTime());
 
-        guarantor.setGurName(Utils.getNotNullText(tietGuardian));
+        guarantor.setGurName(Utils.getNotNullText(tietGuardian).replace("S/O:","").replace("D/O:","").replace("W/O:","").replace("S/O","").replace("D/O","").replace("W/O",""));
         guarantor.setPerAdd1(Utils.getNotNullText(tietAddress1));
         guarantor.setPerAdd2(Utils.getNotNullText(tietAddress2));
         guarantor.setPerAdd3(Utils.getNotNullText(tietAddress3));

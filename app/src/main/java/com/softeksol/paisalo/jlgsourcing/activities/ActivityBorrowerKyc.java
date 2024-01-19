@@ -535,9 +535,23 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                 validateControls(editText, text);
             }
         });
-
         tietAddress2 = findViewById(R.id.tietAddress2);
         tietAddress3 = findViewById(R.id.tietAddress3);
+        tietAddress2.addTextChangedListener(new MyTextWatcher(tietAddress2) {
+            @Override
+            public void validate(EditText editText, String text) {
+                validateControls(editText, text);
+            }
+        });
+
+        tietAddress3.addTextChangedListener(new MyTextWatcher(tietAddress3) {
+            @Override
+            public void validate(EditText editText, String text) {
+                validateControls(editText, text);
+            }
+        });
+
+
         tietCity = findViewById(R.id.tietCity);
         tietCity.addTextChangedListener(new MyTextWatcher(tietCity) {
             @Override
@@ -1205,26 +1219,72 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                                     for (int i = 0; i < address1.length; i++) {
                                         if (address1[i].toUpperCase().contains("S/O") || address1[i].toUpperCase().contains("D/O") || address1[i].toUpperCase().contains("W/O")){
                                             borrower.setGuardianNames(address1[i].replace("S/O:","").replace("D/O:","").replace("W/O:","").replace("S/O","").replace("D/O","").replace("W/O",""));
+                                            if (address1[i].toUpperCase().contains("S/O") || address1[i].toUpperCase().contains("D/O")){
+                                                String[] fatherName=address1[i].split(" ");
+                                                switch (fatherName.length){
+                                                    case 2:
+                                                        tietFatherFName.setText(fatherName[1]);
+                                                        break;
+                                                    case 3:
+                                                        tietFatherFName.setText(fatherName[1]);
+                                                        tietFatherLName.setText(fatherName[2]);
+
+                                                        break;
+                                                    case 4:
+                                                        tietFatherFName.setText(fatherName[1]);
+                                                        tietFatherMName.setText(fatherName[2]);
+                                                        tietFatherLName.setText(fatherName[3]);
+                                                        break;
+                                                    default:
+                                                        tietFatherFName.setText(response.body().get("data").getAsJsonArray().get(0).getAsJsonObject().get("address1").getAsString().split(",")[0].toUpperCase().replace("S/O","").replace("S/O:","").replace("D/O","").replace("D/O:",""));
+                                                        break;
+                                                }
+
+
+                                            }else{
+                                                if (address1[i].startsWith("W/O")){
+                                                    String[] spouseName=address1[i].split(" ");
+                                                    switch (spouseName.length){
+                                                        case 2:
+                                                            tietSpouseFName.setText(spouseName[1]);
+                                                            break;
+                                                        case 3:
+                                                            tietSpouseFName.setText(spouseName[1]);
+                                                            tietSpouseLName.setText(spouseName[2]);
+
+                                                            break;
+                                                        case 4:
+                                                            tietSpouseFName.setText(spouseName[1]);
+                                                            tietSpouseMName.setText(spouseName[2]);
+                                                            tietSpouseLName.setText(spouseName[3]);
+                                                            break;
+                                                        default:
+                                                            tietSpouseFName.setText(address1[i].toUpperCase().replace("W/O","").replace("W/O:",""));
+                                                            break;
+                                                    }
+
+                                                }
+                                            }
                                             continue;
                                         }
                                         borrower.P_Add1 = borrower.P_Add1 + address1[i];
 
-                                        if (containsOnlyAllowedCharacters(borrower.P_Add1)){
-                                            borrower.P_Add1="";
-                                            tietAddress1.setEnabled(true);
-                                        }
-
-
-
-                                        if (containsOnlyAllowedCharacters(borrower.P_add2)){
-                                            borrower.P_add2="";
-                                            tietAddress2.setEnabled(true);
-                                        }
-
-                                        if (containsOnlyAllowedCharacters(borrower.P_add3)){
-                                            borrower.P_add3="";
-                                            tietAddress3.setEnabled(true);
-                                        }
+//                                        if (containsOnlyAllowedCharacters(borrower.P_Add1)){
+//                                            borrower.P_Add1="";
+//                                            tietAddress1.setEnabled(true);
+//                                        }
+//
+//
+//
+//                                        if (containsOnlyAllowedCharacters(borrower.P_add2)){
+//                                            borrower.P_add2="";
+//                                            tietAddress2.setEnabled(true);
+//                                        }
+//
+//                                        if (containsOnlyAllowedCharacters(borrower.P_add3)){
+//                                            borrower.P_add3="";
+//                                            tietAddress3.setEnabled(true);
+//                                        }
                                         /* ----------Add 15-12-23----------------------------------*/
                                         if (address1[i].startsWith("W/O")){
                                             Utils.setSpinnerPosition(spinnerMarritalStatus, "Married", false);
@@ -1331,8 +1391,15 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
     }
 
     public static boolean containsOnlyAllowedCharacters(String input) {
-        String allowedCharactersRegex = "[a-zA-Z0-9 ,.:/\\-]+";
-        return input.matches(".*[^" + allowedCharactersRegex + "].*");
+        String A = "[,:./]";
+        String allowedCharactersRegex = "[a-zA-Z0-9 ,:./\\-]+";
+
+        return ( input.matches(allowedCharactersRegex) && !(input.startsWith(".") ||input.startsWith(":") || input.startsWith("/") ||input.startsWith("-") ||input.startsWith(",")));
+
+    }
+    private boolean containsNumbers(String text) {
+        return text != null && text.matches("^[a-zA-Z ]+$");
+
     }
 
     private void setAadharContent(String aadharDataString) throws Exception {
@@ -2256,8 +2323,8 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                 break;
             case R.id.tietDob:
                 if (editText.length() < 10) {
-                    editText.setError("Should be more than 3 Characters");
-                    Utils.alert(this,"Age should be more than 3 Characters");
+                    editText.setError("Date of Birth Should be correct");
+                    Utils.alert(this,"Date of Birth Should be correct");
 
                     retVal = false;
                 }
@@ -2266,15 +2333,16 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                 if (!containsNumbers(tietGuardian.getText().toString())) {
                     // Show error: Invalid name (contains numbers)
                     tietGuardian.setError("Invalid name. Please remove numbers.");
+                    editText.setEnabled(true);
+                    retVal = false;
+
                 }
                 break;
 
             case R.id.tietName:
-                Log.d("naam","naam"+tietName.getText().toString());
-                Log.d("naam","naam"+editText.length());
+
                 if (editText.length() < 3 || !containsNumbers(tietName.getText().toString())) {
                     editText.setError("Invalid Name");
-
                     retVal = false;
                 }
                 break;
@@ -2297,9 +2365,9 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                 break;
             case R.id.tietAddress1:
                 String character=editText.getText().toString().trim();
-                if (editText.getText().toString().trim().length() < 4) {
-                    editText.setError("Should be more than 2 Characters");
-                    Utils.alert(this,"Address 1 should be more than 2 Characters");
+                if (editText.getText().toString().trim().length() < 3 || !containsOnlyAllowedCharacters(character)) {
+                    editText.setError("Should be more than 2 Characters or correct");
+                    editText.setEnabled(true);
                     retVal = false;
                 }else{
                     /*if (!Pattern.matches(AddressREGX, character)) {
@@ -2323,9 +2391,28 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                 break;
             case R.id.tietAddress2:
                 String character1=editText.getText().toString().trim();
-                if (editText.getText().toString().trim().length() < 1) {
-                    editText.setError("Should be more than 2 Characters");
-                    Utils.alert(this,"Address 1 should be more than 2 Characters");
+                Log.d("TAG", "validateControls: "+character1);
+                if (editText.getText().toString().trim().length() < 1 || !containsOnlyAllowedCharacters(character1)) {
+                    editText.setError("Should be more than 2 Characters or Address correct");
+                    editText.setEnabled(true);
+
+                    retVal = false;
+                }/*else{
+                    if (!Pattern.matches(AddressREGX, character1)) {
+                        editText.setError("Special Char. not allowed.");
+                        retVal = false;
+                    } else {
+                        retVal = true;
+                    }
+                }*/
+                break;
+
+                case R.id.tietAddress3:
+                String character3=editText.getText().toString().trim();
+                if (!containsOnlyAllowedCharacters(character3)) {
+                    editText.setError("Address should be correct");
+                    editText.setEnabled(true);
+
                     retVal = false;
                 }/*else{
                     if (!Pattern.matches(AddressREGX, character1)) {
@@ -2337,16 +2424,19 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                 }*/
                 break;
             case R.id.tietCity:
-                if (editText.getText().toString().trim().length() < 1) {
+                String city=editText.getText().toString();
+                if (city.trim().length() < 1 || !containsOnlyAllowedCharacters(city)) {
                     editText.setError("Should be more than 2 Characters");
-                    Utils.alert(this,"City name should be more than 2 Characters");
+                    editText.setEnabled(true);
+
                     retVal = false;
                 }
                 break;
             case R.id.tietPinCode:
                 if (editText.getText().toString().trim().length() != 6) {
                     editText.setError("Should be of 6 digits");
-                    Utils.alert(this,"Pin code should be of 6 digits");
+                    editText.setEnabled(true);
+
                     retVal = false;
                 }
                 break;
@@ -2355,7 +2445,8 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                 if (editText.getText().toString().trim().length() > 0) {
                     if (editText.getText().toString().trim().length() < 1) {
                         editText.setError("Enter Driving License");
-                        Utils.alert(this,"Enter Driving License");
+                        editText.setEnabled(true);
+
                         retVal = false;
                     }
                 } else {
@@ -2367,6 +2458,7 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                 if (editText.getText().toString().trim().length() > 0) {
                     if (editText.getText().toString().trim().replace(" ","").length() < 10) {
                         editText.setError("Should be more than 9 Characters");
+                        editText.setEnabled(true);
 
                         retVal = false;
                     }
@@ -2379,6 +2471,8 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                 if (editText.getText().toString().trim().length() > 0) {
                     if (editText.getText().toString().trim().replace(" ","").length() != 10) {
                         editText.setError("Should be of 10 digits");
+                        editText.setEnabled(true);
+
                         retVal = false;
                     }
                 } else {
@@ -2389,6 +2483,8 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
             case R.id.tietMotherFName:
                 if (editText.getText().toString().trim().length() < 1 ||!containsNumbers(tietMotherFName.getText().toString())) {
                     editText.setError("Please Enter Correct Mother Name");
+                    editText.setEnabled(true);
+
                     retVal = false;
 
                 } else {
@@ -2400,6 +2496,8 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
             case R.id.tietFatherFName:
                 if (editText.getText().toString().trim().length() < 1|| !containsNumbers(tietFatherFName.getText().toString())) {
                     editText.setError("Please Enter Correct Father Name");
+                    editText.setEnabled(true);
+
                     retVal = false;
 
                 } else {
@@ -2413,6 +2511,7 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                 {
                     if (editText.getText().toString().trim().length() < 1 ||!containsNumbers(tietSpouseFName.getText().toString())) {
                         editText.setError("Please Enter Correct Spouse Name");
+                        editText.setEnabled(true);
 
                         retVal = false;
 
@@ -2428,9 +2527,7 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
         return retVal;
     }
 
-    private boolean containsNumbers(String text) {
-        return text != null && text.matches("^[a-zA-Z ]+$");
-    }
+
 
     private void cardValidate(String id,String type,String bankIfsc,String dob) {
         ProgressDialog progressDialog = new ProgressDialog(this);
@@ -2600,6 +2697,8 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
         retVal &= validateControls(tietAge, tietAge.getText().toString());
         retVal &= validateControls(tietDob, tietDob.getText().toString());
         retVal &= validateControls(tietAddress1, tietAddress1.getText().toString());
+        retVal &= validateControls(tietAddress2, tietAddress2.getText().toString());
+        retVal &= validateControls(tietAddress3, tietAddress3.getText().toString());
         retVal &= validateControls(tietCity, tietCity.getText().toString());
         retVal &= validateControls(tietPinCode, tietPinCode.getText().toString());
         retVal &= validateControls(tietMobile, tietMobile.getText().toString());
