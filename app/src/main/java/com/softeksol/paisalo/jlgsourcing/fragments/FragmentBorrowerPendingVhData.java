@@ -248,6 +248,7 @@ public class FragmentBorrowerPendingVhData extends AbsFragment implements View.O
         borrower = activity.getBorrower();
         borrowerExtra = borrower.getBorrowerExtraByFI(borrower.Code);
         Log.d("TAG", "onResume: "+borrowerExtra);
+        Log.d("TAG", "onResume: "+borrower);
         if (borrowerExtra == null) {
             borrowerExtra = new BorrowerExtra();
             activity.getBorrower().associateExtra(borrowerExtra);
@@ -260,6 +261,8 @@ public class FragmentBorrowerPendingVhData extends AbsFragment implements View.O
     private void setDataToView(View v) {
 
 
+        Log.e("BUSSINESS",borrower.Business_Detail);
+        Log.e("OCCUPATION_TYPE",borrowerExtra.OCCUPATION_TYPE);
 
         String isMarried = borrower.isMarried;
         if(isMarried.equals("U")){
@@ -307,39 +310,45 @@ public class FragmentBorrowerPendingVhData extends AbsFragment implements View.O
     }
 
     private void getDataFromView(View view) {
-        borrower.Expense=Utils.getNotNullInt((TextInputEditText) view.findViewById(R.id.tietExpenseMonthly));
-        borrower.Income=Utils.getNotNullInt((TextInputEditText) view.findViewById(R.id.tietIncomeMonthly));
-        borrowerExtra.AGRICULTURAL_INCOME=Utils.getNotNullText((TextInputEditText) view.findViewById(R.id.tietAgricultureIncome));;
-       // borrowerExtra.AGRICULTURAL_INCOME=Utils.getSpinnerStringValue((Spinner) view.findViewById(R.id.spinAgriIncome));
-        borrowerExtra.ANNUAL_INCOME=String.valueOf(Utils.getNotNullInt((TextInputEditText) view.findViewById(R.id.tietIncomeMonthly))*12);
-        borrowerExtra.MARITAL_STATUS=Utils.getSpinnerStringValue((Spinner) view.findViewById(R.id.spinLoanAppPersonalMarritalStatus));
-       // borrowerExtra.OCCUPATION_TYPE=Utils.getSpinnerStringValue((Spinner) view.findViewById(R.id.acspOccupation));
-       // borrower.Business_Detail=Utils.getSpinnerStringValue((Spinner) view.findViewById(R.id.acspBusinessDetail));
-        borrowerExtra.FamIncomeSource=Utils.getSpinnerStringValue((Spinner) view.findViewById(R.id.earningMemberTypeSpin));
-        borrowerExtra.FamMonthlyIncome=Utils.getNotNullInt((TextInputEditText) view.findViewById(R.id.EditEarningMemberIncome));
-        borrowerExtra.FutureIncome=Utils.getNotNullInt((TextInputEditText) view.findViewById(R.id.tietFutureIncome));
-        borrowerExtra.PensionIncome=Utils.getNotNullInt((TextInputEditText) view.findViewById(R.id.tietPensionIncome));
-        borrowerExtra.OTHER_THAN_AGRICULTURAL_INCOME=Utils.getNotNullText((TextInputEditText) view.findViewById(R.id.tietOtherIncome));
-        borrowerExtra.InterestIncome=Utils.getNotNullInt((TextInputEditText) view.findViewById(R.id.tietInterestIncome));
+        if (view != null) {
+        borrower.Expense = Utils.getNotNullInt((TextInputEditText) view.findViewById(R.id.tietExpenseMonthly));
+        borrower.Income = Utils.getNotNullInt((TextInputEditText) view.findViewById(R.id.tietIncomeMonthly));
+        borrowerExtra.AGRICULTURAL_INCOME = Utils.getNotNullText((TextInputEditText) view.findViewById(R.id.tietAgricultureIncome));
+        ;
+        // borrowerExtra.AGRICULTURAL_INCOME=Utils.getSpinnerStringValue((Spinner) view.findViewById(R.id.spinAgriIncome));
+        borrowerExtra.ANNUAL_INCOME = String.valueOf(Utils.getNotNullInt((TextInputEditText) view.findViewById(R.id.tietIncomeMonthly)) * 12);
+        borrowerExtra.MARITAL_STATUS = Utils.getSpinnerStringValue((Spinner) view.findViewById(R.id.spinLoanAppPersonalMarritalStatus));
+        borrowerExtra.OCCUPATION_TYPE = Utils.getSpinnerStringValue((Spinner) view.findViewById(R.id.acspOccupation));
+        borrower.Business_Detail = Utils.getSpinnerStringValue((Spinner) view.findViewById(R.id.acspBusinessDetail));
+        borrowerExtra.FamIncomeSource = Utils.getSpinnerStringValue((Spinner) view.findViewById(R.id.earningMemberTypeSpin));
+        borrowerExtra.FamMonthlyIncome = Utils.getNotNullInt((TextInputEditText) view.findViewById(R.id.EditEarningMemberIncome));
+        borrowerExtra.FutureIncome = Utils.getNotNullInt((TextInputEditText) view.findViewById(R.id.tietFutureIncome));
+        borrowerExtra.PensionIncome = Utils.getNotNullInt((TextInputEditText) view.findViewById(R.id.tietPensionIncome));
+        borrowerExtra.OTHER_THAN_AGRICULTURAL_INCOME = Utils.getNotNullText((TextInputEditText) view.findViewById(R.id.tietOtherIncome));
+        borrowerExtra.InterestIncome = Utils.getNotNullInt((TextInputEditText) view.findViewById(R.id.tietInterestIncome));
 
         //borrowerExtra.MOTHER_TITLE=((EditText) view.findViewById(R.id.editMOTHER_TITLE)).getText().toString();
-        borrowerExtra.MOTHER_FIRST_NAME=Utils.getNotNullText((TextInputEditText) view.findViewById(R.id.tietMotherFName));
-        borrowerExtra.MOTHER_MIDDLE_NAME=Utils.getNotNullText((TextInputEditText) view.findViewById(R.id.tietmotherMname));
-        borrowerExtra.MOTHER_LAST_NAME=Utils.getNotNullText((TextInputEditText) view.findViewById(R.id.tietMotherLName));
+        borrowerExtra.MOTHER_FIRST_NAME = Utils.getNotNullText((TextInputEditText) view.findViewById(R.id.tietMotherFName));
+        borrowerExtra.MOTHER_MIDDLE_NAME = Utils.getNotNullText((TextInputEditText) view.findViewById(R.id.tietmotherMname));
+        borrowerExtra.MOTHER_LAST_NAME = Utils.getNotNullText((TextInputEditText) view.findViewById(R.id.tietMotherLName));
 //        borrowerExtra.MOTHER_MAIDEN_NAME=((EditText) view.findViewById(R.id.editMOTHER_MAIDEN_NAME)).getText().toString();
 //        borrowerExtra.SPOUSE_TITLE=((EditText) view.findViewById(R.id.editSPOUSE_TITLE)).getText().toString();
-        borrowerExtra.SPOUSE_FIRST_NAME=Utils.getNotNullText((TextInputEditText) view.findViewById(R.id.tietSpouseFName));
-        borrowerExtra.SPOUSE_MIDDLE_NAME=Utils.getNotNullText((TextInputEditText) view.findViewById(R.id.tietSpouseMName));
-        borrowerExtra.SPOUSE_LAST_NAME=Utils.getNotNullText((TextInputEditText) view.findViewById(R.id.tietSpouseLName));
+        borrowerExtra.SPOUSE_FIRST_NAME = Utils.getNotNullText((TextInputEditText) view.findViewById(R.id.tietSpouseFName));
+        borrowerExtra.SPOUSE_MIDDLE_NAME = Utils.getNotNullText((TextInputEditText) view.findViewById(R.id.tietSpouseMName));
+        borrowerExtra.SPOUSE_LAST_NAME = Utils.getNotNullText((TextInputEditText) view.findViewById(R.id.tietSpouseLName));
 //        borrowerExtra.APPLICNT_TITLE=((EditText) view.findViewById(R.id.editAPPLICNT_TITLE)).getText().toString();
 //        borrowerExtra.FATHER_TITLE=((EditText) view.findViewById(R.id.editFATHER_TITLE)).getText().toString();
-        borrowerExtra.FATHER_FIRST_NAME=Utils.getNotNullText((TextInputEditText) view.findViewById(R.id.tietFatherFName));
-        borrowerExtra.FATHER_MIDDLE_NAME=Utils.getNotNullText((TextInputEditText) view.findViewById(R.id.tietFatherMName));
-        borrowerExtra.FATHER_LAST_NAME=Utils.getNotNullText((TextInputEditText) view.findViewById(R.id.tietFatherLName));
-        borrower.isMarried=Utils.getSpinnerStringValue((Spinner) view.findViewById(R.id.spinLoanAppPersonalMarritalStatus)).substring(0,1).toUpperCase();
-       Log.d("TAG", "getDataFromView: yha tk chal rha h 1");
+        borrowerExtra.FATHER_FIRST_NAME = Utils.getNotNullText((TextInputEditText) view.findViewById(R.id.tietFatherFName));
+        borrowerExtra.FATHER_MIDDLE_NAME = Utils.getNotNullText((TextInputEditText) view.findViewById(R.id.tietFatherMName));
+        borrowerExtra.FATHER_LAST_NAME = Utils.getNotNullText((TextInputEditText) view.findViewById(R.id.tietFatherLName));
+        borrower.isMarried = Utils.getSpinnerStringValue((Spinner) view.findViewById(R.id.spinLoanAppPersonalMarritalStatus)).substring(0, 1).toUpperCase();
+        Log.d("TAG", "getDataFromView: yha tk chal rha h 1 VHPENDING");
+        Log.e("ONPUSERBUSSINESS", borrower.Business_Detail);
+        Log.e("ONPUSEROCCUPATION_TYPE", borrowerExtra.OCCUPATION_TYPE);
         borrowerExtra.save();
         borrower.save();
+
+    }
 
     }
 

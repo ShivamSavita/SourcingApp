@@ -1114,7 +1114,6 @@
                                 android:id="@+id/acspLoanReason"
                                 android:layout_marginStart="@dimen/input_label_horizontal_spacing"
                                 android:textSize="15dp"
-
                                 android:layout_width="match_parent"
                                 android:layout_height="40dp" />
                         </LinearLayout>
@@ -1155,7 +1154,6 @@
                             android:id="@+id/acspOccupation"
                             android:layout_marginStart="@dimen/input_label_horizontal_spacing"
                             android:textSize="15dp"
-
                             android:layout_width="match_parent"
                             android:layout_height="40dp" />
                     </LinearLayout>

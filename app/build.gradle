@@ -56,7 +56,6 @@ android {
     }
 
     productFlavors {
-
         igl {
             versionCode 73
             versionName "7.3"
@@ -87,8 +86,8 @@ android {
 
 
         SBIColending {
-            versionCode 12
-            versionName "1.6.10"
+            versionCode 13
+            versionName "1.6.12"
             applicationId "net.softeksol.seil.groupfin.sbicolending"
             resValue("string", "appname", "SBI-CoLending")
             buildConfigField("String", 'DATABASE_NAME', '"SBIPDLCOL"')

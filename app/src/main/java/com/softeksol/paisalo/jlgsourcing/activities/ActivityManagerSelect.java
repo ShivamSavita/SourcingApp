@@ -221,9 +221,12 @@ public class ActivityManagerSelect extends AppCompatActivity implements View.OnC
         // Create the AlertDialog
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setView(customDialogView);
+        AlertDialog alertDialog = builder.create();
         btnApply.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                alertDialog.dismiss();//updated on 20-01-2024
                 intent = new Intent(ActivityManagerSelect.this, ActivityBorrowerKyc.class);
                 intent.putExtra(Global.MANAGER_TAG, manager);
                 intent.putExtra(Global.SCHEME_TAG, selectedSchemeName);
@@ -232,7 +235,7 @@ public class ActivityManagerSelect extends AppCompatActivity implements View.OnC
         });
 
         // Show the AlertDialog
-        AlertDialog alertDialog = builder.create();
+
         alertDialog.show();
     }
     @Override

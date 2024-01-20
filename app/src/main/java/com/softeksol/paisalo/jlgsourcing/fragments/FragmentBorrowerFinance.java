@@ -305,11 +305,13 @@ public class FragmentBorrowerFinance extends AbsFragment implements View.OnClick
                             showDialog(etBankAccount);
                             tilBankAccountName.setVisibility(View.VISIBLE);
                             tilBankAccountName.setText("BANK not Verify");
+                            checkBankAccountNuber.setEnabled(true);
                             //tilBankAccountName.setTextColor(getResources().getColor(R.color.green));
 
 
                         }
                     }catch (Exception e){
+                         checkBankAccountNuber.setEnabled(true);
                         showDialog(etBankAccount);
                         tilBankAccountName.setVisibility(View.VISIBLE);
                         tilBankAccountName.setText("BANK API not Working");
@@ -324,6 +326,7 @@ public class FragmentBorrowerFinance extends AbsFragment implements View.OnClick
             public void onFailure(Call<JsonObject> call, Throwable t) {
                 tilBankAccountName.setText(t.getMessage());
                     progressDialog.cancel();
+                     checkBankAccountNuber.setEnabled(true);
                     checkBankAccountNuber.setBackground(getResources().getDrawable(R.drawable.check_sign_ic));
 
 
@@ -356,9 +359,11 @@ public class FragmentBorrowerFinance extends AbsFragment implements View.OnClick
                      isAccountVerify="V";
                      UpdatefiVerificationDocName();
                 }else{
+                    checkBankAccountNuber.setEnabled(true);
                     Toast.makeText(activity, "Account Number Did not Match. Please Enter Again!!", Toast.LENGTH_SHORT).show();
                 }
             } else {
+                checkBankAccountNuber.setEnabled(true);
                 Toast.makeText(getContext(), "Please Enter Account number", Toast.LENGTH_SHORT).show();
             }
         });

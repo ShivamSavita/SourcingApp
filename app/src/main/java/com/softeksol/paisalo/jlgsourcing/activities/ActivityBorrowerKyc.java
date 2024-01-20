@@ -606,12 +606,12 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
         };
         imgViewCal.setOnClickListener(this);
         tietMobile = findViewById(R.id.tietMobile);
-        tietMobile.addTextChangedListener(new MyTextWatcher(tietMobile) {
+       /* tietMobile.addTextChangedListener(new MyTextWatcher(tietMobile) {
             @Override
             public void validate(EditText editText, String text) {
                 validateControls(editText, text);
             }
-        });
+        });*/
 
         tietPanNo = findViewById(R.id.tietPAN);
 
@@ -2473,7 +2473,6 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                     if (editText.getText().toString().trim().replace(" ","").length() != 10) {
                         editText.setError("Should be of 10 digits");
                         editText.setEnabled(true);
-
                         retVal = false;
                     }
                 } else {

@@ -124,7 +124,7 @@ TextView textViewTotalAnnualIncome;
                 SQLite.select().from(RangeCategory.class).where(RangeCategory_Table.cat_key.eq("occupation-type")).queryList(), false);
 
         rlaBussiness= new AdapterListRange(this,
-                SQLite.select().from(RangeCategory.class).where(RangeCategory_Table.cat_key.eq("loan_purpose")).queryList(), false);
+                SQLite.select().from(RangeCategory.class).where(RangeCategory_Table.cat_key.eq("other_employment")).queryList(), false);
 
         rlaEarningMember = new AdapterListRange(this,
                 SQLite.select().from(RangeCategory.class).where(RangeCategory_Table.cat_key.eq("other_income")).queryList(), false);
