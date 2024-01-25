@@ -234,6 +234,7 @@ public class ActivityLogin extends AppCompatActivity implements View.OnClickList
                             List<Manager> managers = WebOperations.convertToObjectArray(loginData.getString("folist"), listType);
                             loginData.remove("folist");
                             //Log.d("Login Resp",loginData.toString());
+                            
 
                         /*IglPreferences.removePref(getBaseContext(), SEILESign.APP_SETTINGS);
                         IglPreferences.removePref(getBaseContext(), SEILESign.IS_ACTUAL);

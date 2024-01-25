@@ -340,6 +340,28 @@ public class WebOperations {
         }
     }
 
+
+
+    public void postEntityESignTest(Context context, String controller, String method, String jsonString, ResponseHandlerInterface responseHandler) {
+        try {
+            //Log.d("Json Data",jsonString);
+            // String url = "https://agra.seil.in:8444/ESignSBIAV1/" + "api/" + controller + "/" + method;
+            String url = "https://agra.Paisalo.in:8444/ESignSBIAV1TEST/" + "api/" + controller + "/" + method;
+            Log.d("TAG", "postEntity: "+ "https://agra.seil.in:8444/ESignSBIAV1/" + "api/" + controller + "/" + method);
+            StringEntity entity = new StringEntity(Utils.cleanTextContent(jsonString));
+            AsyncHttpClient client = new AsyncHttpClient();
+            client.setThreadPool(Executors.newSingleThreadExecutor());
+            setHttpHeadersJsonESign(context, client, true);
+            Log.d("Url", url+"///post entity:///"+entity+"/////response hendler:"+responseHandler);
+            client.post(context, url, entity, "application/json", responseHandler);
+            //client.getLogInterface().setLoggingEnabled(1);
+            //client.setLoggingEnabled(true);
+            //client.setLoggingLevel(9);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void postAttendence(Context context, String dbName, String controller, String method, String jsonString, ResponseHandlerInterface responseHandler) {
         try {
             String url = IglPreferences.getPrefString(context, SEILIGL.BASE_URL, "") + "api/" + controller + "/" + method;

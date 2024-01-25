@@ -272,7 +272,7 @@ public class FragmentBorrowerPendingVhData extends AbsFragment implements View.O
         }
 
         Utils.setSpinnerPosition((Spinner) v.findViewById(R.id.spinLoanAppPersonalMarritalStatus),isMarried,true);
-        v.findViewById(R.id.spinLoanAppPersonalMarritalStatus).setEnabled(false);
+        ((Spinner)v.findViewById(R.id.spinLoanAppPersonalMarritalStatus)).setEnabled(false);
         //Utils.setSpinnerPosition((Spinner) v.findViewById(R.id.spinLoanAppPersonalMarritalStatus),borrowerExtra.MARITAL_STATUS);
         Utils.setSpinnerPosition((Spinner) v.findViewById(R.id.acspOccupation),borrowerExtra.OCCUPATION_TYPE);
         Utils.setSpinnerPosition((Spinner) v.findViewById(R.id.acspBusinessDetail),borrower.Business_Detail);

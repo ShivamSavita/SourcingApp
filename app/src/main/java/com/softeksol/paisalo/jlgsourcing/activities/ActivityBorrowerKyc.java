@@ -1398,7 +1398,7 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
 
     }
     private boolean containsNumbers(String text) {
-        return text != null && text.matches("^[a-zA-Z ]+$");
+        return text != null && text.matches("^[a-zA-Z ]+\\.?[a-zA-Z ]*$");
 
     }
 

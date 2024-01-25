@@ -152,16 +152,20 @@ public class ActivityLoanDetails extends AppCompatActivity implements View.OnCli
         unsignedDocRequest.FiCode = eSignBorrower.FiCode;
         String schemeCode=eSignBorrower.KycUuid;
           if(schemeCode.substring(0,2).equalsIgnoreCase("UC")){
+              unsignedDocRequest.UserID = IglPreferences.getPrefString(this, SEILIGL.USER_ID, "");
+              Log.d("TAG", "downloadUnsignedDoc: "+WebOperations.convertToJson(unsignedDocRequest));
               unsignedDocRequest.DocName = BuildConfig.DOC_NAME + (IglPreferences.getPrefString(this, SEILIGL.IS_ACTUAL, "").equals("Y") ? "_sample" : "");
-          }else if(schemeCode==""){
-              unsignedDocRequest.DocName = BuildConfig.DOC_NAME + (IglPreferences.getPrefString(this, SEILIGL.IS_ACTUAL, "").equals("Y") ? "_sample" : "");
+              ( new WebOperations()).postEntityESign(this, "DocsESignPvn", "downloadunsigneddoc", WebOperations.convertToJson(unsignedDocRequest), fileAsyncResponseHandler);
+
           }else{
               unsignedDocRequest.DocName = "SBINEWDOC";//BuildConfig.DOC_NAME + (IglPreferences.getPrefString(this, SEILIGL.IS_ACTUAL, "").equals("Y") ? "_sample" : "");
+              unsignedDocRequest.UserID = IglPreferences.getPrefString(this, SEILIGL.USER_ID, "");
+              Log.d("TAG", "downloadUnsignedDoc: "+WebOperations.convertToJson(unsignedDocRequest));
+              ( new WebOperations()).postEntityESignTest(this, "DocsESignPvn", "downloadunsigneddoc", WebOperations.convertToJson(unsignedDocRequest), fileAsyncResponseHandler);
+
           }
        // Toast.makeText(this, schemeCode, Toast.LENGTH_SHORT).show();
-        unsignedDocRequest.UserID = IglPreferences.getPrefString(this, SEILIGL.USER_ID, "");
-        Log.d("TAG", "downloadUnsignedDoc: "+WebOperations.convertToJson(unsignedDocRequest));
-        ( new WebOperations()).postEntityESign(this, "DocsESignPvn", "downloadunsigneddoc", WebOperations.convertToJson(unsignedDocRequest), fileAsyncResponseHandler);
+
     }
 
     private void updateEsignerList() {
