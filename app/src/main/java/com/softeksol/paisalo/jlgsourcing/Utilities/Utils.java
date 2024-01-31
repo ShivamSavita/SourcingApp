@@ -5,6 +5,8 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
+import android.location.Address;
+import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
@@ -59,6 +61,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -682,6 +685,29 @@ public class Utils {
                 || (Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic"))
                 || "google_sdk".equals(Build.PRODUCT)
                 || Build.HARDWARE.contains("golfdish");
+    }
+
+
+    public static String getAddress(double latitude, double longitude,Context context) {
+        String addrerss="";
+        StringBuilder result = new StringBuilder();
+        if(latitude != 0.0){
+            try {
+                Geocoder geocoder = new Geocoder(context, Locale.getDefault());
+                List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
+                if (addresses.size() > 0) {
+                    Address address = addresses.get(0);
+                    result.append(address.getAddressLine(0));
+                    // result.append(address.getLocality());
+                    // result.append(address.getCountryName());
+                    addrerss=result.toString();
+                    Log.e("tag", addrerss);
+                }
+            } catch (IOException e) {
+                //  Log.e("tag", e.getMessage());
+            }
+        }
+        return addrerss;
     }
 
 }

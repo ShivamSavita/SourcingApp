@@ -422,6 +422,7 @@ public class ActivityOperationSelect extends AppCompatActivity implements Naviga
         jsonObject.addProperty("latitude",gpsTracker.getLatitude()+"");
         jsonObject.addProperty("longitude", gpsTracker.getLongitude()+"");
         jsonObject.addProperty("appInBackground",login);
+        jsonObject.addProperty("Activity","0");
         jsonObject.addProperty("Address",getAddress(gpsTracker.getLatitude(),gpsTracker.getLongitude()));
         return jsonObject;
     }

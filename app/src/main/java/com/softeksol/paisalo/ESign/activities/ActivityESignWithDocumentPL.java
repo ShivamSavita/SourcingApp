@@ -423,7 +423,7 @@ public class  ActivityESignWithDocumentPL extends AppCompatActivity implements V
             alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
         } else
             alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(consentCheckbox.isChecked() && tilAadhar.getVisibility() == View.VISIBLE
-                    && tietAadhar.getText().length() == 12 && Long.parseLong(tietAadhar.getText().toString().substring(8)) > 0);
+                    && tietAadhar.getText().length() == 12 );   //&& Long.parseLong(tietAadhar.getText().toString().substring(8)) > 0
     }
 
     private void showApprovalDialog(final JSONObject jsonObject) {

@@ -1,14 +1,11 @@
 package com.softeksol.paisalo.jlgsourcing.fragments;
 
-import static com.softeksol.paisalo.jlgsourcing.Global.ESIGN_TYPE_TAG;
-
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.media.Image;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -45,14 +42,17 @@ import com.softeksol.paisalo.jlgsourcing.Utilities.MyTextWatcher;
 import com.softeksol.paisalo.jlgsourcing.Utilities.Utils;
 import com.softeksol.paisalo.jlgsourcing.WebOperations;
 import com.softeksol.paisalo.jlgsourcing.activities.ActivityCollection;
-import com.softeksol.paisalo.jlgsourcing.activities.ActivityLogin;
 import com.softeksol.paisalo.jlgsourcing.activities.OnlinePaymentActivity;
 import com.softeksol.paisalo.jlgsourcing.adapters.AdapterDueData;
 import com.softeksol.paisalo.jlgsourcing.adapters.AdapterInstallment;
+import com.softeksol.paisalo.jlgsourcing.adapters.AdapterInstallmentTemp;
 import com.softeksol.paisalo.jlgsourcing.entities.DueData;
 import com.softeksol.paisalo.jlgsourcing.entities.Installment;
+import com.softeksol.paisalo.jlgsourcing.entities.InstallmentTemp;
 import com.softeksol.paisalo.jlgsourcing.entities.PosInstRcv;
 import com.softeksol.paisalo.jlgsourcing.handlers.DataAsyncResponseHandler;
+import com.softeksol.paisalo.jlgsourcing.location.GpsTracker;
+import com.softeksol.paisalo.jlgsourcing.retrofit.ApiClient;
 import com.softeksol.paisalo.jlgsourcing.retrofit.ApiInterface;
 
 import java.text.ParseException;
@@ -94,7 +94,10 @@ public class FragmentCollection extends AbsCollectionFragment {
     private boolean isProcessingEMI=false;
     String userid;
     private String SchmCode;
-
+    private String SMCode;
+    GpsTracker gpsTracker;
+    Dialog dialogConfirm;
+    ArrayList<InstallmentTemp> insttemplist;
     public FragmentCollection() {
         // Required empty public constructor
     }
@@ -134,6 +137,9 @@ public class FragmentCollection extends AbsCollectionFragment {
         View view = inflater.inflate(R.layout.fragment_collection, container, false);
         userid=IglPreferences.getPrefString(getContext(), SEILIGL.USER_ID, "");
         lv = (ListView) view.findViewById(R.id.lvDueData);
+        gpsTracker=new GpsTracker(getContext());
+        dialogConfirm = new Dialog(getContext());
+
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -286,7 +292,9 @@ public class FragmentCollection extends AbsCollectionFragment {
         final DueData dueData = (DueData) adapterDueData.getItem(position);
         Log.d("DueData",dueData.toString());
         Log.d("DueDataSchmCode",dueData.getSchmCode());
+        insttemplist=new ArrayList<>();
         SchmCode=dueData.getSchmCode();
+        SMCode=dueData.getCaseCode();
         latePmtIntAmt=0;
         adapterDueData.notifyDataSetChanged();
         final int maxDue = dueData.getMaxDueAmount();
@@ -438,6 +446,15 @@ public class FragmentCollection extends AbsCollectionFragment {
                 onlinepayment.setEnabled(collectionAmount + latePmtIntAmt> (latePmtIntAmt>0?latePmtIntAmt-1:0));
 
                 tvTotDue.setText(String.valueOf(collectionAmount+ latePmtIntAmt));
+                if(installment.isSelected()==true){
+                    InstallmentTemp intemp=new InstallmentTemp();
+                    intemp.setAmount(installment.getAmount());
+                    intemp.setDueDate(installment.getDueDate());
+                    insttemplist.add(intemp);
+                }else{
+                    insttemplist.remove(position);
+                }
+
             }
         });
 
@@ -499,7 +516,7 @@ public class FragmentCollection extends AbsCollectionFragment {
             }
         });
         collect.setOnClickListener(new View.OnClickListener() {
-            @Override
+
             public void onClick(View v) {
                 dueData.setEnabled(false);
                 collect.setEnabled(false);
@@ -513,8 +530,51 @@ public class FragmentCollection extends AbsCollectionFragment {
                 if(radioGroup.getCheckedRadioButtonId()==R.id.rbLumpSumAmount) {
                     saveDepositeWithPFAndEmiAmount(dueData.getCreator(), dueData.getCustName(), dueData.getCaseCode(), dueData.getMobile(), totCollectAmt, Utils.getNotNullInt(tietEMIAmount), Utils.getNotNullInt(tietPFAmount), Utils.getNotNullInt(tietOtherEMIAmount));
                 }
-                saveDeposit(SchmCode,dueData, totCollectAmt,latePmtIntAmt,tglBtnPaidBy.isChecked() ? "F" : "B");
-                dialog.dismiss();
+
+
+               // ConfirmationDialog(totCollectAmt,latePmtIntAmt);
+
+                ////////////////////////////////////////////////////////// ALERT /////////////////////////////////////////////////////
+
+                dialogConfirm.setContentView(R.layout.dialogconfirmation_layout);
+                dialogConfirm.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                dialogConfirm.setCancelable(false);
+                // dialogConfirm.getWindow().getAttributes().windowAnimations = R.style.animation;
+
+                ListView  list_dialog=dialogConfirm.findViewById(R.id.list_dialog);
+                TextView text_instamt = dialogConfirm.findViewById(R.id.text_instamt);
+                TextView text_totalamt = dialogConfirm.findViewById(R.id.text_totalamt);
+                list_dialog.setAdapter(new AdapterInstallmentTemp(getContext(), R.layout.layout_item_installmenttemp, insttemplist));
+                text_totalamt.setText(totCollectAmt+"");
+                text_instamt.setText(latePmtIntAmt+"");
+
+                Button btnSave = dialogConfirm.findViewById(R.id.button_saveEmi);
+                Button btncancel = dialogConfirm.findViewById(R.id.button_Closedialog);
+
+                btnSave.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                        dialogConfirm.dismiss();
+                        saveDeposit(SchmCode,dueData, totCollectAmt,latePmtIntAmt,tglBtnPaidBy.isChecked() ? "F" : "B");
+                        //Toast.makeText(MainActivity.this, "okay clicked", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+                btncancel.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialogConfirm.dismiss();
+                        // Toast.makeText(MainActivity.this, "Cancel clicked", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+                dialogConfirm.show();
+
+
+
+
+
             }
         });
         dialog.show();
@@ -626,6 +686,7 @@ public class FragmentCollection extends AbsCollectionFragment {
                         saveDepositOwn(SchmCode,dueData, collectedAmount,latePmtAmount,depBy);
                     }*/
                     ((ActivityCollection) getActivity()).refreshData(FragmentCollection.this);
+                    getLoginLocation("Collection","");
                 }
             }
             @Override
@@ -720,6 +781,75 @@ public class FragmentCollection extends AbsCollectionFragment {
             mDbName = savedInstanceState.getString(ARG_DB_NAME);
             mDbDesc = savedInstanceState.getString(ARG_DB_DESC);
         }
+    }
+
+
+    private void ConfirmationDialog(int totCollectAmt, int latePmtIntAmt){
+        dialogConfirm.setContentView(R.layout.dialogconfirmation_layout);
+        dialogConfirm.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialogConfirm.setCancelable(false);
+       // dialogConfirm.getWindow().getAttributes().windowAnimations = R.style.animation;
+
+        ListView  list_dialog=dialogConfirm.findViewById(R.id.list_dialog);
+        TextView text_instamt = dialogConfirm.findViewById(R.id.text_instamt);
+        TextView text_totalamt = dialogConfirm.findViewById(R.id.text_totalamt);
+        list_dialog.setAdapter(new AdapterInstallmentTemp(getContext(), R.layout.layout_item_installmenttemp, insttemplist));
+        text_totalamt.setText(totCollectAmt+"");
+        text_instamt.setText(latePmtIntAmt+"");
+
+        Button btnSave = dialogConfirm.findViewById(R.id.button_saveEmi);
+        Button btncancel = dialogConfirm.findViewById(R.id.button_Closedialog);
+
+        btnSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                dialogConfirm.dismiss();
+                //Toast.makeText(MainActivity.this, "okay clicked", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        btncancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialogConfirm.dismiss();
+               // Toast.makeText(MainActivity.this, "Cancel clicked", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        dialogConfirm.show();
+
+    }
+
+    private void getLoginLocation(String login,String address){
+        ApiInterface apiInterface= ApiClient.getClient(SEILIGL.NEW_SERVERAPI).create(ApiInterface.class);
+        Log.d("TAG", "checkCrifScore: "+getdatalocation(login, address));
+        Call<JsonObject> call=apiInterface.livetrack(getdatalocation(login,address));
+        call.enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                Log.d("TAG", "onResponse: "+response.body());
+            }
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                Log.d("TAG", "onFailure: "+t.getMessage());
+
+            }
+        });
+    }
+
+    private JsonObject getdatalocation(String login, String address) {
+        JsonObject jsonObject=new JsonObject();
+        jsonObject.addProperty("userId", IglPreferences.getPrefString(getContext(), SEILIGL.USER_ID, ""));
+        jsonObject.addProperty("deviceId", IglPreferences.getPrefString(getContext(), SEILIGL.DEVICE_ID, ""));
+        jsonObject.addProperty("Creator", IglPreferences.getPrefString(getContext(), SEILIGL.CREATOR, ""));
+        jsonObject.addProperty("trackAppVersion", BuildConfig.VERSION_NAME);
+        jsonObject.addProperty("latitude",gpsTracker.getLatitude()+"");
+        jsonObject.addProperty("longitude", gpsTracker.getLongitude()+"");
+        jsonObject.addProperty("appInBackground",login);
+        jsonObject.addProperty("Activity",SMCode);
+        jsonObject.addProperty("Address",Utils.getAddress(gpsTracker.getLatitude(),gpsTracker.getLongitude(),getContext()));
+        return jsonObject;
     }
 
 }
