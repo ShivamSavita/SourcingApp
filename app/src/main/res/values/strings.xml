@@ -16,6 +16,7 @@
     <string name="loan_duration_month">Loan Duration(month)<font color='red'>*</font></string>
 
     <string name="hindiconfirmation">क्या आप निश्चित रूप से उधारकर्ता से नीचे दी गई राशि वसूल रहे हैं?</string>
+    <string name="hindiqr">दिए गए QR कोड को स्कैन करें और ग्राहक द्वारा किए गए भुगतान के बाद स्थिति(Status) प्राप्त करें।</string>
 
 
     <string name="term_and_conditions"><b><u>TERMS &amp; CONDITIONS FOR ONLINE PAYMENTS TO BE MADE TO PAISALO DIGITAL LTD</u></b> \n

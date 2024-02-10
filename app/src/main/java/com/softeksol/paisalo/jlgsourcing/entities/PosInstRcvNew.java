@@ -5,7 +5,7 @@ import com.google.gson.annotations.Expose;
 import java.util.Comparator;
 import java.util.Date;
 
-public class PosInstRcv {
+public class PosInstRcvNew {
 
     @Expose
     private int InstRcvID;
@@ -44,9 +44,41 @@ public class PosInstRcv {
     @Expose
     private int InterestAmt;
 
+    @Expose
+    private String CollPoint;
+    @Expose
+    private String PaymentMode;
+    @Expose
+    private String collBranchCode;
 
-    public static Comparator<PosInstRcv> InstRcvName = new Comparator<PosInstRcv>() {
-        public int compare(PosInstRcv dueData1, PosInstRcv dueData2) {
+
+    public String getCollBranchCode() {
+        return collBranchCode;
+    }
+
+    public void setCollBranchCode(String collBranchCode) {
+        this.collBranchCode = collBranchCode;
+    }
+
+    public String getCollPoint() {
+        return CollPoint;
+    }
+
+    public void setCollPoint(String collPoint) {
+        CollPoint = collPoint;
+    }
+
+    public String getPaymentMode() {
+        return PaymentMode;
+    }
+
+    public void setPaymentMode(String paymentMode) {
+        PaymentMode = paymentMode;
+    }
+
+
+    public static Comparator<PosInstRcvNew> InstRcvName = new Comparator<PosInstRcvNew>() {
+        public int compare(PosInstRcvNew dueData1, PosInstRcvNew dueData2) {
 
             int compareName = dueData1.CustName.compareTo(dueData2.CustName);
 

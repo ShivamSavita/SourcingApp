@@ -445,7 +445,7 @@ public class ActivityLogin extends AppCompatActivity implements View.OnClickList
         DatabaseName.add(new RangeCategory("SBI COLENDING", "Database"));
         DatabaseName.add(new RangeCategory("PDL OWN", "Database"));
         DatabaseName.add(new RangeCategory("GROUP FINANCE", "Database"));
-        // DatabaseName.add(new RangeCategory("SBI PDL", "Database"));
+        DatabaseName.add(new RangeCategory("SBI PDL", "Database"));
         // DatabaseName.add(new RangeCategory("PNB COLENDING", "Database"));
 
         database.setAdapter(new AdapterListRange(this, R.layout.spinner_card_orange,DatabaseName));

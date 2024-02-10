@@ -60,7 +60,7 @@ Borrower borrower;
 private AdapterListRange rlaBankType, rlaPurposeType, rlaLoanAmount, rlaEarningMember, rlaSchemeType ,rlsOccupation,rlaBussiness;
 Intent i;
 String FatherFName, FatherLName,FatherMName, MotherFName,MotherLName, MotherMName,SpouseLName,SpouseMName,SpouseFName;
-String VoterIdName="",tilPAN_Name="",tilDL_Name="",tietName="";
+String VoterIdName="",tilPAN_Name="",tilDL_Name="",tietName="",AddressCodes="";
 TextView textViewTotalAnnualIncome;
     String schemeNameForVH;
 
@@ -82,9 +82,11 @@ TextView textViewTotalAnnualIncome;
         tilPAN_Name=i.getStringExtra("PANName").length()<1?"":i.getStringExtra("PANName");
         tilDL_Name=i.getStringExtra("DLName").length()<1?"":i.getStringExtra("DLName");
         tietName=i.getStringExtra("AadharName").length()<1?"":i.getStringExtra("AadharName");
+        AddressCodes=i.getStringExtra("AddressCodes").length()<1?"":i.getStringExtra("AddressCodes");
+
+        Log.d("TAG", "onCreate: "+AddressCodes);
 
         schemeNameForVH=i.getStringExtra(Global.SCHEME_TAG);
-
 
 
         manager = (Manager) i.getSerializableExtra("manager");
@@ -415,7 +417,7 @@ TextView textViewTotalAnnualIncome;
                                     Log.d("TAG", "onSuccess: "+WebOperations.convertToJson(borrower.fiExtraBank));
                                     Log.d("TAG", "onSuccess: "+WebOperations.convertToJson(borrower));
 
-                                    AsyncResponseHandler dataAsyncResponseHandlerUpdateFI = new AsyncResponseHandler(KYC_Form_New.this, "Loan Financing\nSubmittiong Loan Application","Submitting Borrower Information") {
+                                    AsyncResponseHandler dataAsyncResponseHandlerUpdateFI = new AsyncResponseHandler(KYC_Form_New.this, "Loan Financing\nSubmitting Loan Application","Submitting Borrower Information") {
                                         @Override
                                         public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                                             String jsonString = new String(responseBody);
@@ -449,6 +451,9 @@ TextView textViewTotalAnnualIncome;
                                     (new WebOperations()).postEntity(KYC_Form_New.this, "posfi", "updatefi", WebOperations.convertToJson(borrower), dataAsyncResponseHandlerUpdateFI);
                                     if (schemeNameForVH.length()>1){
                                         saveFIWithSchemeName(manager.Creator,FiCode);
+                                    }
+                                    if (AddressCodes.length()>1){
+                                        saveAddressCodeOfFi(manager.Creator,FiCode,AddressCodes);
                                     }
 
                                     AlertDialog.Builder builder = new AlertDialog.Builder(KYC_Form_New.this);
@@ -503,6 +508,45 @@ TextView textViewTotalAnnualIncome;
             }
 
         }
+    }
+
+    private void saveAddressCodeOfFi(String creator, long fiCode,String addressCodes) {
+
+        String[] codes=addressCodes.split("_");
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+        httpClient.connectTimeout(1, TimeUnit.MINUTES);
+        httpClient.readTimeout(1,TimeUnit.MINUTES);
+        httpClient.addInterceptor(logging);
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://erpservice.paisalo.in:980/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(httpClient.build())
+                .build();
+
+        JsonObject jsonObject=new JsonObject();
+        jsonObject.addProperty("FiCode",String.valueOf(fiCode));
+        jsonObject.addProperty("Creator",creator);
+        jsonObject.addProperty("villagE_CODE",codes[3]);
+        jsonObject.addProperty("suB_DIST_CODE",codes[2]);
+        jsonObject.addProperty("DIST_CODE",codes[1]);
+        jsonObject.addProperty("STATE_CODE",codes[0]);
+        ApiInterface apiInterface=retrofit.create(ApiInterface.class);
+        Call<JsonObject> call=apiInterface.insertAddressCodes(jsonObject);
+        call.enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                Log.d("TAG", "onResponse: "+response.body());
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                Log.d("TAG", "onFailure: "+t.getMessage());
+
+            }
+        });
+
     }
 
     private void getDataFromView(View view) {

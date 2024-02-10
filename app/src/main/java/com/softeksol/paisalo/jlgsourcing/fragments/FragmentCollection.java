@@ -3,10 +3,12 @@ package com.softeksol.paisalo.jlgsourcing.fragments;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,6 +33,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.fragment.app.Fragment;
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.gson.JsonObject;
@@ -50,10 +53,15 @@ import com.softeksol.paisalo.jlgsourcing.entities.DueData;
 import com.softeksol.paisalo.jlgsourcing.entities.Installment;
 import com.softeksol.paisalo.jlgsourcing.entities.InstallmentTemp;
 import com.softeksol.paisalo.jlgsourcing.entities.PosInstRcv;
+import com.softeksol.paisalo.jlgsourcing.entities.PosInstRcvNew;
 import com.softeksol.paisalo.jlgsourcing.handlers.DataAsyncResponseHandler;
 import com.softeksol.paisalo.jlgsourcing.location.GpsTracker;
+import com.softeksol.paisalo.jlgsourcing.models.QrUrlData;
 import com.softeksol.paisalo.jlgsourcing.retrofit.ApiClient;
 import com.softeksol.paisalo.jlgsourcing.retrofit.ApiInterface;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -97,7 +105,11 @@ public class FragmentCollection extends AbsCollectionFragment {
     private String SMCode;
     GpsTracker gpsTracker;
     Dialog dialogConfirm;
+    Dialog dialogQrcode;
+    ImageView  righticon;
+    private ProgressDialog progressDialog;
     ArrayList<InstallmentTemp> insttemplist;
+   // TextToSpeech textToSpeech;
     public FragmentCollection() {
         // Required empty public constructor
     }
@@ -139,6 +151,20 @@ public class FragmentCollection extends AbsCollectionFragment {
         lv = (ListView) view.findViewById(R.id.lvDueData);
         gpsTracker=new GpsTracker(getContext());
         dialogConfirm = new Dialog(getContext());
+        dialogQrcode = new Dialog(getContext());
+
+        /*textToSpeech = new TextToSpeech(getContext(), new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int i) {
+
+                // if No error is found then only it will run
+                if(i!=TextToSpeech.ERROR){
+                    // To Choose language of speech
+                    textToSpeech.setLanguage(Locale.UK);
+                }
+            }
+        });*/
+
 
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -285,6 +311,35 @@ public class FragmentCollection extends AbsCollectionFragment {
 
 
 
+    private JsonObject getdataQr(String smcode) {
+        JsonObject jsonObject=new JsonObject();
+        jsonObject.addProperty("mid", "randomId");
+        jsonObject.addProperty("terminalId", smcode);
+        jsonObject.addProperty("req", "abc");
+        return jsonObject;
+    }
+
+
+    public static Retrofit getClientNew(String BASE_URL) {
+        Retrofit retrofit = null;
+        if (retrofit==null) {
+            HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+            logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+            OkHttpClient.Builder httpClient = new OkHttpClient.Builder(
+
+            );
+            httpClient.connectTimeout(1, TimeUnit.MINUTES);
+            httpClient.readTimeout(1,TimeUnit.MINUTES);
+            httpClient.addInterceptor(logging);
+            retrofit = new Retrofit.Builder()
+                    .baseUrl(BASE_URL)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .client(httpClient.build())
+                    .build();
+        }
+        return retrofit;
+    }
+
 
 
     private void showPaymentDialog(AdapterView<?> parent,int position) {
@@ -337,12 +392,118 @@ public class FragmentCollection extends AbsCollectionFragment {
                 getActivity().startActivity(intent);
             }
         });
-        if(isProcessingEMI==false){
+       /* if(isProcessingEMI==false){
             prossingFees.setVisibility(View.INVISIBLE);
-        }
+        }*/
         prossingFees.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //getQrCode(SMCode);
+                dialogQrcode.setContentView(R.layout.dialogqr_layout);
+                dialogQrcode.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                dialogQrcode.setCancelable(false);
+                // dialogConfirm.getWindow().getAttributes().windowAnimations = R.style.animation;
+                ImageView  imageQrCode=dialogQrcode.findViewById(R.id.qrcode);
+                TextView  tv_heading=dialogQrcode.findViewById(R.id.text_smcode);
+                tv_heading.setText("Loan A/C- "+SMCode);
+                righticon=dialogQrcode.findViewById(R.id.righticon);
+                righticon.setVisibility(View.GONE);
+                /*Glide.with(getContext())
+                       // .load("")
+                        .asGif()
+                        .placeholder(R.drawable.righticon)
+                        .into(righticon);*/
+
+                Glide.with(getContext())
+                        .load(getContext().getResources().getDrawable(R.drawable.righticon))
+                        //.asGif()
+                       // .placeholder(R.mipmap.icon)
+                        .into(righticon);
+
+
+                Button btnSave = dialogQrcode.findViewById(R.id.button_saveEmi);
+                Button btncancel = dialogQrcode.findViewById(R.id.button_Closedialog);
+
+                btnSave.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                    /*    dialogConfirm.dismiss();
+                        saveDeposit(SchmCode,dueData, totCollectAmt,latePmtIntAmt,tglBtnPaidBy.isChecked() ? "F" : "B");
+                        //Toast.makeText(MainActivity.this, "okay clicked", Toast.LENGTH_SHORT).show();*/
+                    }
+                });
+
+                btncancel.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialogQrcode.dismiss();
+                        // Toast.makeText(MainActivity.this, "Cancel clicked", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+                dialogQrcode.show();
+                progressDialog = ProgressDialog.show(getContext(), "", "Loading...", true, false);
+                ApiInterface apiInterface= getClientNew("https://erpservice.paisalo.in:980/PDL.FIService.API/api/").create(ApiInterface.class);
+                // Log.d("TAG", "checkCrifScore: "+getdatalocation(login, login));
+                Call<QrUrlData> call=apiInterface.getQrCode(getdataQr("UCCP000056"));
+                call.enqueue(new Callback<QrUrlData>() {
+                    @Override
+                    public void onResponse(Call<QrUrlData> call, Response<QrUrlData> response) {
+                        Log.d("TAG", "onResponse: "+response.body());
+                        progressDialog.dismiss();
+                        if(response.body().getStatusCode().equals("200")){
+                            try {
+                                JSONObject Qrjo=new JSONObject(response.body().getData());
+                                String qr=Qrjo.getString("QrCodeUrl");
+                                Glide.with(getContext())
+                                        .load(qr)
+                                        // .asGif()
+                                        .placeholder(R.drawable.righticon)
+                                        .into(imageQrCode);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                        }else{
+                            dialogQrcode.dismiss();
+                            Toast.makeText(getContext(), "QR code not found", Toast.LENGTH_SHORT).show();
+                        }
+                       /* try {
+                            JSONObject jo = new JSONObject(String.valueOf(response));
+                            Log.d("TAG", "statusCode: "+jo.getString("statusCode"));
+                            if(jo.getString("statusCode").equals("200")){
+                                JSONObject Qrjo=new JSONObject(jo.getString("data"));
+                                String qr=Qrjo.getString("QrCodeUrl");
+                                Log.d("TAG", "QrCodeUrl: "+qr);
+                                Glide.with(getContext())
+                                        .load(qr)
+                                        // .asGif()
+                                        .placeholder(R.drawable.righticon)
+                                        .into(imageQrCode);
+                            }
+
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }*/
+
+
+                    }
+
+                    @Override
+                    public void onFailure(Call<QrUrlData> call, Throwable t) {
+                        Log.d("TAG", "onFailure: "+t.getMessage());
+                        Toast.makeText(getContext(), "QR code not found", Toast.LENGTH_SHORT).show();
+                        progressDialog.dismiss();
+                        dialogQrcode.dismiss();
+                    }
+                });
+
+
+
+
+
+
 
             }
         });
@@ -556,7 +717,10 @@ public class FragmentCollection extends AbsCollectionFragment {
                     public void onClick(View v) {
                         dialog.dismiss();
                         dialogConfirm.dismiss();
+                        //String st=  String.valueOf((totCollectAmt+latePmtIntAmt)+" money received");
+                      //  textToSpeech.speak(st,TextToSpeech.QUEUE_FLUSH,null);
                         saveDeposit(SchmCode,dueData, totCollectAmt,latePmtIntAmt,tglBtnPaidBy.isChecked() ? "F" : "B");
+                       // saveRecipetNewAmount(SchmCode,dueData, totCollectAmt,latePmtIntAmt,tglBtnPaidBy.isChecked() ? "F" : "B");
                         //Toast.makeText(MainActivity.this, "okay clicked", Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -577,8 +741,80 @@ public class FragmentCollection extends AbsCollectionFragment {
 
             }
         });
+
+
+
+
+
+
         dialog.show();
     }
+
+
+
+
+    private void
+    saveRecipetNewAmount(String schmCode, DueData dueData, int totCollectAmt, int latePmtIntAmt, String s) {
+        PosInstRcvNew instRcv = new PosInstRcvNew();
+        instRcv.setCaseCode(dueData.getCaseCode());
+        instRcv.setCreator(dueData.getCreator());
+        instRcv.setDataBaseName(dueData.getDb());
+        instRcv.setIMEI(IglPreferences.getPrefString(getContext(), SEILIGL.DEVICE_IMEI, "0"));
+        instRcv.setInstRcvAmt(totCollectAmt - latePmtIntAmt);
+        instRcv.setInstRcvDateTimeUTC(new Date());
+        instRcv.setFoCode(dueData.getFoCode());
+        instRcv.setCustName(dueData.getCustName());
+        instRcv.setPartyCd(dueData.getPartyCd());
+        instRcv.setInterestAmt(latePmtIntAmt);
+        instRcv.setPayFlag("E");
+        instRcv.setCollPoint("FIELD");
+        instRcv.setPaymentMode("CASH");
+        instRcv.setCollBranchCode("");
+        Log.d("JsonInstRcv", String.valueOf(WebOperations.convertToJson(instRcv)));
+
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+        httpClient.connectTimeout(1, TimeUnit.MINUTES);
+        httpClient.readTimeout(1,TimeUnit.MINUTES);
+        httpClient.addInterceptor(logging);
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://predeptest.paisalo.in:8084/PDL.SourcingApp.Api/api/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(httpClient.build())
+                .build();
+        ApiInterface apiInterface=retrofit.create(ApiInterface.class);
+       // Log.d("TAG", "saveDepositeWithPFAndEmiAmount: "+getJsonOfRcDist(creator,custName,caseCode,mobile,totCollectAmt,EmiAmt,pfAmt,otherAmt));
+        Call<JsonObject> call=apiInterface.insertRcDistributionNew(instRcv,"yfMerfC6mRvfr0AOoHmOJ8Et9Q9MPwNEKzFdLsfEs1A=",IglPreferences.getPrefString(getContext(), SEILIGL.USER_ID, ""));
+        call.enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                Log.d("TAG", "insertRcDistributionNew: "+response.body());
+              //  Toast.makeText(getContext(), "Data is valid. Saving...", Toast.LENGTH_SHORT).show();
+                if (response.body()!=null){
+                    if (response.body().get("statusCode").getAsInt()==200){
+                        Utils.alert(getContext(),response.body().get("message").getAsString());
+
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                Log.d("TAG", "onFailure: "+t.getMessage());
+
+            }
+        });
+    }
+
+
+
+
+
+
+
+
+
 
     private void saveDepositeWithPFAndEmiAmount(String creator, String custName, String caseCode, String mobile, int totCollectAmt, int EmiAmt, int pfAmt, int otherAmt) {
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();

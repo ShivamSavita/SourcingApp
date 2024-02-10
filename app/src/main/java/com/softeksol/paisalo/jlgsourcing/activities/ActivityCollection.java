@@ -114,7 +114,6 @@ public class ActivityCollection extends AppCompatActivity {
         RequestParams params = new RequestParams();
         params.add("gdate", DateUtils.getFormatedDate(new Date(), "yyyy-MM-dd"));
         params.add("CityCode", manager.AreaCd);
-
         //String queryDB = BuildConfig.APPLICATION_ID == "com.softeksol.paisalo.jlgsourcing" ? "POSDATA" : BuildConfig.DATABASE_NAME;
         String queryDB = BuildConfig.APPLICATION_ID == "com.softeksol.paisalo.jlgsourcing" ? "POSDATA" : IglPreferences.getPrefString(ActivityCollection.this, SEILIGL.DATABASE_NAME, "")+"";
         (new WebOperations()).getEntity(this, queryDB, "instcollection", "getdueinstallments", params, asyncResponseHandler);

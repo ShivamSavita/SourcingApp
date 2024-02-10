@@ -2,6 +2,7 @@ package com.softeksol.paisalo.jlgsourcing.activities;
 
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -15,8 +16,6 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -27,18 +26,17 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SearchView;
 import android.widget.Spinner;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatSpinner;
 import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.cardview.widget.CardView;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.dhaval2404.imagepicker.ImagePicker;
 import com.google.android.material.textfield.TextInputEditText;
@@ -53,6 +51,7 @@ import com.softeksol.paisalo.jlgsourcing.R;
 import com.softeksol.paisalo.jlgsourcing.SEILIGL;
 import com.softeksol.paisalo.jlgsourcing.Utilities.AadharUtils;
 import com.softeksol.paisalo.jlgsourcing.Utilities.CameraUtils;
+import com.softeksol.paisalo.jlgsourcing.Utilities.CustomProgressDialog;
 import com.softeksol.paisalo.jlgsourcing.Utilities.DateUtils;
 import com.softeksol.paisalo.jlgsourcing.Utilities.IglPreferences;
 import com.softeksol.paisalo.jlgsourcing.Utilities.MyTextWatcher;
@@ -61,19 +60,32 @@ import com.softeksol.paisalo.jlgsourcing.Utilities.Verhoeff;
 import com.softeksol.paisalo.jlgsourcing.WebOperations;
 import com.softeksol.paisalo.jlgsourcing.adapters.AdapterListRange;
 import com.softeksol.paisalo.jlgsourcing.adapters.AdapterRecViewListDocuments;
+import com.softeksol.paisalo.jlgsourcing.adapters.CityListAdapter;
+import com.softeksol.paisalo.jlgsourcing.adapters.CreatorListAdapter;
+import com.softeksol.paisalo.jlgsourcing.adapters.DistrictListAdapter;
+import com.softeksol.paisalo.jlgsourcing.adapters.SubDistrictListAdapter;
+import com.softeksol.paisalo.jlgsourcing.adapters.VillageListAdapter;
 import com.softeksol.paisalo.jlgsourcing.entities.AadharData;
 import com.softeksol.paisalo.jlgsourcing.entities.Borrower;
 import com.softeksol.paisalo.jlgsourcing.entities.BorrowerExtra;
 import com.softeksol.paisalo.jlgsourcing.entities.BorrowerExtraBank;
+import com.softeksol.paisalo.jlgsourcing.entities.CityData;
+import com.softeksol.paisalo.jlgsourcing.entities.CityModelList;
+import com.softeksol.paisalo.jlgsourcing.entities.CreatorModel;
+import com.softeksol.paisalo.jlgsourcing.entities.DistrictData;
+import com.softeksol.paisalo.jlgsourcing.entities.DistrictListModel;
 import com.softeksol.paisalo.jlgsourcing.entities.DocumentStore;
 import com.softeksol.paisalo.jlgsourcing.entities.Manager;
 import com.softeksol.paisalo.jlgsourcing.entities.RangeCategory;
 import com.softeksol.paisalo.jlgsourcing.entities.RangeCategory_Table;
+import com.softeksol.paisalo.jlgsourcing.entities.SubDistrictData;
+import com.softeksol.paisalo.jlgsourcing.entities.SubDistrictModel;
+import com.softeksol.paisalo.jlgsourcing.entities.VillageData;
+import com.softeksol.paisalo.jlgsourcing.entities.VillageListModel;
 import com.softeksol.paisalo.jlgsourcing.entities.dto.BorrowerDTO;
 import com.softeksol.paisalo.jlgsourcing.entities.dto.OldFIById;
 import com.softeksol.paisalo.jlgsourcing.handlers.DataAsyncResponseHandler;
 import com.softeksol.paisalo.jlgsourcing.location.GpsTracker;
-import com.softeksol.paisalo.jlgsourcing.retrofit.ApiClient;
 import com.softeksol.paisalo.jlgsourcing.retrofit.ApiInterface;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
@@ -103,10 +115,8 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -130,10 +140,11 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
-public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnClickListener,AdapterRecViewListDocuments.ItemListener, CameraUtils.OnCameraCaptureUpdate { //, CameraUtils.OnCameraCaptureUpdate
+public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnClickListener,AdapterRecViewListDocuments.ItemListener, CameraUtils.OnCameraCaptureUpdate ,onListCReatorInteraction,VillageChooseListner,DistrictChooseListner,CityChooseListner,SubDistChooseListner{ //, CameraUtils.OnCameraCaptureUpdate
 
     private final AppCompatActivity activity = this;
 
+    CustomProgressDialog customProgressDialog;
     int PAN_CARD_CAPTURE=1100;
 
     AdapterListRange rlaMarritalStatus;
@@ -167,6 +178,7 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
     private boolean showSubmitBorrowerMenuItem = true;
     private LinearLayoutCompat llTopupCode;
     AdapterListRange genderAdapter;
+
     protected static final byte SEPARATOR_BYTE = (byte)255;
     protected static final int VTC_INDEX = 15;
     protected int emailMobilePresent, imageStartIndex, imageEndIndex;
@@ -199,11 +211,546 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
     boolean isgetPanwithOCR=false;
     String schemeNameForVH;
     String AddressREGX="^[0-9A-Za-z\\s]+$";
+    String choosedCreator;
 
+    TextView txtVDistrictName, txtCityName,txtVillageName,txtSubDistictName;
     @Override
     public boolean onSupportNavigateUp() {
         onBackPressed();
         return true;
+    }
+    List<CreatorModel> list=new ArrayList<>();
+    List<VillageData> villageDataList =new ArrayList<>();
+    List<CityData> cityDataList =new ArrayList<>();
+    List<DistrictData> districtDataList =new ArrayList<>();
+    List<SubDistrictData> subDistrictDataList =new ArrayList<>();
+    onListCReatorInteraction listCReatorInteraction;
+    VillageData villageData;
+    DistrictData districtDat;
+
+    SubDistrictData subDistrictData;
+
+    CityData cityData;
+
+    VillageChooseListner listVillageInteraction;
+    DistrictChooseListner listDistictInteraction;
+    SubDistChooseListner listSubDistructInteraction;
+
+    CityChooseListner cityChooseListner;
+    CreatorListAdapter adapter;
+
+    VillageListAdapter villageListAdapter;
+    DistrictListAdapter districtListAdapter;
+    SubDistrictListAdapter subDistrictListAdapter;
+    SubDistrictListAdapter SubDistrictListAdapter;
+
+    CityListAdapter cityListAdapter;
+
+    private void showCreatorSearchDialog(TextView creators) {
+
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+        httpClient.connectTimeout(1, TimeUnit.MINUTES);
+        httpClient.readTimeout(1,TimeUnit.MINUTES);
+        httpClient.addInterceptor(logging);
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://erpservice.paisalo.in:980/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(httpClient.build())
+                .build();
+        ApiInterface apiInterface=retrofit.create(ApiInterface.class);
+
+
+        Dialog  dialogSearch=new Dialog(ActivityBorrowerKyc.this);
+        dialogSearch.setContentView(R.layout.dialog_searchable_spinner);
+        dialogSearch.getWindow().setLayout(650,800);
+        EditText edit_text=dialogSearch.findViewById(R.id.edit_text);
+        RecyclerView recViewOfCreator=dialogSearch.findViewById(R.id.recViewOfCreator);
+        dialogSearch.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialogInterface) {
+                Log.d("TAG", "onDismiss: hiiitt"+choosedCreator);
+
+                creators.setText(choosedCreator);
+            }
+        });
+        recViewOfCreator.setLayoutManager(new LinearLayoutManager(this));
+
+        Call<List<CreatorModel>> call=apiInterface.getCreatorList();
+        call.enqueue(new Callback<List<CreatorModel>>() {
+            @Override
+            public void onResponse(Call<List<CreatorModel>> call, Response<List<CreatorModel>> response) {
+                list.addAll(response.body());
+                adapter=new CreatorListAdapter(ActivityBorrowerKyc.this,list,dialogSearch,listCReatorInteraction);
+                recViewOfCreator.setAdapter(adapter);
+                adapter.notifyDataSetChanged();
+
+            }
+
+            @Override
+            public void onFailure(Call<List<CreatorModel>> call, Throwable t) {
+
+            }
+        });
+
+        edit_text.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count,             int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+               // filter(s.toString().toUpperCase());
+
+
+            }
+        });
+
+
+        dialogSearch.show();
+    }
+    public void filterVillage(String s) {
+        Log.d("TAG", "filter: "+s);
+        List<VillageData> villageDataModel=new ArrayList<>();
+        for (int i = 0; i < villageDataList.size(); i++) {
+
+            if (villageDataList.get(i).getVillagENAME().toUpperCase().contains(s.toString())) {
+                villageDataModel.add(villageDataList.get(i));
+             //   Log.d("TAG", "filter: "+list.get(i));
+            }
+        }
+
+
+        villageListAdapter.filterList(villageDataModel);
+        villageListAdapter.notifyDataSetChanged();
+    }
+   public void filterCity(String s) {
+        Log.d("TAG", "filter: "+s);
+        List<CityData> cityData1=new ArrayList<>();
+        for (int i = 0; i < cityDataList.size(); i++) {
+
+            if (cityDataList.get(i).getCitYNAME().toUpperCase().contains(s.toString())) {
+                cityData1.add(cityDataList.get(i));
+             //   Log.d("TAG", "filter: "+list.get(i));
+            }
+        }
+
+
+       cityListAdapter.filterList(cityData1);
+       cityListAdapter.notifyDataSetChanged();
+    }
+
+    public void filterDistrict(String s) {
+        Log.d("TAG", "filter: "+s);
+        List<DistrictData> districtDataModel=new ArrayList<>();
+        for (int i = 0; i < districtDataList.size(); i++) {
+
+            if (districtDataList.get(i).getDisTNAME().toUpperCase().contains(s.toString())) {
+                districtDataModel.add(districtDataList.get(i));
+             //   Log.d("TAG", "filter: "+list.get(i));
+            }
+        }
+
+
+        districtListAdapter.filterList(districtDataModel);
+        districtListAdapter.notifyDataSetChanged();
+    }
+
+    public void filterSubDistrict(String s) {
+        Log.d("TAG", "filter: "+s);
+        List<SubDistrictData> subDistrictDataModel=new ArrayList<>();
+        for (int i = 0; i < subDistrictDataList.size(); i++) {
+
+            if (subDistrictDataList.get(i).getSuBDISTNAME().toUpperCase().contains(s.toString())) {
+                subDistrictDataModel.add(subDistrictDataList.get(i));
+                //   Log.d("TAG", "filter: "+list.get(i));
+            }
+        }
+
+
+        subDistrictListAdapter.filterList(subDistrictDataModel);
+        subDistrictListAdapter.notifyDataSetChanged();
+    }
+
+
+    private void showCityDialog(TextView txtCityName, String stateCode ) {
+        customProgressDialog.show();
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+        httpClient.connectTimeout(1, TimeUnit.MINUTES);
+        httpClient.readTimeout(1,TimeUnit.MINUTES);
+        httpClient.addInterceptor(logging);
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://erpservice.paisalo.in:980/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(httpClient.build())
+                .build();
+        ApiInterface apiInterface=retrofit.create(ApiInterface.class);
+
+
+        Dialog  dialogSearch=new Dialog(ActivityBorrowerKyc.this);
+        dialogSearch.setContentView(R.layout.dialog_searchable_spinner);
+        dialogSearch.setCancelable(false);
+        dialogSearch.getWindow().setLayout(1000,1600);
+        EditText edit_text=dialogSearch.findViewById(R.id.edit_text);
+        TextView dialog_name=dialogSearch.findViewById(R.id.dialog_name);
+        dialog_name.setText("Select City");
+        RecyclerView recViewOfCreator=dialogSearch.findViewById(R.id.recViewOfCreator);
+        dialogSearch.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialogInterface) {
+             //   Log.d("TAG", "onDismiss: hiiitt"+choosedCreator);
+
+                try {
+                    txtCityName.setText(cityData.getCitYNAME());
+                }catch (NullPointerException e){
+
+                }
+            }
+        });
+        recViewOfCreator.setLayoutManager(new LinearLayoutManager(this));
+
+        Call<CityModelList> call=apiInterface.getCityList(stateCode);
+        call.enqueue(new Callback<CityModelList>() {
+            @Override
+            public void onResponse(Call<CityModelList> call, Response<CityModelList> response) {
+                if (cityDataList.size()>1)
+                    cityDataList.clear();
+                cityDataList.addAll(response.body().getData());
+                cityListAdapter=new CityListAdapter(ActivityBorrowerKyc.this, cityDataList,dialogSearch,cityChooseListner);
+                recViewOfCreator.setAdapter(cityListAdapter);
+                cityListAdapter.notifyDataSetChanged();
+                if (cityDataList.size()>=1){
+                    dialogSearch.show();
+                }else{
+                    Toast.makeText(ActivityBorrowerKyc.this, "Village List is not coming for "+stateCode, Toast.LENGTH_SHORT).show();
+                }
+                customProgressDialog.dismiss();
+            }
+
+            @Override
+            public void onFailure(Call<CityModelList> call, Throwable t) {
+                customProgressDialog.dismiss();
+
+            }
+        });
+
+        edit_text.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count,  int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+                filterCity(s.toString().toUpperCase());
+
+
+            }
+        });
+
+
+
+    }
+    private void showDistrictDialog(TextView txtVVillageName, String districtCode ) {
+        customProgressDialog.show();
+
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+        httpClient.connectTimeout(1, TimeUnit.MINUTES);
+        httpClient.readTimeout(1,TimeUnit.MINUTES);
+        httpClient.addInterceptor(logging);
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://erpservice.paisalo.in:980/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(httpClient.build())
+                .build();
+        ApiInterface apiInterface=retrofit.create(ApiInterface.class);
+
+
+        Dialog  dialogSearch=new Dialog(ActivityBorrowerKyc.this);
+        dialogSearch.setContentView(R.layout.dialog_searchable_spinner);
+        dialogSearch.setCancelable(false);
+        dialogSearch.getWindow().setLayout(1000,1600);
+        EditText edit_text=dialogSearch.findViewById(R.id.edit_text);
+        TextView dialog_name=dialogSearch.findViewById(R.id.dialog_name);
+        dialog_name.setText("Select District");
+        RecyclerView recViewOfCreator=dialogSearch.findViewById(R.id.recViewOfCreator);
+        dialogSearch.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialogInterface) {
+             //   Log.d("TAG", "onDismiss: hiiitt"+choosedCreator);
+
+                try {
+                    txtVVillageName.setText(districtDat.getDisTNAME());
+                }catch (NullPointerException e){
+
+                }
+            }
+        });
+        recViewOfCreator.setLayoutManager(new LinearLayoutManager(this));
+
+        Call<DistrictListModel> call=apiInterface.getDistictList(districtCode);
+        call.enqueue(new Callback<DistrictListModel>() {
+            @Override
+            public void onResponse(Call<DistrictListModel> call, Response<DistrictListModel> response) {
+                if (districtDataList.size()>1)
+                    districtDataList.clear();
+                districtDataList.addAll(response.body().getData());
+                districtListAdapter=new DistrictListAdapter(ActivityBorrowerKyc.this, districtDataList,dialogSearch,listDistictInteraction);
+                recViewOfCreator.setAdapter(districtListAdapter);
+                districtListAdapter.notifyDataSetChanged();
+                if (districtDataList.size()>=1){
+                    dialogSearch.show();
+                }else{
+                    Toast.makeText(ActivityBorrowerKyc.this, "district list is not coming for "+districtCode, Toast.LENGTH_SHORT).show();
+                }
+                customProgressDialog.dismiss();
+
+            }
+
+            @Override
+            public void onFailure(Call<DistrictListModel> call, Throwable t) {
+                customProgressDialog.dismiss();
+
+            }
+        });
+
+        edit_text.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count,  int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+                filterDistrict(s.toString().toUpperCase());
+
+
+            }
+        });
+
+
+
+    }
+    private void showSubDistrictDialog(TextView txtVVillageName, String districtCode ) {
+        customProgressDialog.show();
+
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+        httpClient.connectTimeout(1, TimeUnit.MINUTES);
+        httpClient.readTimeout(1,TimeUnit.MINUTES);
+        httpClient.addInterceptor(logging);
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://erpservice.paisalo.in:980/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(httpClient.build())
+                .build();
+        ApiInterface apiInterface=retrofit.create(ApiInterface.class);
+
+
+        Dialog  dialogSearch=new Dialog(ActivityBorrowerKyc.this);
+        dialogSearch.setContentView(R.layout.dialog_searchable_spinner);
+        dialogSearch.setCancelable(false);
+        dialogSearch.getWindow().setLayout(1000,1600);
+        EditText edit_text=dialogSearch.findViewById(R.id.edit_text);
+        TextView dialog_name=dialogSearch.findViewById(R.id.dialog_name);
+        dialog_name.setText("Select Sub-District");
+        RecyclerView recViewOfCreator=dialogSearch.findViewById(R.id.recViewOfCreator);
+        dialogSearch.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialogInterface) {
+             //   Log.d("TAG", "onDismiss: hiiitt"+choosedCreator);
+
+                try {
+                    txtVVillageName.setText(subDistrictData.getSuBDISTNAME());
+                }catch (NullPointerException e){
+
+                }
+            }
+        });
+        recViewOfCreator.setLayoutManager(new LinearLayoutManager(this));
+
+        Call<SubDistrictModel> call=apiInterface.getSubDistrictList(districtCode);
+        call.enqueue(new Callback<SubDistrictModel>() {
+            @Override
+            public void onResponse(Call<SubDistrictModel> call, Response<SubDistrictModel> response) {
+                if (subDistrictDataList.size()>1)
+                    subDistrictDataList.clear();
+                try {
+                    subDistrictDataList.addAll(response.body().getData());
+                    SubDistrictData other=   new SubDistrictData("2222222222","Other","22222");
+                    subDistrictDataList.add(other);
+                    subDistrictListAdapter=new SubDistrictListAdapter(ActivityBorrowerKyc.this, subDistrictDataList,dialogSearch,listSubDistructInteraction);
+                    recViewOfCreator.setAdapter(subDistrictListAdapter);
+                    subDistrictListAdapter.notifyDataSetChanged();
+                    if (subDistrictDataList.size()>=1){
+                        dialogSearch.show();
+                    }else{
+                        Toast.makeText(ActivityBorrowerKyc.this, "district list is not coming for "+districtCode, Toast.LENGTH_SHORT).show();
+                    }
+                }catch (Exception c){
+                    SubDistrictData other=   new SubDistrictData("2222222222","Other","22222");
+                    subDistrictDataList.add(other);
+                }
+
+                customProgressDialog.dismiss();
+
+            }
+
+            @Override
+            public void onFailure(Call<SubDistrictModel> call, Throwable t) {
+                SubDistrictData other=   new SubDistrictData("2222222222","Other","22222");
+                subDistrictDataList.add(other);
+                customProgressDialog.dismiss();
+            }
+        });
+
+        edit_text.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count,  int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+                filterSubDistrict(s.toString().toUpperCase());
+
+
+            }
+        });
+
+
+
+    }
+
+
+
+    private void showVillageDialog(TextView txtVDistrictName, String stateCode, String disTCODE, String suBDISTCODE) {
+
+        customProgressDialog.show();
+
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+        httpClient.connectTimeout(1, TimeUnit.MINUTES);
+        httpClient.readTimeout(1,TimeUnit.MINUTES);
+        httpClient.addInterceptor(logging);
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://erpservice.paisalo.in:980/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(httpClient.build())
+                .build();
+        ApiInterface apiInterface=retrofit.create(ApiInterface.class);
+
+
+        Dialog  dialogSearch=new Dialog(ActivityBorrowerKyc.this);
+        dialogSearch.setContentView(R.layout.dialog_searchable_spinner);
+        dialogSearch.setCancelable(false);
+        dialogSearch.getWindow().setLayout(1000,1600);
+        EditText edit_text=dialogSearch.findViewById(R.id.edit_text);
+        TextView dialog_name=dialogSearch.findViewById(R.id.dialog_name);
+        dialog_name.setText("Select Village");
+        RecyclerView recViewOfCreator=dialogSearch.findViewById(R.id.recViewOfCreator);
+        dialogSearch.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialogInterface) {
+                //   Log.d("TAG", "onDismiss: hiiitt"+choosedCreator);
+
+                try {
+                    txtVDistrictName.setText(villageData.getVillagENAME());
+                }catch (NullPointerException e){
+
+                }
+            }
+        });
+        recViewOfCreator.setLayoutManager(new LinearLayoutManager(this));
+
+        Call<VillageListModel> call=apiInterface.getVillageList(stateCode,disTCODE,suBDISTCODE);
+        call.enqueue(new Callback<VillageListModel>() {
+            @Override
+            public void onResponse(Call<VillageListModel> call, Response<VillageListModel> response) {
+                if (villageDataList.size()>1)
+                    villageDataList.clear();
+                try {
+                    villageDataList.addAll(response.body().getData());
+                    VillageData other=new VillageData("2222222222222222","Other", "000", "0000", "0000");
+                    villageDataList.add(other);
+                    villageListAdapter=new VillageListAdapter(ActivityBorrowerKyc.this, villageDataList,dialogSearch,listVillageInteraction);
+                    recViewOfCreator.setAdapter(villageListAdapter);
+                    villageListAdapter.notifyDataSetChanged();
+                    if (villageDataList.size()>=1){
+                        dialogSearch.show();
+                    }else{
+                        Toast.makeText(ActivityBorrowerKyc.this, "district list is not coming", Toast.LENGTH_SHORT).show();
+                    }
+                }catch (Exception e){
+                    VillageData other=new VillageData("2222222222222222","Other", "000", "0000", "0000");
+                    villageDataList.add(other);
+                }
+
+                customProgressDialog.dismiss();
+
+            }
+
+            @Override
+            public void onFailure(Call<VillageListModel> call, Throwable t) {
+                VillageData other=new VillageData("2222222222222222","Other", "000", "0000", "0000");
+                villageDataList.add(other);
+                customProgressDialog.dismiss();
+
+            }
+        });
+
+        edit_text.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count,  int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+                filterVillage(s.toString().toUpperCase());
+
+
+            }
+        });
+
     }
 
     @Override
@@ -212,6 +759,16 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
         setContentView(R.layout.activity_borrower_entry);
         BtnNextOnFirstKyc=findViewById(R.id.BtnSaveKYCData);
         capturePanCardImage=findViewById(R.id.capturePanCardImage);
+        txtVDistrictName=findViewById(R.id.txtVDistrictName);
+        txtSubDistictName=findViewById(R.id.txtSubDistictName);
+        txtVillageName=findViewById(R.id.txtVillageName);
+        txtCityName =findViewById(R.id.txtCityName);
+        listCReatorInteraction=ActivityBorrowerKyc.this;
+        listDistictInteraction=ActivityBorrowerKyc.this;
+        cityChooseListner=ActivityBorrowerKyc.this;
+        listSubDistructInteraction=ActivityBorrowerKyc.this;
+        customProgressDialog = new CustomProgressDialog(this);
+        listVillageInteraction=ActivityBorrowerKyc.this;
         BtnNextOnFirstKyc.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -413,6 +970,50 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                         .cameraOnly()
                         .start(1000);
 
+            }
+        });
+        txtCityName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (((RangeCategory) acspAadharState.getSelectedItem()).RangeCode.equals("99")){
+                    Toast.makeText(activity, "Please select Valid State", Toast.LENGTH_SHORT).show();
+                }else{
+                    showCityDialog(txtCityName,((RangeCategory) acspAadharState.getSelectedItem()).RangeCode);
+                }
+            }
+        });
+
+        txtVDistrictName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (((RangeCategory) acspAadharState.getSelectedItem()).RangeCode.equals("99")){
+                    Toast.makeText(activity, "Please select Valid State", Toast.LENGTH_SHORT).show();
+                }else{
+                    showDistrictDialog(txtVDistrictName,((RangeCategory) acspAadharState.getSelectedItem()).RangeCode);
+                }
+            }
+        });
+        txtSubDistictName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (districtDat!=null){
+
+                    showSubDistrictDialog(txtSubDistictName,districtDat.getDisTCODE());
+                }else{
+                    Toast.makeText(activity, "Please choose any District", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        txtVillageName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (subDistrictData!=null && districtDat!=null && !((RangeCategory) acspAadharState.getSelectedItem()).RangeCode.equals("99")){
+
+                    showVillageDialog(txtVillageName,((RangeCategory) acspAadharState.getSelectedItem()).RangeCode,districtDat.getDisTCODE(),subDistrictData.getSuBDISTCODE());
+                }else{
+                    Toast.makeText(activity, "Please choose any valid state, district or sub district", Toast.LENGTH_SHORT).show();
+                }
             }
         });
         /*svOldCase.setOnSearchClickListener(new View.OnClickListener() {
@@ -635,6 +1236,18 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                 RangeCategory rangeCategory= (RangeCategory) adapterView.getSelectedItem();
                 Log.d("TAG", "onItemSelected: "+rangeCategory.DescriptionEn);
                 stateData=rangeCategory.DescriptionEn;
+                villageData=null;
+                districtDat=null;
+                subDistrictData=null;
+                cityData=null;
+                txtVDistrictName.setText("");
+                txtVillageName.setText("");
+                txtSubDistictName.setText("");
+                txtCityName.setText("");
+                villageDataList.clear();
+                districtDataList.clear();
+                cityDataList.clear();
+                subDistrictDataList.clear();
 
             }
 
@@ -768,6 +1381,9 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
         });
 
     }
+
+
+
     public static String formatDate (String date, String initDateFormat, String endDateFormat) throws ParseException {
 
         Date initDate = new SimpleDateFormat(initDateFormat).parse(date);
@@ -879,7 +1495,7 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
         borrower.setNames(Utils.getNotNullText(tietName));
         borrower.Age = Utils.getNotNullInt(tietAge);
         borrower.DOB = myCalendar.getTime();
-        borrower.setGuardianNames(Utils.getNotNullText(tietGuardian).replace("S/O:","").replace("D/O:","").replace("W/O:","").replace("S/O","").replace("D/O","").replace("W/O",""));
+        borrower.setGuardianNames(Utils.getNotNullText(tietGuardian).replace("S/O:","").replace("D/O:","").replace("W/O:","").replace("S/O","").replace("D/O","").replace("W/O","").replace("\"",""));
         borrower.P_Add1 = Utils.getNotNullText(tietAddress1);
         borrower.P_add2 = Utils.getNotNullText(tietAddress2);
         borrower.P_add3 = Utils.getNotNullText(tietAddress3);
@@ -1166,7 +1782,7 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                                         throw new RuntimeException(e);
                                     }
                                     Instant instant = null;
-                                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                                         instant = date.toInstant();
                                         ZonedDateTime zone = instant.atZone(ZoneId.systemDefault());
                                         LocalDate givenDate = zone.toLocalDate();
@@ -1218,7 +1834,7 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                                     String[] address1 = response.body().get("data").getAsJsonArray().get(0).getAsJsonObject().get("address1").getAsString().split(",");
                                     for (int i = 0; i < address1.length; i++) {
                                         if (address1[i].toUpperCase().contains("S/O") || address1[i].toUpperCase().contains("D/O") || address1[i].toUpperCase().contains("W/O")){
-                                            borrower.setGuardianNames(address1[i].replace("S/O:","").replace("D/O:","").replace("W/O:","").replace("S/O","").replace("D/O","").replace("W/O",""));
+                                            borrower.setGuardianNames(address1[i].replace("S/O:","").replace("D/O:","").replace("W/O:","").replace("S/O","").replace("D/O","").replace("W/O","").replace("\"",""));
                                             if (address1[i].toUpperCase().contains("S/O") || address1[i].toUpperCase().contains("D/O")){
                                                 String[] fatherName=address1[i].split(" ");
                                                 switch (fatherName.length){
@@ -1236,7 +1852,7 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                                                         tietFatherLName.setText(fatherName[3]);
                                                         break;
                                                     default:
-                                                        tietFatherFName.setText(response.body().get("data").getAsJsonArray().get(0).getAsJsonObject().get("address1").getAsString().split(",")[0].toUpperCase().replace("S/O","").replace("S/O:","").replace("D/O","").replace("D/O:",""));
+                                                        tietFatherFName.setText(response.body().get("data").getAsJsonArray().get(0).getAsJsonObject().get("address1").getAsString().split(",")[0].toUpperCase().replace("S/O","").replace("S/O:","").replace("D/O","").replace("D/O:","").replace("'",""));
                                                         break;
                                                 }
 
@@ -1259,7 +1875,7 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                                                             tietSpouseLName.setText(spouseName[3]);
                                                             break;
                                                         default:
-                                                            tietSpouseFName.setText(address1[i].toUpperCase().replace("W/O","").replace("W/O:",""));
+                                                            tietSpouseFName.setText(address1[i].toUpperCase().replace("W/O","").replace("W/O:","").replace("\"",""));
                                                             break;
                                                     }
 
@@ -1304,7 +1920,7 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                                                     tietSpouseLName.setText(spouseName[3]);
                                                     break;
                                                 default:
-                                                    tietSpouseFName.setText(address1[i].toUpperCase().replace("S/O","").replace("D/O","").replace("W/O",""));
+                                                    tietSpouseFName.setText(address1[i].toUpperCase().replace("S/O","").replace("D/O","").replace("W/O","").replace("\"",""));
                                                     break;
                                             }
 
@@ -1325,7 +1941,7 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                                                     tietFatherLName.setText(fatherName[3]);
                                                     break;
                                                 default:
-                                                    tietFatherFName.setText(response.body().get("data").getAsJsonArray().get(0).getAsJsonObject().get("address1").getAsString().split(",")[0].toUpperCase().replace("S/O","").replace("D/O","").replace("W/O",""));
+                                                    tietFatherFName.setText(response.body().get("data").getAsJsonArray().get(0).getAsJsonObject().get("address1").getAsString().split(",")[0].toUpperCase().replace("S/O","").replace("D/O","").replace("W/O","").replace("\"",""));
                                                     break;
                                             }
                                         }
@@ -1368,26 +1984,15 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                             }
                             progressBar.dismiss();
                         }
-
                         //   borrower.setNames(response.body().get("data").getAsJsonArray().get(0).getAsJsonObject().get("name").getAsString());
                     }
                 }
             }
-
             @Override
             public void onFailure(Call<JsonObject> call, Throwable t) {
                 Log.d("TAG", "onFailure: "+t.getMessage());
             }
         });
-
-
-
-
-
-
-
-
-
     }
 
     public static boolean containsOnlyAllowedCharacters(String input) {
@@ -1455,7 +2060,7 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
             borrower.DOB = aadharData.DOB;
             borrower.Age = aadharData.Age;
             borrower.Gender = aadharData.Gender;
-            borrower.setGuardianNames(aadharData.GurName==null?"":aadharData.GurName.replace("S/O:","").replace("D/O:","").replace("W/O:","").replace("S/O","").replace("D/O","").replace("W/O",""));
+            borrower.setGuardianNames(aadharData.GurName==null?"":aadharData.GurName.replace("S/O:","").replace("D/O:","").replace("W/O:","").replace("S/O","").replace("D/O","").replace("W/O","").replace("\"",""));
             borrower.P_city = aadharData.City;
             borrower.p_pin = aadharData.Pin;
             borrower.P_Add1 = aadharData.Address1;
@@ -1702,7 +2307,7 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
         }
         // populate decoded data
         SimpleDateFormat sdt = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             sdt = new SimpleDateFormat("dd-MM-YYYY");
 
         }
@@ -1719,7 +2324,7 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
         Date date = formatter.parse(decodedData.get(4-inc));
 
         Instant instant = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             instant = date.toInstant();
             ZonedDateTime zone = instant.atZone(ZoneId.systemDefault());
             LocalDate givenDate = zone.toLocalDate();
@@ -1750,7 +2355,7 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
 
         }else{
             if (decodedData.get(6-inc).startsWith("S/O:") ||decodedData.get(6-inc).startsWith("D/O:") ||decodedData.get(6-inc).startsWith("W/O:")){
-                borrower.setGuardianNames(decodedData.get(6-inc).split(":")[1].replace("S/O:","").replace("D/O:","").replace("W/O:","").replace("S/O","").replace("D/O","").replace("W/O","").trim());
+                borrower.setGuardianNames(decodedData.get(6-inc).split(":")[1].replace("S/O:","").replace("D/O:","").replace("W/O:","").replace("S/O","").replace("D/O","").replace("\"","").replace("W/O","").trim());
                 if (decodedData.get(6-inc).toUpperCase().startsWith("W/O:")){
                     Utils.setSpinnerPosition(spinnerMarritalStatus, "Married", false);
                     String[] spouseName=decodedData.get(6-inc).split(" ");
@@ -1776,11 +2381,11 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
             }else if (decodedData.get(6-inc).startsWith("S/O,") ||decodedData.get(6-inc).startsWith("D/O,") ||decodedData.get(6-inc).startsWith("W/O,")){
                 borrower.setGuardianNames(decodedData.get(6-inc).split(",")[1].trim());
             }else{
-                borrower.setGuardianNames(decodedData.get(6-inc).replace("S/O:","").replace("D/O:","").replace("W/O:","").replace("S/O","").replace("D/O","").replace("W/O",""));
+                borrower.setGuardianNames(decodedData.get(6-inc).replace("S/O:","").replace("D/O:","").replace("W/O:","").replace("S/O","").replace("D/O","").replace("W/O","").replace("\"",""));
 
             }
             if (decodedData.get(6-inc).startsWith("S/O:") ||decodedData.get(6-inc).startsWith("D/O:") ||decodedData.get(6-inc).startsWith("W/O:")){
-                borrower.setGuardianNames(decodedData.get(6-inc).split(":")[1].replace("S/O:","").replace("D/O:","").replace("W/O:","").replace("S/O","").replace("D/O","").replace("W/O","").trim());
+                borrower.setGuardianNames(decodedData.get(6-inc).split(":")[1].replace("S/O:","").replace("D/O:","").replace("W/O:","").replace("S/O","").replace("D/O","").replace("\"","").replace("W/O","").trim());
                 if (decodedData.get(6-inc).toUpperCase().startsWith("W/O:")){
                     Utils.setSpinnerPosition(spinnerMarritalStatus, "Married", false);
                     String[] spouseName=decodedData.get(6-inc).split(" ");
@@ -1806,7 +2411,7 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
             }else if (decodedData.get(6-inc).startsWith("S/O,") ||decodedData.get(6-inc).startsWith("D/O,") ||decodedData.get(6-inc).startsWith("W/O,")){
                 borrower.setGuardianNames(decodedData.get(6-inc).split(",")[1].trim());
             }else{
-                borrower.setGuardianNames(decodedData.get(6-inc).replace("S/O:","").replace("D/O:","").replace("W/O:","").replace("S/O","").replace("D/O","").replace("W/O",""));
+                borrower.setGuardianNames(decodedData.get(6-inc).replace("S/O:","").replace("D/O:","").replace("W/O:","").replace("S/O","").replace("D/O","").replace("W/O","").replace("\"",""));
 
             }
             if (decodedData.get(6-inc).startsWith("S/O") ||decodedData.get(6-inc).startsWith("D/O")){
@@ -2166,6 +2771,7 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                 intent.putExtra("manager", manager);
                 intent.putExtra("borrower", borrower);
                 intent.putExtra(Global.SCHEME_TAG, schemeNameForVH);
+                intent.putExtra("AddressCodes",cityData.getCitYCODE()+"_"+districtDat.getDisTCODE()+"_"+subDistrictData.getSuBDISTCODE()+"_"+villageData.getVillagECODE());
                 startActivity(intent);
             }else{
                 Utils.alert(ActivityBorrowerKyc.this,"Verify any one ID from PAN|DL|Voter ID");
@@ -2190,6 +2796,8 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                 intent.putExtra("manager", manager);
                 intent.putExtra("borrower", borrower);
                 intent.putExtra(Global.SCHEME_TAG, schemeNameForVH);
+                intent.putExtra("AddressCodes",cityData.getCitYCODE()+"_"+districtDat.getDisTCODE()+"_"+subDistrictData.getSuBDISTCODE()+"_"+villageData.getVillagECODE());
+
                 startActivity(intent);
 
             }else{
@@ -2527,6 +3135,37 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
         return retVal;
     }
 
+  private boolean validateControls(TextView editText, String text) {
+        boolean retVal = true;
+        editText.setError(null);
+        switch (editText.getId()) {
+
+            case R.id.txtCityName:
+                    if (editText.getText().toString().trim().length() < 1) {
+                        editText.setError("Please Choose City");
+                        retVal = false;
+                    }
+                break;   case R.id.txtSubDistictName:
+                    if (editText.getText().toString().trim().length() < 1) {
+                        editText.setError("Please Choose Sub-District");
+                        retVal = false;
+                    }
+                break;   case R.id.txtVDistrictName:
+                    if (editText.getText().toString().trim().length() < 1) {
+                        editText.setError("Please Choose District");
+                        retVal = false;
+                    }
+                break;   case R.id.txtVillageName:
+                    if (editText.getText().toString().trim().length() < 1) {
+                        editText.setError("Please Choose Village");
+                        retVal = false;
+                    }
+                break;
+
+        }
+        return retVal;
+    }
+
 
 
     private void cardValidate(String id,String type,String bankIfsc,String dob) {
@@ -2707,6 +3346,10 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
         retVal &= validateControls(tietMotherFName, tietMotherFName.getText().toString());
         retVal &= validateControls(tietFatherFName, tietFatherFName.getText().toString());
         retVal &= validateControls(tietSpouseFName, tietSpouseFName.getText().toString());
+        retVal &= validateControls(txtCityName, txtCityName.getText().toString());
+        retVal &= validateControls(txtSubDistictName, txtSubDistictName.getText().toString());
+        retVal &= validateControls(txtVDistrictName, txtVDistrictName.getText().toString());
+        retVal &= validateControls(txtVillageName, txtVillageName.getText().toString());
         return retVal;
     }
 
@@ -2820,7 +3463,34 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
     }
 
 
+    @Override
+    public void onListCReatorInteraction(String choosedCreatora) {
+        Log.d("TAG", "onListCReatorInteraction: "+choosedCreatora);
+        choosedCreator=choosedCreatora;
+    }
 
+    @Override
+    public void DistrictChooseListner(DistrictData districtDatas) {
+        districtDat=districtDatas;
+    }
+
+    @Override
+    public void VillageChooseListner(VillageData villageDatas) {
+        villageData=villageDatas;
+
+
+    }
+
+    @Override
+    public void CityChooseListner(CityData cityDatas) {
+        cityData=cityDatas;
+    }
+
+    @Override
+    public void SubDistChooseListner(SubDistrictData subDistrictDatas) {
+        subDistrictData=subDistrictDatas;
+
+    }
 }
 
 

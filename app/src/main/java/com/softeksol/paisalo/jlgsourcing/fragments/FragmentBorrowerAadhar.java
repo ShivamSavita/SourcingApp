@@ -359,10 +359,8 @@ public class FragmentBorrowerAadhar extends AbsFragment implements View.OnClickL
             }
 
         }
-        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE){
             Exception error = null;
-
-
             if (data != null) {
                 Uri imageUri = CameraUtils.finaliseImageCropUri(resultCode, data, 300, error, false);
                 //Toast.makeText(activity, imageUri.toString(), Toast.LENGTH_SHORT).show();

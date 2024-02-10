@@ -3,13 +3,20 @@ package com.softeksol.paisalo.jlgsourcing.retrofit;
 
 import com.google.gson.JsonObject;
 import com.softeksol.paisalo.jlgsourcing.entities.BREResponse;
+import com.softeksol.paisalo.jlgsourcing.entities.CityModelList;
 import com.softeksol.paisalo.jlgsourcing.entities.CreatorModel;
+import com.softeksol.paisalo.jlgsourcing.entities.DistrictListModel;
 import com.softeksol.paisalo.jlgsourcing.entities.HomeVisitFiList;
 import com.softeksol.paisalo.jlgsourcing.entities.HomeVisitListModel;
+import com.softeksol.paisalo.jlgsourcing.entities.PosInstRcv;
+import com.softeksol.paisalo.jlgsourcing.entities.PosInstRcvNew;
 import com.softeksol.paisalo.jlgsourcing.entities.ProcessingEmiData;
+import com.softeksol.paisalo.jlgsourcing.entities.SubDistrictModel;
+import com.softeksol.paisalo.jlgsourcing.entities.VillageListModel;
 import com.softeksol.paisalo.jlgsourcing.entities.dto.OCRResponseModel;
 import com.softeksol.paisalo.jlgsourcing.homevisit.FIDataModel;
 import com.softeksol.paisalo.jlgsourcing.models.AccountDetails_Model;
+import com.softeksol.paisalo.jlgsourcing.models.QrUrlData;
 
 import java.util.Calendar;
 import java.util.List;
@@ -55,6 +62,9 @@ public interface ApiInterface {
 
     @POST("LiveTrack/CreateLiveTrack")
     public Call<JsonObject> livetrack(@Body JsonObject object);
+
+    @POST("FiWip/CheckQrCode")
+    public Call<QrUrlData> getQrCode(@Body JsonObject object);
 
     @GET("LiveTrack/GetAppLink")
     Call<AppUpdateResponse> getAppLinkStatus(@Query("version") String version, @Query("AppName") String AppName, @Query("action") int action);
@@ -116,6 +126,25 @@ public interface ApiInterface {
     @GET("PDL.Userservice.api/api/DDLHelper/GetCreator")
     Call<List<CreatorModel>> getCreatorList();
 
+    @GET("PDL.Userservice.api/api/DDLHelper/GetSBIVillageMaster")
+    Call<VillageListModel> getVillageList(@Query("stcode") String stcode, @Query("discode") String discode, @Query("subdiscode") String subdiscode);
+
+
+    @GET("PDL.Userservice.api/api/DDLHelper/GetSBICityMaster")
+    Call<CityModelList> getCityList(@Query("ststecode") String stcode);
+
+
+    @GET("PDL.Userservice.api/api/DDLHelper/GetSBIDistrictMaster")
+    Call<DistrictListModel> getDistictList(@Query("ststecode") String subDistrict);
+
+
+    @GET("PDL.Userservice.api/api/DDLHelper/GetSBISubDistrictMaster")
+    Call<SubDistrictModel> getSubDistrictList(@Query("subDistrict") String subDistrict);
+
+
+
+    @POST("PDL.Userservice.api/api/DDLHelper/InsertVillDistCode")
+    Call<JsonObject> insertAddressCodes(@Body JsonObject jsonObject);
 
 
     @POST("PDL.Mobile.API/api/IMEIMapping/RcPromiseToPay")
@@ -123,6 +152,12 @@ public interface ApiInterface {
 
     @POST("PDL.Mobile.API/api/IMEIMapping/InsertRcDistribution")
     Call<JsonObject> insertRcDistribution(@Body JsonObject jsonObject);
+
+
+    @POST("InstCollection/SaveReceipt")
+    Call<JsonObject> insertRcDistributionNew(@Body PosInstRcvNew jsonObject,
+                                             @Header("dbname") String dbname,
+                                             @Header("userid") String userid);
 
     @POST("PDL.Mobile.API/api/Crif/InitilizeCrif")
     Call<JsonObject> generateCrifForVehicle(@Body JsonObject jsonObject);

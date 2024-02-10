@@ -68,16 +68,18 @@
                 android:text="Vehicle Receipt" />
 
             <Button
+                android:padding="5dp"
                 android:id="@+id/prossingFees"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
                 android:layout_weight="1"
-                android:background="@color/colorMenuDeposit"
-                android:text="Processing Fee EMI"
+                android:background="@color/colorPrimary"
+                android:text="QR CODE"
+                android:drawableLeft="@drawable/qr_code"
                 android:textAllCaps="false"
                 android:textColor="@color/black"
                 android:textSize="12dp"
-                android:visibility="invisible" />
+                android:visibility="visible" />
 
         </LinearLayout>
 
