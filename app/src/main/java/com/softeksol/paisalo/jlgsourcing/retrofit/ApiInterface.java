@@ -21,6 +21,7 @@ import com.softeksol.paisalo.jlgsourcing.models.QrUrlData;
 import java.util.Calendar;
 import java.util.List;
 
+import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Response;
@@ -66,8 +67,13 @@ public interface ApiInterface {
     @POST("FiWip/CheckQrCode")
     public Call<QrUrlData> getQrCode(@Body JsonObject object);
 
+    @GET("GenerateQr/CheckQrCode")
+    Call<QrUrlData> getCheckQrCode(@Query("smcode") String SmCode);
+
     @GET("LiveTrack/GetAppLink")
     Call<AppUpdateResponse> getAppLinkStatus(@Query("version") String version, @Query("AppName") String AppName, @Query("action") int action);
+
+
 
     @POST("LiveTrack/SourcingStatus")
     Call<JsonObject> updateStatus(@Query("ficode") String Ficode, @Query("creator") String Creator);
@@ -158,6 +164,17 @@ public interface ApiInterface {
     Call<JsonObject> insertRcDistributionNew(@Body PosInstRcvNew jsonObject,
                                              @Header("dbname") String dbname,
                                              @Header("userid") String userid);
+
+    @POST("InstCollection/IsQrPaySuccess")
+    Call<JsonObject> insertQRPayment(@Body PosInstRcvNew jsonObject,
+                                             @Header("dbname") String dbname,
+                                             @Header("userid") String userid);
+
+    @Multipart
+    @POST("PDL.SourcingApp.Api/api/InstCollection/QrPaymentSettlement")
+    Call<JsonObject> saveReciptOnpayment(
+                                         @Part MultipartBody.Part FileName, // Image file part
+                                         @Part("SmCode") RequestBody SmCode); // Other parts, if any)
 
     @POST("PDL.Mobile.API/api/Crif/InitilizeCrif")
     Call<JsonObject> generateCrifForVehicle(@Body JsonObject jsonObject);
