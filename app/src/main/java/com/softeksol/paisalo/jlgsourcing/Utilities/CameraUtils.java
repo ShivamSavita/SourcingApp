@@ -34,7 +34,6 @@ import static android.app.Activity.RESULT_OK;
  */
 public class CameraUtils {
     public static final int REQUEST_TAKE_PHOTO = 101;
-    public static final int REQUEST_TAKE_PROFILE_PHOTO = 105;
     public static final int SELECT_PICTURE = 110;
     static String mCurrentPhotoPath;
     private static String TAG = "CameraUtils";

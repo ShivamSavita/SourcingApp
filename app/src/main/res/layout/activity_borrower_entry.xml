@@ -1131,7 +1131,7 @@
                     android:layout_marginEnd="8dp"
                     app:cardCornerRadius="7dp"
                     app:cardElevation="3dp"
-                    app:layout_constraintEnd_toStartOf="@+id/mobileNuberCheckSign"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/textView24">
 
@@ -1159,16 +1159,6 @@
                             android:textSize="15dp" />
                     </com.google.android.material.textfield.TextInputLayout>
                 </androidx.cardview.widget.CardView>
-
-                <Button
-                    android:id="@+id/mobileNuberCheckSign"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_marginEnd="8dp"
-                    android:background="@drawable/check_sign_ic"
-                    app:layout_constraintBottom_toBottomOf="@+id/tilMobile"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/tilMobile" />
 
 
                 <TextView

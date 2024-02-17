@@ -39,45 +39,29 @@ public class ApiClient {
 
 
 
-
     public static  Retrofit getClientdynamic(String dbname,String deviceId) {
         Retrofit retrofit = null;
         if (retrofit==null) {
             OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
             httpClient.addInterceptor(new Interceptor() {
-                                          @Override
-                                          public Response intercept(Chain chain) throws IOException {
-                                              Request original = chain.request();
+                @Override
+                public Response intercept(Chain chain) throws IOException {
+                    Request original = chain.request();
 
-                                              Request request = original.newBuilder()
-                                                      .header("userid", deviceId)
-                                                      .header("dbname", dbname)
-                                                      .method(original.method(), original.body())
-                                                      .build();
+                    Request request = original.newBuilder()
+                            .header("userid", deviceId)
+                            .header("dbname", dbname)
+                            .method(original.method(), original.body())
+                            .build();
 
-                                              return chain.proceed(request);
-                                          }
-                                      });
+                    return chain.proceed(request);
+                }
+            });
 
-                    OkHttpClient client = httpClient.build();
-//            OkHttpClient httpClient = new OkHttpClient();
-//            httpClient.networkInterceptors().add(new Interceptor() {
-//                @Override
-//                public Response intercept(Chain chain) throws IOException {
-//                    Request.Builder requestBuilder = chain.request().newBuilder();
-//                    requestBuilder.header("accept", "application/json");
-//                    requestBuilder.header("access", "application/json");
-//                    requestBuilder.header("procname", "");
-//                    requestBuilder.header("Content-Encoding", "gzip,deflate,compress");
-//                    requestBuilder.header("imeino", "354690572942373");
-//                    requestBuilder.header("devid", "8519713985787243");
-//                    requestBuilder.header("dbname", "SBIPDLCOL");
-//                    return chain.proceed(requestBuilder.build());
-//                }
-//            });
+            OkHttpClient client = httpClient.build();
 
             retrofit = new Retrofit.Builder()
-                    .baseUrl("https://predeptest.paisalo.in:8084/")
+                    .baseUrl("https://erpservice.paisalo.in:980/")
                     .addConverterFactory(GsonConverterFactory.create())
                     .client(client)
                     .build();
