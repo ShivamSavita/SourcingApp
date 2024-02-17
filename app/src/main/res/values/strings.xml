@@ -193,4 +193,10 @@ Contact Email <i>DELHI@PAISALO.IN</i>
         <item>"Don't have money"</item>
         <item>"Others"</item>
     </array>
+
+
+    <string-array name="choice_array">
+        <item>Choose from Gallery</item>
+        <item>Take a Photo</item>
+    </string-array>
 </resources>

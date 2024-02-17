@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -17,11 +18,13 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SearchView;
@@ -31,6 +34,7 @@ import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatSpinner;
 import androidx.appcompat.widget.LinearLayoutCompat;
@@ -55,6 +59,7 @@ import com.softeksol.paisalo.jlgsourcing.Utilities.CustomProgressDialog;
 import com.softeksol.paisalo.jlgsourcing.Utilities.DateUtils;
 import com.softeksol.paisalo.jlgsourcing.Utilities.IglPreferences;
 import com.softeksol.paisalo.jlgsourcing.Utilities.MyTextWatcher;
+import com.softeksol.paisalo.jlgsourcing.Utilities.OTPDialog;
 import com.softeksol.paisalo.jlgsourcing.Utilities.Utils;
 import com.softeksol.paisalo.jlgsourcing.Utilities.Verhoeff;
 import com.softeksol.paisalo.jlgsourcing.WebOperations;
@@ -135,6 +140,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 import static com.softeksol.paisalo.jlgsourcing.Utilities.CameraUtils.REQUEST_TAKE_PHOTO;
+import static com.softeksol.paisalo.jlgsourcing.Utilities.CameraUtils.REQUEST_TAKE_PROFILE_PHOTO;
 import static com.softeksol.paisalo.jlgsourcing.Utilities.Verhoeff.validateCaseCode;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -145,6 +151,7 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
     private final AppCompatActivity activity = this;
 
     CustomProgressDialog customProgressDialog;
+    int otpVerified=0;
     int PAN_CARD_CAPTURE=1100;
 
     AdapterListRange rlaMarritalStatus;
@@ -171,7 +178,7 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
     private TextWatcher ageTextWatcher;
     private Calendar myCalendar;
     private DatePickerDialog.OnDateSetListener dateSetListner;
-    Button voterIdCheckSign,panCheckSign,dLCheckSign;
+    Button voterIdCheckSign,panCheckSign,dLCheckSign,mobileNuberCheckSign;
     private MyTextWatcher aadharTextChangeListner;
     private AdapterRecViewListDocuments adapterRecViewListDocuments;
     private DocumentStore documentPic;
@@ -212,7 +219,8 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
     String schemeNameForVH;
     String AddressREGX="^[0-9A-Za-z\\s]+$";
     String choosedCreator;
-
+    ImageView imgViewAadharPhoto;
+    int profileImageClick=0;
     TextView txtVDistrictName, txtCityName,txtVillageName,txtSubDistictName;
     @Override
     public boolean onSupportNavigateUp() {
@@ -447,20 +455,15 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
         edit_text.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count,  int after) {
-
             }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-
             }
 
             @Override
             public void afterTextChanged(Editable s) {
-
                 filterCity(s.toString().toUpperCase());
-
-
             }
         });
 
@@ -830,6 +833,7 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                 genders.add(new RangeCategory("Female", "Gender"));
                 genders.add(new RangeCategory("Transgender", "Gender"));
         }*/
+
         tietDob = findViewById(R.id.tietDob);
         tietMotherMName=findViewById(R.id.tietIncomeMonthly);
         tietMotherFName=findViewById(R.id.tietMotherFName);
@@ -852,6 +856,7 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
         dLCheckSign = findViewById(R.id.dLCheckSign);
 
         voterIdCheckSign = findViewById(R.id.voterIdCheckSign);
+        mobileNuberCheckSign = findViewById(R.id.mobileNuberCheckSign);
         acspGender = findViewById(R.id.acspGender);
         tilPAN_Name = findViewById(R.id.tilPAN_Name);
         tilVoterId_Name = findViewById(R.id.tilVoterId_Name);
@@ -1167,13 +1172,22 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                 validateControls(editText, text);
             }
         });
-        ImageView imageView = ((ImageView) findViewById(R.id.imgViewAadharPhoto));
-        imageView.setVisibility(View.GONE);
-        imageView.setOnClickListener(this);
+        imgViewAadharPhoto= ((ImageView) findViewById(R.id.imgViewAadharPhoto));
+
         imgViewScanQR = (ImageView) findViewById(R.id.imgViewScanQR);
         imgViewScanQR.setOnClickListener(this);
         imgViewScanQR.setVisibility(View.VISIBLE);
+        imgViewAadharPhoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
 
+                profileImageClick=1;
+
+                ImagePicker.with(ActivityBorrowerKyc.this)
+                        .cameraOnly()
+                        .start(REQUEST_TAKE_PROFILE_PHOTO);
+            }
+        });
         ageTextWatcher = new TextWatcher() {
             String dtString;
 
@@ -1207,12 +1221,14 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
         };
         imgViewCal.setOnClickListener(this);
         tietMobile = findViewById(R.id.tietMobile);
-       /* tietMobile.addTextChangedListener(new MyTextWatcher(tietMobile) {
+        tietMobile.addTextChangedListener(new MyTextWatcher(tietMobile) {
             @Override
             public void validate(EditText editText, String text) {
-                validateControls(editText, text);
+                mobileNuberCheckSign.setBackground(getResources().getDrawable(R.drawable.check_sign_ic));
+                mobileNuberCheckSign.setEnabled(true);
+                otpVerified=0;
             }
-        });*/
+        });
 
         tietPanNo = findViewById(R.id.tietPAN);
 
@@ -1316,6 +1332,16 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                 }
             }
         });
+        mobileNuberCheckSign.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (tietMobile.getText().toString().trim().length()!=10){
+                    tietMobile.setError("Please enter correct mobile number!!");
+                }else{
+                    getMobileOTP(tietMobile.getText().toString().trim());
+                }
+            }
+        });
 
         tietPanNo.addTextChangedListener(new TextWatcher() {
             @Override
@@ -1382,6 +1408,128 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
 
     }
 
+    private void getMobileOTP(String mobileNumber) {
+
+        ProgressDialog progressBar = new ProgressDialog(this);
+        progressBar.setCancelable(false);//you can cancel it by pressing back button.
+        progressBar.setMessage(" Please wait...");
+        progressBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressBar.show();
+
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+        httpClient.connectTimeout(1, TimeUnit.MINUTES);
+        httpClient.readTimeout(1,TimeUnit.MINUTES);
+        httpClient.addInterceptor(logging);
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://erpservice.paisalo.in:980/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(httpClient.build())
+                .build();
+        ApiInterface apiInterface=retrofit.create(ApiInterface.class);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(ActivityBorrowerKyc.this);
+        View dialogView = getLayoutInflater().inflate(R.layout.otp_dialog_layout, null);
+        builder.setView(dialogView);
+
+        AlertDialog dialogs = builder.create();
+        dialogs.setCanceledOnTouchOutside(false);
+        dialogs.setCancelable(false);
+        EditText otpEditText = dialogView.findViewById(R.id.editTextOTP);
+        Button submitButton = dialogView.findViewById(R.id.buttonSubmit);
+        ImageButton crossButtonDialog = dialogView.findViewById(R.id.crossButtonDialog);
+        crossButtonDialog.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                progressBar.dismiss();
+                dialogs.dismiss();
+            }
+        });
+        InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+        submitButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (otpEditText.getText().toString().trim().length()!=6){
+                    otpEditText.setError("Wrong OTP");
+                }else{
+                    Call<JsonObject> call=apiInterface.verifyOTP(mobileNumber,otpEditText.getText().toString().trim());
+                    call.enqueue(new Callback<JsonObject>() {
+                        @Override
+                        public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                            if (response.isSuccessful()){
+                                if (response.body().get("message").getAsString().equals("verified OTP")){
+                                    mobileNuberCheckSign.setBackground(getResources().getDrawable(R.drawable.check_sign_ic_green));
+                                    mobileNuberCheckSign.setEnabled(false);
+                                    Toast.makeText(ActivityBorrowerKyc.this, "OTP verified", Toast.LENGTH_SHORT).show();
+                                    otpVerified=1;
+                                    progressBar.dismiss();
+                                    dialogs.dismiss();
+
+                                }else{
+                                    otpEditText.setError("Wrong OTP");
+                                    Toast.makeText(ActivityBorrowerKyc.this, "OTP Not verified", Toast.LENGTH_SHORT).show();
+                                    mobileNuberCheckSign.setBackground(getResources().getDrawable(R.drawable.check_sign_ic));
+                                    mobileNuberCheckSign.setEnabled(true);
+                                   // dialogs.dismiss();
+                                }
+                            }else{
+                                otpEditText.setError("Wrong OTP");
+                                Toast.makeText(ActivityBorrowerKyc.this, "Something went wrong", Toast.LENGTH_SHORT).show();
+                                mobileNuberCheckSign.setBackground(getResources().getDrawable(R.drawable.check_sign_ic));
+                                mobileNuberCheckSign.setEnabled(true);
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<JsonObject> call, Throwable t) {
+
+                            Toast.makeText(ActivityBorrowerKyc.this, "Please try again!!", Toast.LENGTH_SHORT).show();
+                            mobileNuberCheckSign.setBackground(getResources().getDrawable(R.drawable.check_sign_ic));
+                            mobileNuberCheckSign.setEnabled(true);
+                        }
+                    });
+
+                }
+            }
+        });
+
+
+
+
+            JsonObject jsonObject=new JsonObject();
+            jsonObject.addProperty("contentId","1007458689942092806");
+            jsonObject.addProperty("username","paisalo.trans");
+            jsonObject.addProperty("password","oDqLM");
+            jsonObject.addProperty("unicode",false);
+            jsonObject.addProperty("from","PAISAL");
+            jsonObject.addProperty("to",mobileNumber);
+            jsonObject.addProperty("text","Your OTP for validation of mobile number with Paisalo Digital Limited is {#otp#} https://www.paisalo.in");
+
+        Call<JsonObject> call=apiInterface.getOtp(jsonObject);
+        call.enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                if (response.isSuccessful()){
+                    if(response.body().get("message").getAsString().contains("Successfully")){
+                        dialogs.show();
+                    }else{
+                        Toast.makeText(ActivityBorrowerKyc.this, "Something went wrong, API Failure", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                Toast.makeText(ActivityBorrowerKyc.this, "Something went wrong "+t.getMessage(), Toast.LENGTH_SHORT).show();
+
+            }
+        });
+
+
+
+    }
 
 
     public static String formatDate (String date, String initDateFormat, String endDateFormat) throws ParseException {
@@ -1621,7 +1769,22 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                 }
             }
         } else {
-            if (requestCode == REQUEST_TAKE_PHOTO) {
+            if (requestCode == REQUEST_TAKE_PROFILE_PHOTO && resultCode == RESULT_OK) {
+
+
+                if (data != null) {
+                    uriPicture = data.getData();
+                    CropImage.activity(uriPicture)
+                            .setGuidelines(CropImageView.Guidelines.ON)
+                            .setAspectRatio(45, 52)
+                            .start(  ActivityBorrowerKyc.this);
+                } else {
+                    Log.e("ImageData","Null");
+                    Toast.makeText(this, "Image Data Null", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+            else if (requestCode == REQUEST_TAKE_PHOTO) {
                 if (resultCode == RESULT_OK) {
                     if (documentPic.checklistid == 0) {
                         CropImage.activity(this.uriPicture)
@@ -1655,7 +1818,7 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                             .start(  ActivityBorrowerKyc.this);
                 }
             }
-            if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE && profileImageClick==0) {
 
                 Exception error = null;
                 if (documentPic!=null){
@@ -1681,7 +1844,8 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                         }
                     }
 
-                }else{
+                }
+                else{
 
                     Uri imageUri1 = CameraUtils.finaliseImageCropUri(resultCode, data, 1000, error, false);
                     File tempCroppedImage1 = new File(imageUri1.getPath());
@@ -1711,9 +1875,105 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
 
                 }
             }
+            else if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE && profileImageClick==1){
+
+                Toast.makeText(activity, "Image in processing..", Toast.LENGTH_SHORT).show();
+                Exception error = null;
+                    Uri imageUri = CameraUtils.finaliseImageCropUri(resultCode, data, 300, error, false);
+                    File tempCroppedImage = new File(imageUri.getPath());
+                    Log.d("TAG", "onActivityResult: "+tempCroppedImage.length());
+                if (tempCroppedImage.length() > 100) {
+                    if (borrower != null) {
+                        (new File(this.uriPicture.getPath())).delete();
+                        try {
+                            File croppedImage = CameraUtils.moveCachedImage2Storage(this, tempCroppedImage, true,0);
+                            borrower.setPicture(croppedImage.getPath());
+                            borrower.Oth_Prop_Det = null;
+                            borrower.save();
+                            if (borrower.getPicture() != null && (new File(borrower.getPicture().getPath())).length() > 100) {
+                                if (new File(borrower.getPicture().getPath()).length() != 0) {
+
+                                    Bitmap myBitmap = BitmapFactory.decodeFile(new File(borrower.getPicture().getPath()).getAbsolutePath());
+
+                                    //ImageView myImage = (ImageView) findViewById(R.id.imageviewTest);
+
+                                    if (myBitmap != null) {
+                                        imgViewAadharPhoto.setImageBitmap(myBitmap);
+                                        Log.e("CHeckingmyBitmap22",myBitmap+"");
+                                    } else {
+                                        Toast.makeText(this, "Bitmap Null", Toast.LENGTH_SHORT).show();
+                                        Log.e("BitmapImage", "Null");
+                                    }
+                                } else {
+                                    Toast.makeText(this, "Filepath Empty", Toast.LENGTH_SHORT).show();
+
+                                }
+                                  }
+
+
+                        } catch (IOException e) {
+                            Log.d("TAG", "onActivityResult: "+e.getMessage());
+                            e.printStackTrace();
+                        }
+                    }else {
+                        Toast.makeText(this, "Borrower is null", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                    profileImageClick=0;
+
+            }
 
         }
     }
+
+    private void showPicture(Borrower borrower) {
+
+
+//        Log.e("CHeckingNewCondition",borrower.getPictureborrower()+"");
+        if (borrower != null) {
+
+            Log.d("TAG", "showPicture: "+borrower.toString());
+//            if (borrower.getPictureborrower()!=null){
+//                imageView.setImageBitmap(StringToBitmap(borrower.getPictureborrower()));
+//            }
+
+            //Log.d("BorrowerImagePath",borrower.getPicture().getPath());
+            if (borrower.getPicture() != null && (new File(borrower.getPicture().getPath())).length() > 100) {
+                Log.d("BorrowerImagePath1",borrower.getPicture().getPath());
+                Toast.makeText(this, "BorrowerPicture: " + borrower.getPicture().getPath() + "", Toast.LENGTH_SHORT).show();
+
+                setImagepath(new File(borrower.getPicture().getPath()));
+                //imageView.setImageBitmap(StringToBitmap(borrower.getPictureborrower()));
+                //Glide.with(activity).load(borrower.getPicture().getPath()).override(Target.SIZE_ORIGINAL, 300).into(imageView);
+            }
+        }
+    }
+    private void setImagepath(File file) {
+
+//        File imgFile = new  File("/sdcard/Images/test_image.jpg");
+
+//        customProgress.hideProgress();
+        // Toast.makeText(this, "Checking File: "+file.getAbsolutePath()+"", Toast.LENGTH_SHORT).show();
+
+        if (file.length() != 0) {
+
+            Bitmap myBitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
+
+            //ImageView myImage = (ImageView) findViewById(R.id.imageviewTest);
+
+            if (myBitmap != null) {
+                imgViewAadharPhoto.setImageBitmap(myBitmap);
+                Log.e("CHeckingmyBitmap22",myBitmap+"");
+            } else {
+                Toast.makeText(this, "Bitmap Null", Toast.LENGTH_SHORT).show();
+                Log.e("BitmapImage", "Null");
+            }
+        } else {
+            Toast.makeText(this, "Filepath Empty", Toast.LENGTH_SHORT).show();
+
+        }
+    }
+
 
     private void setDataOfAdhar(File croppedImage,String imageData,String type) {
         ProgressDialog progressBar = new ProgressDialog(this);
@@ -2678,6 +2938,10 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
     private void  updateBorrower() {
         if(stateData.equalsIgnoreCase("APO Address")){
             Toast.makeText(activity, "Select State Name", Toast.LENGTH_SHORT).show();
+        }else if( otpVerified==0){
+            Toast.makeText(activity, "Please verify mobile number vis OTP", Toast.LENGTH_SHORT).show();
+        }else if( borrower.getPicture().getPath().length()<5){
+            Toast.makeText(activity, "Please upload borrower's picture first", Toast.LENGTH_SHORT).show();
         }else{
             if (borrower != null) {
                 getDataFromView(this.findViewById(android.R.id.content).getRootView());
