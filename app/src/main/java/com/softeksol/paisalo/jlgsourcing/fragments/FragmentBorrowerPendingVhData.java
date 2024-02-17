@@ -261,8 +261,7 @@ public class FragmentBorrowerPendingVhData extends AbsFragment implements View.O
     private void setDataToView(View v) {
 
 
-        Log.e("BUSSINESS",borrower.Business_Detail);
-        Log.e("OCCUPATION_TYPE",borrowerExtra.OCCUPATION_TYPE);
+
 
         String isMarried = borrower.isMarried;
         if(isMarried.equals("U")){

@@ -195,7 +195,17 @@ public interface ApiInterface {
     @POST("LiveTrack/FiForUdhan")
     Call<JsonObject> saveSchemeForVH(@Body JsonObject jsonObject);
 
+    @POST("PDL.SMS.API/api/Sms/SendSms?MessageType=otp")
+    Call<JsonObject> getOtp(@Body JsonObject jsonObject);
 
+
+    @GET("PDL.SMS.API/api/Sms/SendOtp")
+    Call<JsonObject> verifyOTP(@Query("MobileNo") String MobileNo,@Query("Otp") String Otp);
+
+    @Multipart
+    @POST("PDL.SourcingApp.Api/api/InstCollection/QrPaymentSettlement")
+    Call<JsonObject> saveReciptOnpayment(@Part MultipartBody.Part FileName, // Image file part
+                                         @Part("SmCode") RequestBody SmCode); // Other parts, if any)
 
 /*
     @Field("ficode") String fiCode, @Field("full_name") String fullName, @Field("dob") String dob,

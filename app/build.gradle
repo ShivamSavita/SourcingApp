@@ -86,7 +86,7 @@ android {
 
 
         SBIColending {
-            versionCode 14
+            versionCode 13
             versionName "1.6.17"
             applicationId "net.softeksol.seil.groupfin.sbicolending"
             resValue("string", "appname", "SBI-CoLending")

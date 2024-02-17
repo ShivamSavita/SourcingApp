@@ -194,6 +194,7 @@ Contact Email <i>DELHI@PAISALO.IN</i>
         <item>"Others"</item>
     </array>
 
+
     <string-array name="choice_array">
         <item>Choose from Gallery</item>
         <item>Take a Photo</item>
