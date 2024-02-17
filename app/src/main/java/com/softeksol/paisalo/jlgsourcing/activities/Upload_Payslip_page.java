@@ -5,6 +5,7 @@ import static com.softeksol.paisalo.jlgsourcing.Utilities.CameraUtils.REQUEST_TA
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -14,16 +15,19 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.dhaval2404.imagepicker.ImagePicker;
 import com.google.gson.JsonObject;
 import com.softeksol.paisalo.jlgsourcing.R;
+import com.softeksol.paisalo.jlgsourcing.SEILIGL;
 import com.softeksol.paisalo.jlgsourcing.Utilities.CameraUtils;
+import com.softeksol.paisalo.jlgsourcing.Utilities.IglPreferences;
 import com.softeksol.paisalo.jlgsourcing.retrofit.ApiClient;
 import com.softeksol.paisalo.jlgsourcing.retrofit.ApiInterface;
 import com.theartofdev.edmodo.cropper.CropImage;
@@ -42,14 +46,16 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class Upload_Payslip_page extends AppCompatActivity {
-    Button btnUploadImage,btnSubmit;
+    Button btnUploadImage;
     private ImageView imageViewSelectedImage;
     private Uri selectedImageUri;
-    EditText editTextCaseCode;
+    String smcode;
+    Button btnSubmit;
     File pickedFile;
+    TextView editTextProductName;
+    private ProgressDialog progressDialog;
     @Override
     public boolean onSupportNavigateUp() {
         onBackPressed();
@@ -61,28 +67,35 @@ public class Upload_Payslip_page extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_upload_payslip_page);
-
+        getSupportActionBar().show();
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Intent intent=getIntent();
+        smcode=intent.getStringExtra("SMCODE");
+        editTextProductName=findViewById(R.id.editTextProductName);
+        editTextProductName.setText(smcode);
         btnUploadImage=findViewById(R.id.btnUploadImage);
-        editTextCaseCode=findViewById(R.id.editTextCaseCode);
-        btnSubmit=findViewById(R.id.btnSubmit);
         imageViewSelectedImage=findViewById(R.id.imageViewSelectedImage);
-
+        btnSubmit=findViewById(R.id.btnSubmit);
         btnUploadImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 showChoiceDialog();
             }
         });
+
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-             //   if (pickedFile!=null && editTextCaseCode.getText().toString().trim().length()<8)
-                saveReciept(pickedFile,editTextCaseCode.getText().toString().trim());
+                //   if (pickedFile!=null && editTextCaseCode.getText().toString().trim().length()<8)
+                saveReciept(pickedFile,editTextProductName.getText().toString().trim());
             }
         });
+
     }
 
+
     private void saveReciept(File pickedFile, String smCode) {
+        progressDialog = ProgressDialog.show(Upload_Payslip_page.this, "", "Loading...", true, false);
         Log.d("TAG", "saveReciept: api hitt");
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
@@ -90,33 +103,56 @@ public class Upload_Payslip_page extends AppCompatActivity {
         httpClient.connectTimeout(1, TimeUnit.MINUTES);
         httpClient.readTimeout(1,TimeUnit.MINUTES);
         httpClient.addInterceptor(logging);
-        Retrofit retrofit = ApiClient.getClientdynamic("yfMerfC6mRvfr0AOoHmOJ8Et9Q9MPwNEKzFdLsfEs1A=","GRST000223");
+        Retrofit retrofit = ApiClient.getClientdynamic("yfMerfC6mRvfr0AOoHmOJ8Et9Q9MPwNEKzFdLsfEs1A=", IglPreferences.getPrefString(getApplicationContext(), SEILIGL.USER_ID, ""));
         ApiInterface apiInterface=retrofit.create(ApiInterface.class);
-
-
-            RequestBody Body = RequestBody.create(MediaType.parse("*/*"),pickedFile);
+        RequestBody Body = RequestBody.create(MediaType.parse("*/*"),pickedFile);
         MultipartBody.Part ImagesParts = MultipartBody.Part.createFormData("FileName",pickedFile.getName(),Body);
-
-        final RequestBody smcode = RequestBody.create(MediaType.parse("text/plain"), smCode);
 
         Log.d("TAG", "saveReciept: "+pickedFile.getPath());
         Log.d("TAG", "saveReciept: "+smCode);
         Log.d("TAG", "saveReciept: "+smCode);
-        Call<JsonObject> call=apiInterface.saveReciptOnpayment(ImagesParts,smcode);
+        final RequestBody smcoderequest = RequestBody.create(MediaType.parse("text/plain"), smCode);
+        Call<JsonObject> call=apiInterface.saveReciptOnpayment(ImagesParts,smcoderequest);
         call.enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                Log.d("TAG", "onResponse: "+response.body());
-                Log.d("TAG", "onResponse: "+response.headers());
+                progressDialog.dismiss();
+                failAlert(1,"Upload Successfully","Receipt Upload successfully");
+                //Log.d("TAG", "onResponse: "+response.body());
+                //.d("TAG", "onResponse: "+response.headers());
             }
 
             @Override
             public void onFailure(Call<JsonObject> call, Throwable t) {
-                Log.d("TAG", "onFailure: "+t.getMessage());
+                progressDialog.dismiss();
+               // Log.d("TAG", "onFailure: "+t.getMessage());
+                failAlert(2,"Upload Image Failed","Receipt Uploading failed,Try again");
             }
         });
     }
 
+    private void failAlert(int i, String upload_successfully, String s){
+        AlertDialog.Builder builder = new AlertDialog.Builder(Upload_Payslip_page.this);
+        // Set the dialog title and message
+        builder.setTitle(upload_successfully)
+                .setMessage(s);
+        // Add OK button
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if(i==1){
+                    dialog.dismiss();
+                    finish();
+                }else{
+                    dialog.dismiss();
+                }
+               // Dismiss the dialog
+            }
+        });
+        // Create and show the AlertDialog
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
     private void showChoiceDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Choose an option")
@@ -196,6 +232,7 @@ public class Upload_Payslip_page extends AppCompatActivity {
         }
         return result;
     }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
@@ -293,6 +330,18 @@ public class Upload_Payslip_page extends AppCompatActivity {
                 Toast.makeText(this, "CropImage data: NULL", Toast.LENGTH_SHORT).show();
             }
 
+        }
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 }

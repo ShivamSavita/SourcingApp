@@ -5,57 +5,44 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation=
-        "vertical"
+    android:orientation="vertical"
     android:padding="16dp"
     >
-    <ScrollView
+
+    <TextView
+        android:gravity="center"
+        android:id="@+id/editTextProductName"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:orientation="vertical"
-            android:layout_height="match_parent">
-            <EditText
-                android:id="@+id/editTextCaseCode"
-                android:layout_width="match_parent"
-                android:paddingStart="@dimen/margin_6dp"
-                android:background="@drawable/spinner_bg"
-                android:layout_height="50dp"
-                android:hint="Case Code"/>
+        android:paddingStart="@dimen/margin_6dp"
+        android:background="@drawable/spinner_bg"
+        android:layout_height="50dp"
+        android:hint=""/>
 
 
+    <Button
+        android:id="@+id/btnUploadImage"
+        android:layout_width="200dp"
+        android:layout_gravity="center"
+        android:backgroundTint="@color/colorPrimary"
+        android:textColor="@color/white"
+        android:layout_height="wrap_content"
+        android:text="Upload Reciept"
+        android:layout_marginTop="16dp"/>
 
+    <!-- ImageView to show the selected image -->
+    <ImageView
+        android:id="@+id/imageViewSelectedImage"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:visibility="gone"
+        android:layout_marginTop="16dp"/>
 
+    <!-- You can add more fields or widgets as needed -->
 
-            <Button
-                android:id="@+id/btnUploadImage"
-                android:layout_width="200dp"
-                android:layout_gravity="center"
-                android:backgroundTint="@color/colorPrimary"
-                android:textColor="@color/white"
-                android:layout_height="wrap_content"
-                android:text="Upload Reciept"
-                android:layout_marginTop="16dp"/>
-
-            <!-- ImageView to show the selected image -->
-            <ImageView
-                android:id="@+id/imageViewSelectedImage"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:visibility="gone"/>
-
-            <!-- You can add more fields or widgets as needed -->
-
-            <Button
-                android:id="@+id/btnSubmit"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Submit"
-                android:layout_marginTop="16dp"/>
-        </LinearLayout>
-    </ScrollView>
-
-
+    <Button
+        android:id="@+id/btnSubmit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Submit"
+        android:layout_marginTop="16dp"/>
 </LinearLayout>

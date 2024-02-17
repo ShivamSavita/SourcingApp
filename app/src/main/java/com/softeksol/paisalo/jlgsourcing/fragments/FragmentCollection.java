@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -46,6 +45,7 @@ import com.softeksol.paisalo.jlgsourcing.Utilities.Utils;
 import com.softeksol.paisalo.jlgsourcing.WebOperations;
 import com.softeksol.paisalo.jlgsourcing.activities.ActivityCollection;
 import com.softeksol.paisalo.jlgsourcing.activities.OnlinePaymentActivity;
+import com.softeksol.paisalo.jlgsourcing.activities.Upload_Payslip_page;
 import com.softeksol.paisalo.jlgsourcing.adapters.AdapterDueData;
 import com.softeksol.paisalo.jlgsourcing.adapters.AdapterInstallment;
 import com.softeksol.paisalo.jlgsourcing.adapters.AdapterInstallmentTemp;
@@ -106,6 +106,8 @@ public class FragmentCollection extends AbsCollectionFragment {
     GpsTracker gpsTracker;
     Dialog dialogConfirm;
     Dialog dialogQrcode;
+    Dialog dialogQrcodePayment;
+    AlertDialog dialog;
     ImageView  righticon;
     private ProgressDialog progressDialog;
     ArrayList<InstallmentTemp> insttemplist;
@@ -152,6 +154,7 @@ public class FragmentCollection extends AbsCollectionFragment {
         gpsTracker=new GpsTracker(getContext());
         dialogConfirm = new Dialog(getContext());
         dialogQrcode = new Dialog(getContext());
+        dialogQrcodePayment = new Dialog(getContext());
 
         /*textToSpeech = new TextToSpeech(getContext(), new TextToSpeech.OnInitListener() {
             @Override
@@ -343,6 +346,7 @@ public class FragmentCollection extends AbsCollectionFragment {
 
 
     private void showPaymentDialog(AdapterView<?> parent,int position) {
+
         AdapterDueData adapterDueData = (AdapterDueData) parent.getAdapter();
         final DueData dueData = (DueData) adapterDueData.getItem(position);
         Log.d("DueData",dueData.toString());
@@ -371,6 +375,7 @@ public class FragmentCollection extends AbsCollectionFragment {
         final Button prossingFees = dialogView.findViewById(R.id.prossingFees);
         final CheckBox chkLatePayment = dialogView.findViewById(R.id.chkLatePmtInterest);
         final TextView tvLatePayAmount = dialogView.findViewById(R.id.tvLatePmtInterestAmt);
+
         if (latePaymentInterest > 0) {
             llLatePayment.setVisibility(View.VISIBLE);
             tvLatePayAmount.setText(String.valueOf(latePaymentInterest));
@@ -399,6 +404,7 @@ public class FragmentCollection extends AbsCollectionFragment {
             @Override
             public void onClick(View v) {
                 //getQrCode(SMCode);
+                dialog.dismiss();
                 dialogQrcode.setContentView(R.layout.dialogqr_layout);
                 dialogQrcode.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 dialogQrcode.setCancelable(false);
@@ -408,26 +414,14 @@ public class FragmentCollection extends AbsCollectionFragment {
                 tv_heading.setText("Loan A/C- "+SMCode);
                 righticon=dialogQrcode.findViewById(R.id.righticon);
                 righticon.setVisibility(View.GONE);
-                /*Glide.with(getContext())
-                       // .load("")
-                        .asGif()
-                        .placeholder(R.drawable.righticon)
-                        .into(righticon);*/
-
-                Glide.with(getContext())
-                        .load(getContext().getResources().getDrawable(R.drawable.righticon))
-                        //.asGif()
-                       // .placeholder(R.mipmap.icon)
-                        .into(righticon);
-
-
                 Button btnSave = dialogQrcode.findViewById(R.id.button_saveEmi);
                 Button btncancel = dialogQrcode.findViewById(R.id.button_Closedialog);
 
                 btnSave.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                    /*    dialogConfirm.dismiss();
+                        qrCodePaymentConfirmAPI(SchmCode,dueData,SMCode);
+                    /*  dialogConfirm.dismiss();
                         saveDeposit(SchmCode,dueData, totCollectAmt,latePmtIntAmt,tglBtnPaidBy.isChecked() ? "F" : "B");
                         //Toast.makeText(MainActivity.this, "okay clicked", Toast.LENGTH_SHORT).show();*/
                     }
@@ -443,67 +437,48 @@ public class FragmentCollection extends AbsCollectionFragment {
 
                 dialogQrcode.show();
                 progressDialog = ProgressDialog.show(getContext(), "", "Loading...", true, false);
-                ApiInterface apiInterface= getClientNew("https://erpservice.paisalo.in:980/PDL.FIService.API/api/").create(ApiInterface.class);
+                ApiInterface apiInterface= getClientNew("https://erpservice.paisalo.in:980/PDL.USERSERvice.API/api/").create(ApiInterface.class);
                 // Log.d("TAG", "checkCrifScore: "+getdatalocation(login, login));
-                Call<QrUrlData> call=apiInterface.getQrCode(getdataQr("UCCP000056"));
+                Call<QrUrlData> call=apiInterface.getCheckQrCode(SMCode);
                 call.enqueue(new Callback<QrUrlData>() {
                     @Override
                     public void onResponse(Call<QrUrlData> call, Response<QrUrlData> response) {
                         Log.d("TAG", "onResponse: "+response.body());
                         progressDialog.dismiss();
                         if(response.body().getStatusCode().equals("200")){
+                            Glide.with(getContext())
+                                    .load(response.body().getData())
+                                    // .asGif()
+                                  //  .placeholder(R.drawable.ic_qr_code)
+                                    .into(imageQrCode);
+                        }else{
+                            dialogQrcode.dismiss();
+                            Toast.makeText(getContext(), "QR code not found", Toast.LENGTH_SHORT).show();
+                        }
+
+                      /*  if(response.body().getStatusCode().equals("200")){
                             try {
                                 JSONObject Qrjo=new JSONObject(response.body().getData());
                                 String qr=Qrjo.getString("QrCodeUrl");
                                 Glide.with(getContext())
                                         .load(qr)
                                         // .asGif()
-                                        .placeholder(R.drawable.righticon)
+                                        .placeholder(R.drawable.ic_qr_code)
                                         .into(imageQrCode);
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
-
-                        }else{
-                            dialogQrcode.dismiss();
-                            Toast.makeText(getContext(), "QR code not found", Toast.LENGTH_SHORT).show();
-                        }
-                       /* try {
-                            JSONObject jo = new JSONObject(String.valueOf(response));
-                            Log.d("TAG", "statusCode: "+jo.getString("statusCode"));
-                            if(jo.getString("statusCode").equals("200")){
-                                JSONObject Qrjo=new JSONObject(jo.getString("data"));
-                                String qr=Qrjo.getString("QrCodeUrl");
-                                Log.d("TAG", "QrCodeUrl: "+qr);
-                                Glide.with(getContext())
-                                        .load(qr)
-                                        // .asGif()
-                                        .placeholder(R.drawable.righticon)
-                                        .into(imageQrCode);
-                            }
-
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
                         }*/
-
-
                     }
 
                     @Override
                     public void onFailure(Call<QrUrlData> call, Throwable t) {
                         Log.d("TAG", "onFailure: "+t.getMessage());
-                        Toast.makeText(getContext(), "QR code not found", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "QR code not generated", Toast.LENGTH_SHORT).show();
                         progressDialog.dismiss();
                         dialogQrcode.dismiss();
                     }
                 });
-
-
-
-
-
-
 
             }
         });
@@ -669,7 +644,7 @@ public class FragmentCollection extends AbsCollectionFragment {
             }
         });
 
-        final AlertDialog dialog = builder.create();
+        dialog = builder.create();
         cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -719,8 +694,8 @@ public class FragmentCollection extends AbsCollectionFragment {
                         dialogConfirm.dismiss();
                         //String st=  String.valueOf((totCollectAmt+latePmtIntAmt)+" money received");
                       //  textToSpeech.speak(st,TextToSpeech.QUEUE_FLUSH,null);
-                        saveDeposit(SchmCode,dueData, totCollectAmt,latePmtIntAmt,tglBtnPaidBy.isChecked() ? "F" : "B");
-                       // saveRecipetNewAmount(SchmCode,dueData, totCollectAmt,latePmtIntAmt,tglBtnPaidBy.isChecked() ? "F" : "B");
+                       // saveDeposit(SchmCode,dueData, totCollectAmt,latePmtIntAmt,tglBtnPaidBy.isChecked() ? "F" : "B");
+                        saveRecipetNewAmount(SchmCode,dueData, totCollectAmt,latePmtIntAmt,tglBtnPaidBy.isChecked() ? "F" : "B");
                         //Toast.makeText(MainActivity.this, "okay clicked", Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -751,10 +726,113 @@ public class FragmentCollection extends AbsCollectionFragment {
     }
 
 
+     private  void qrCodePaymentConfirmAPI(String schmCode, DueData dueData, String SMCode){
+         PosInstRcvNew instRcv = new PosInstRcvNew();
+         instRcv.setCaseCode(dueData.getCaseCode());
+       //  instRcv.setCaseCode("UCJN000254");
+         instRcv.setCreator(dueData.getCreator());
+         instRcv.setDataBaseName(dueData.getDb());
+         instRcv.setIMEI(IglPreferences.getPrefString(getContext(), SEILIGL.DEVICE_IMEI, "0"));
+         instRcv.setInstRcvDateTimeUTC(new Date());
+         instRcv.setFoCode(dueData.getFoCode());
+         instRcv.setCustName(dueData.getCustName());
+         instRcv.setPartyCd(dueData.getPartyCd());
+         //instRcv.setPartyCd("UCJN000254");
+         instRcv.setPayFlag("E");
+         instRcv.setCollPoint("FIELD");
+         instRcv.setPaymentMode("QR");
+         Log.d("JsonInstRcv", String.valueOf(WebOperations.convertToJson(instRcv)));
+         dialogQrcodePayment.setContentView(R.layout.dialogqrpayment_layout);
+         dialogQrcodePayment.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+         dialogQrcodePayment.setCancelable(false);
+         // dialogConfirm.getWindow().getAttributes().windowAnimations = R.style.animation;
+         ImageView  imagesuccess=dialogQrcodePayment.findViewById(R.id.success_sign);
 
 
-    private void
-    saveRecipetNewAmount(String schmCode, DueData dueData, int totCollectAmt, int latePmtIntAmt, String s) {
+         Button btnSave = dialogQrcodePayment.findViewById(R.id.button_qrClosedialog);
+        // Button btncancel = dialogQrcode.findViewById(R.id.button_Closedialog);
+
+         btnSave.setOnClickListener(new View.OnClickListener() {
+             @Override
+             public void onClick(View v) {
+                 dialogQrcodePayment.dismiss();
+                 dialogConfirm.dismiss();
+                 ((ActivityCollection) getActivity()).refreshData(FragmentCollection.this);
+                 getLoginLocation("Collection","");
+                 //qrCodePaymentConfirmAPI(SchmCode,dueData,SMCode);
+                    /*  dialogQrcodePayment.dismiss();
+                        saveDeposit(SchmCode,dueData, totCollectAmt,latePmtIntAmt,tglBtnPaidBy.isChecked() ? "F" : "B");
+                        //Toast.makeText(MainActivity.this, "okay clicked", Toast.LENGTH_SHORT).show();*/
+             }
+         });
+
+
+         progressDialog = ProgressDialog.show(getContext(), "", "Loading...", true, false);
+         ApiInterface apiInterface= getClientNew("https://erpservice.paisalo.in:980/PDL.SourcingApp.Api/api/").create(ApiInterface.class);
+         Call<JsonObject> call=apiInterface.insertQRPayment(instRcv,"yfMerfC6mRvfr0AOoHmOJ8Et9Q9MPwNEKzFdLsfEs1A=",IglPreferences.getPrefString(getContext(), SEILIGL.USER_ID, ""));
+         call.enqueue(new Callback<JsonObject>() {
+             @Override
+             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                 Log.d("TAG", "onResponse: "+response.body());
+                 progressDialog.dismiss();
+                 if (response.body()!=null){
+                     if (response.body().get("statusCode").getAsInt()==300){
+                         dialogQrcodePayment.show();
+                         dialogQrcode.dismiss();
+                         Glide.with(getContext())
+                                 .asGif()
+                                 .load(R.drawable.righticon)
+                                 .into(imagesuccess);
+                     }else{
+                         failAlert(dueData);
+                     }
+                 } else{
+                     Toast.makeText(getContext(), "Payment not found try again", Toast.LENGTH_SHORT).show();
+                 }
+             }
+
+             @Override
+             public void onFailure(Call<JsonObject> call, Throwable t) {
+                // Log.d("TAG", "onFailure: "+t.getMessage());
+                 Toast.makeText(getContext(), "Try to get Status again", Toast.LENGTH_SHORT).show();
+                 progressDialog.dismiss();
+                 failAlert(dueData);
+             }
+         });
+
+     }
+
+     private void failAlert(DueData dueData){
+         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+         // Set the dialog title and message
+         builder.setTitle("Payment not received")
+                 .setMessage("Try again to get status or Upload payment receipt.");
+         // Add OK button
+         builder.setPositiveButton("Try Again", new DialogInterface.OnClickListener() {
+             @Override
+             public void onClick(DialogInterface dialog, int which) {
+                 // Perform any action here when OK is clicked
+                 qrCodePaymentConfirmAPI("",dueData,"");
+                 dialog.dismiss(); // Dismiss the dialog
+             }
+         });
+         builder.setNegativeButton("Upload Image", new DialogInterface.OnClickListener() {
+             @Override
+             public void onClick(DialogInterface dialog, int which) {
+                 Intent intent=new Intent(getContext(), Upload_Payslip_page.class);
+                 intent.putExtra("SMCODE",dueData.getCaseCode());
+                 startActivity(intent);
+                 dialog.dismiss();
+
+                 // Dismiss the dialog
+             }
+         });
+         // Create and show the AlertDialog
+         AlertDialog alertDialog = builder.create();
+         alertDialog.show();
+     }
+
+    private void saveRecipetNewAmount(String schmCode, DueData dueData, int totCollectAmt, int latePmtIntAmt, String s) {
         PosInstRcvNew instRcv = new PosInstRcvNew();
         instRcv.setCaseCode(dueData.getCaseCode());
         instRcv.setCreator(dueData.getCreator());
@@ -779,7 +857,7 @@ public class FragmentCollection extends AbsCollectionFragment {
         httpClient.readTimeout(1,TimeUnit.MINUTES);
         httpClient.addInterceptor(logging);
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://predeptest.paisalo.in:8084/PDL.SourcingApp.Api/api/")
+                .baseUrl("https://erpservice.paisalo.in:980/PDL.SourcingApp.Api/api/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(httpClient.build())
                 .build();
@@ -802,6 +880,7 @@ public class FragmentCollection extends AbsCollectionFragment {
             @Override
             public void onFailure(Call<JsonObject> call, Throwable t) {
                 Log.d("TAG", "onFailure: "+t.getMessage());
+                Utils.alert(getContext(),t.getMessage());
 
             }
         });
