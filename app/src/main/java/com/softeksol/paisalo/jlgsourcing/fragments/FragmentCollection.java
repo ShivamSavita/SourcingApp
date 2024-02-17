@@ -693,8 +693,8 @@ public class FragmentCollection extends AbsCollectionFragment {
                         dialog.dismiss();
                         dialogConfirm.dismiss();
                         //String st=  String.valueOf((totCollectAmt+latePmtIntAmt)+" money received");
-                      //  textToSpeech.speak(st,TextToSpeech.QUEUE_FLUSH,null);
-                       // saveDeposit(SchmCode,dueData, totCollectAmt,latePmtIntAmt,tglBtnPaidBy.isChecked() ? "F" : "B");
+                        //textToSpeech.speak(st,TextToSpeech.QUEUE_FLUSH,null);
+                        //saveDeposit(SchmCode,dueData, totCollectAmt,latePmtIntAmt,tglBtnPaidBy.isChecked() ? "F" : "B");
                         saveRecipetNewAmount(SchmCode,dueData, totCollectAmt,latePmtIntAmt,tglBtnPaidBy.isChecked() ? "F" : "B");
                         //Toast.makeText(MainActivity.this, "okay clicked", Toast.LENGTH_SHORT).show();
                     }
@@ -747,8 +747,6 @@ public class FragmentCollection extends AbsCollectionFragment {
          dialogQrcodePayment.setCancelable(false);
          // dialogConfirm.getWindow().getAttributes().windowAnimations = R.style.animation;
          ImageView  imagesuccess=dialogQrcodePayment.findViewById(R.id.success_sign);
-
-
          Button btnSave = dialogQrcodePayment.findViewById(R.id.button_qrClosedialog);
         // Button btncancel = dialogQrcode.findViewById(R.id.button_Closedialog);
 
@@ -776,7 +774,14 @@ public class FragmentCollection extends AbsCollectionFragment {
                  Log.d("TAG", "onResponse: "+response.body());
                  progressDialog.dismiss();
                  if (response.body()!=null){
-                     if (response.body().get("statusCode").getAsInt()==300){
+                     if (response.body().get("statusCode").getAsInt()==200){
+                         dialogQrcodePayment.show();
+                         dialogQrcode.dismiss();
+                         Glide.with(getContext())
+                                 .asGif()
+                                 .load(R.drawable.righticon)
+                                 .into(imagesuccess);
+                     }if (response.body().get("statusCode").getAsInt()==201){
                          dialogQrcodePayment.show();
                          dialogQrcode.dismiss();
                          Glide.with(getContext())
@@ -787,7 +792,7 @@ public class FragmentCollection extends AbsCollectionFragment {
                          failAlert(dueData);
                      }
                  } else{
-                     Toast.makeText(getContext(), "Payment not found try again", Toast.LENGTH_SHORT).show();
+                     Toast.makeText(getContext(), "Payment not found. Contact to Administrator department", Toast.LENGTH_SHORT).show();
                  }
              }
 

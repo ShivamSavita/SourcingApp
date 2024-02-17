@@ -261,8 +261,8 @@ public class FragmentBorrowerPendingVhData extends AbsFragment implements View.O
     private void setDataToView(View v) {
 
 
-        Log.e("BUSSINESS",borrower.Business_Detail);
-        Log.e("OCCUPATION_TYPE",borrowerExtra.OCCUPATION_TYPE);
+       /// Log.e("BUSSINESS",borrower.Business_Detail);
+      ///  Log.e("OCCUPATION_TYPE",borrowerExtra.OCCUPATION_TYPE);
 
         String isMarried = borrower.isMarried;
         if(isMarried.equals("U")){
@@ -331,13 +331,13 @@ public class FragmentBorrowerPendingVhData extends AbsFragment implements View.O
         borrowerExtra.MOTHER_FIRST_NAME = Utils.getNotNullText((TextInputEditText) view.findViewById(R.id.tietMotherFName));
         borrowerExtra.MOTHER_MIDDLE_NAME = Utils.getNotNullText((TextInputEditText) view.findViewById(R.id.tietmotherMname));
         borrowerExtra.MOTHER_LAST_NAME = Utils.getNotNullText((TextInputEditText) view.findViewById(R.id.tietMotherLName));
-//        borrowerExtra.MOTHER_MAIDEN_NAME=((EditText) view.findViewById(R.id.editMOTHER_MAIDEN_NAME)).getText().toString();
-//        borrowerExtra.SPOUSE_TITLE=((EditText) view.findViewById(R.id.editSPOUSE_TITLE)).getText().toString();
+//      borrowerExtra.MOTHER_MAIDEN_NAME=((EditText) view.findViewById(R.id.editMOTHER_MAIDEN_NAME)).getText().toString();
+//      borrowerExtra.SPOUSE_TITLE=((EditText) view.findViewById(R.id.editSPOUSE_TITLE)).getText().toString();
         borrowerExtra.SPOUSE_FIRST_NAME = Utils.getNotNullText((TextInputEditText) view.findViewById(R.id.tietSpouseFName));
         borrowerExtra.SPOUSE_MIDDLE_NAME = Utils.getNotNullText((TextInputEditText) view.findViewById(R.id.tietSpouseMName));
         borrowerExtra.SPOUSE_LAST_NAME = Utils.getNotNullText((TextInputEditText) view.findViewById(R.id.tietSpouseLName));
-//        borrowerExtra.APPLICNT_TITLE=((EditText) view.findViewById(R.id.editAPPLICNT_TITLE)).getText().toString();
-//        borrowerExtra.FATHER_TITLE=((EditText) view.findViewById(R.id.editFATHER_TITLE)).getText().toString();
+//      borrowerExtra.APPLICNT_TITLE=((EditText) view.findViewById(R.id.editAPPLICNT_TITLE)).getText().toString();
+//      borrowerExtra.FATHER_TITLE=((EditText) view.findViewById(R.id.editFATHER_TITLE)).getText().toString();
         borrowerExtra.FATHER_FIRST_NAME = Utils.getNotNullText((TextInputEditText) view.findViewById(R.id.tietFatherFName));
         borrowerExtra.FATHER_MIDDLE_NAME = Utils.getNotNullText((TextInputEditText) view.findViewById(R.id.tietFatherMName));
         borrowerExtra.FATHER_LAST_NAME = Utils.getNotNullText((TextInputEditText) view.findViewById(R.id.tietFatherLName));
