@@ -420,8 +420,11 @@ public class FragmentCollection extends AbsCollectionFragment {
                 btnSave.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        qrCodePaymentConfirmAPI(SchmCode,dueData,SMCode);
-                    /*  dialogConfirm.dismiss();
+                        ((ActivityCollection) getActivity()).refreshData(FragmentCollection.this);
+                        getLoginLocation("Collection","");
+                        dialogQrcode.dismiss();
+                        //qrCodePaymentConfirmAPI(SchmCode,dueData,SMCode);
+                        /*  dialogConfirm.dismiss();
                         saveDeposit(SchmCode,dueData, totCollectAmt,latePmtIntAmt,tglBtnPaidBy.isChecked() ? "F" : "B");
                         //Toast.makeText(MainActivity.this, "okay clicked", Toast.LENGTH_SHORT).show();*/
                     }
