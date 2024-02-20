@@ -197,7 +197,7 @@ public interface ApiInterface {
     @GET("PDL.SMS.API/api/Sms/SendOtp")
     Call<JsonObject> verifyOTP(@Query("MobileNo") String MobileNo,@Query("Otp") String Otp);
 
-    @GET("PDL.Mobile.Api/api/LiveTrack/CheckLoanByAadhar?")
+    @GET("PDL.Mobile.Api/api/LiveTrack/CheckLoanByAadhar")
     Call<DeDupeResponse> checkAdharDeDupe(@Query("Aadharno") String Aadharno);
 
     @Multipart

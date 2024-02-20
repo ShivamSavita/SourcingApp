@@ -1110,7 +1110,8 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
             @Override
             public void validate(EditText editText, String text) {
                 String aadharId = editText.getText().toString();
-                if (aadharId.trim().length()==12){
+
+                if (aadharId.trim().length()==12 && Verhoeff.validateVerhoeff(aadharId)){
                     ProgressDialog progressBar = new ProgressDialog(ActivityBorrowerKyc.this);
                     progressBar.setCancelable(false);//you can cancel it by pressing back button.
                     progressBar.setMessage(" Please wait...");
@@ -1173,6 +1174,8 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                         }
                     });
 
+                }else{
+                    tietAadharId.setError("Please enter correct aadhaar id");
                 }
             }
         });
