@@ -37,7 +37,7 @@ import cz.msebera.android.httpclient.message.BasicHeader;
  */
 public class WebOperations {
 
-    static  String deviceId="";
+    static  String deviceId="2234514145687247";
     public static <E> String convertToJson(E object) {
         String jsonString;
         Gson gson = new GsonBuilder().serializeNulls().setExclusionStrategies(new DbFlowExclusionStrategy()).excludeFieldsWithoutExposeAnnotation().create();

@@ -119,27 +119,19 @@ TextView textViewTotalAnnualIncome;
         textViewTotalAnnualIncome=findViewById(R.id.textViewTotalAnnualIncome);
         BtnSaveKYCData=findViewById(R.id.BtnFinalSaveKYCData);
 
-        rlaSchemeType = new AdapterListRange(this,
-                SQLite.select().from(RangeCategory.class).where(RangeCategory_Table.cat_key.eq("DISBSCH")).queryList(), false);
+        rlaSchemeType = new AdapterListRange(this,RangeCategory.getRangesByCatKey("DISBSCH"), false);
 
-        rlaPurposeType = new AdapterListRange(this,
-                SQLite.select().from(RangeCategory.class).where(RangeCategory_Table.cat_key.eq("loan_purpose"))
-                        .orderBy(RangeCategory_Table.SortOrder, true).queryList(), true);
+        rlaPurposeType = new AdapterListRange(this,RangeCategory.getRangesByCatKey("loan_purpose"), true);
 
-        rlaBankType = new AdapterListRange(this,
-                SQLite.select().from(RangeCategory.class).where(RangeCategory_Table.cat_key.eq("banks")).queryList(), false);
+        rlaBankType = new AdapterListRange(this,RangeCategory.getRangesByCatKey("banks"), false);
 
-        rlaLoanAmount= new AdapterListRange(this,
-                SQLite.select().from(RangeCategory.class).where(RangeCategory_Table.cat_key.eq("loan_amt")).queryList(), false);
+        rlaLoanAmount= new AdapterListRange(this,RangeCategory.getRangesByCatKey("loan_amt"), false);
 
-        rlsOccupation= new AdapterListRange(this,
-                SQLite.select().from(RangeCategory.class).where(RangeCategory_Table.cat_key.eq("occupation-type")).queryList(), false);
+        rlsOccupation= new AdapterListRange(this,RangeCategory.getRangesByCatKey("occupation-type"), false);
 
-        rlaBussiness= new AdapterListRange(this,
-                SQLite.select().from(RangeCategory.class).where(RangeCategory_Table.cat_key.eq("other_employment")).queryList(), false);
+        rlaBussiness= new AdapterListRange(this,RangeCategory.getRangesByCatKey("other_employment"), false);
 
-        rlaEarningMember = new AdapterListRange(this,
-                SQLite.select().from(RangeCategory.class).where(RangeCategory_Table.cat_key.eq("other_income")).queryList(), false);
+        rlaEarningMember = new AdapterListRange(this,RangeCategory.getRangesByCatKey("other_income"), false);
 
 
         loanbanktype.setAdapter(rlaBankType);
@@ -321,7 +313,9 @@ TextView textViewTotalAnnualIncome;
 
 
     }
+
     private void  updateBorrower() {
+
         int maxLoanAmt=300000;
         String maxLoanAmtStr="Three lacks";
         Log.d("TAG", "updateBorrower: "+manager.Creator);
@@ -332,7 +326,9 @@ TextView textViewTotalAnnualIncome;
         if (borrower != null) {
             getDataFromView(this.findViewById(android.R.id.content).getRootView());
 
-            if (tietIncomeMonthly.getText().toString().trim().equals("")){
+            if (checkSpinnerData()){
+                Utils.showSnakbar(findViewById(android.R.id.content),"Please check all fields");
+            }else if (tietIncomeMonthly.getText().toString().trim().equals("")){
                 tietIncomeMonthly.setError("Please Enter Income");
                 Utils.showSnakbar(findViewById(android.R.id.content),"Please enter Income");
             }else if(tietExpenseMonthly.getText().toString().trim().equals("")){
@@ -366,8 +362,7 @@ TextView textViewTotalAnnualIncome;
             } else if(Integer.parseInt(acspLoanAppFinanceLoanAmount.getText().toString().trim())>maxLoanAmt ||Integer.parseInt(acspLoanAppFinanceLoanAmount.getText().toString().trim())<5000){
                 acspLoanAppFinanceLoanAmount.setError("Please Enter Loan Amount Less than "+maxLoanAmtStr+" and Greater than 5 thousand");
                 Utils.showSnakbar(findViewById(android.R.id.content),"Please enter Loan Amount Less than "+maxLoanAmtStr+" and Greater than 5 thousand");
-            }
-            if(((Double.parseDouble(tietIncomeMonthly.getText().toString().trim())))<(0.15*Double.parseDouble(acspLoanAppFinanceLoanAmount.getText().toString().trim()))){
+            }else if(((Double.parseDouble(tietIncomeMonthly.getText().toString().trim())))<(0.15*Double.parseDouble(acspLoanAppFinanceLoanAmount.getText().toString().trim()))){
                 tietIncomeMonthly.setError("Income should be greater than 15% of Loan Amount");
                 Utils.showSnakbar(findViewById(android.R.id.content),"Income should be greater than 15% of Loan Amount");
             }
@@ -519,6 +514,43 @@ TextView textViewTotalAnnualIncome;
             }
 
         }
+    }
+
+    private boolean checkSpinnerData() {
+//        loanbanktype
+//                acspLoanReason
+//        acspBusinessDetail
+//                acspOccupation
+//        earningMemberTypeSpin
+        if (((RangeCategory)earningMemberTypeSpin.getSelectedItem()).DescriptionEn.equalsIgnoreCase("--Select--"))
+        {
+            Toast.makeText(this, "Please select earning member type", Toast.LENGTH_SHORT).show();
+            return true;
+        }else if (((RangeCategory)acspBusinessDetail.getSelectedItem()).DescriptionEn.equalsIgnoreCase("--Select--"))
+        {
+            Toast.makeText(this, "Please select business type", Toast.LENGTH_SHORT).show();
+            return true;
+        }else  if (((RangeCategory)acspLoanReason.getSelectedItem()).DescriptionEn.equalsIgnoreCase("--Select--"))
+        {
+            Toast.makeText(this, "Please select loan reason type", Toast.LENGTH_SHORT).show();
+            return true;
+        }else  if (((RangeCategory)acspOccupation.getSelectedItem()).DescriptionEn.equalsIgnoreCase("--Select--"))
+        {
+            Toast.makeText(this, "Please select occupation type", Toast.LENGTH_SHORT).show();
+            return true;
+        }else if (loanDuration.getSelectedItem().toString().equalsIgnoreCase("--Select--"))
+        {
+            Toast.makeText(this, "Please select loan duration", Toast.LENGTH_SHORT).show();
+            return true;
+        }else if (((RangeCategory)loanbanktype.getSelectedItem()).DescriptionEn.equalsIgnoreCase("--Select--"))
+        {
+            Toast.makeText(this, "Please select bank type", Toast.LENGTH_SHORT).show();
+            return true;
+        }else{
+            return false;
+        }
+
+
     }
 
     private void saveDataOfImages(Borrower borrower, String borrowerProfilePic,String imgTag) {

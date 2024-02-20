@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.softeksol.paisalo.jlgsourcing.entities.BREResponse;
 import com.softeksol.paisalo.jlgsourcing.entities.CityModelList;
 import com.softeksol.paisalo.jlgsourcing.entities.CreatorModel;
+import com.softeksol.paisalo.jlgsourcing.entities.DeDupeResponse;
 import com.softeksol.paisalo.jlgsourcing.entities.DistrictListModel;
 import com.softeksol.paisalo.jlgsourcing.entities.HomeVisitFiList;
 import com.softeksol.paisalo.jlgsourcing.entities.HomeVisitListModel;
@@ -170,12 +171,6 @@ public interface ApiInterface {
                                              @Header("dbname") String dbname,
                                              @Header("userid") String userid);
 
-    @Multipart
-    @POST("PDL.SourcingApp.Api/api/InstCollection/QrPaymentSettlement")
-    Call<JsonObject> saveReciptOnpayment(
-                                         @Part MultipartBody.Part FileName, // Image file part
-                                         @Part("SmCode") RequestBody SmCode); // Other parts, if any)
-
     @POST("PDL.Mobile.API/api/Crif/InitilizeCrif")
     Call<JsonObject> generateCrifForVehicle(@Body JsonObject jsonObject);
 
@@ -202,10 +197,12 @@ public interface ApiInterface {
     @GET("PDL.SMS.API/api/Sms/SendOtp")
     Call<JsonObject> verifyOTP(@Query("MobileNo") String MobileNo,@Query("Otp") String Otp);
 
+    @GET("PDL.Mobile.Api/api/LiveTrack/CheckLoanByAadhar?")
+    Call<DeDupeResponse> checkAdharDeDupe(@Query("Aadharno") String Aadharno);
+
     @Multipart
     @POST("PDL.SourcingApp.Api/api/InstCollection/QrPaymentSettlement")
-    Call<JsonObject> saveReciptOnpayment(@Part MultipartBody.Part FileName, // Image file part
-                                         @Part("SmCode") RequestBody SmCode); // Other parts, if any)
+    Call<JsonObject> saveReciptOnpayment(@Part MultipartBody.Part FileName, @Part("SmCode") RequestBody SmCode); // Other parts, if any)
 
 /*
     @Field("ficode") String fiCode, @Field("full_name") String fullName, @Field("dob") String dob,

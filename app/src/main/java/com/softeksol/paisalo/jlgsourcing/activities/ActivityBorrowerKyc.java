@@ -15,6 +15,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.Html;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
@@ -77,6 +78,8 @@ import com.softeksol.paisalo.jlgsourcing.entities.BorrowerExtraBank;
 import com.softeksol.paisalo.jlgsourcing.entities.CityData;
 import com.softeksol.paisalo.jlgsourcing.entities.CityModelList;
 import com.softeksol.paisalo.jlgsourcing.entities.CreatorModel;
+import com.softeksol.paisalo.jlgsourcing.entities.DeDupeData;
+import com.softeksol.paisalo.jlgsourcing.entities.DeDupeResponse;
 import com.softeksol.paisalo.jlgsourcing.entities.DistrictData;
 import com.softeksol.paisalo.jlgsourcing.entities.DistrictListModel;
 import com.softeksol.paisalo.jlgsourcing.entities.DocumentStore;
@@ -193,7 +196,7 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
     int ImageType=0;
     protected String signature,email,mobile;
     ArrayList<RangeCategory> genders;
-    String loanDurationData,stateData,genderData;
+    String loanDurationData,stateData,genderData,maritalStatus,relationShipData;
     boolean aadharNumberentry=false;
     String isAdhaarEntry ="N";
     String isNameMatched ="0";
@@ -788,12 +791,12 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
         //borrower = new Borrower();
         borrower = new Borrower(manager.Creator, manager.TAG, manager.FOCode, manager.AreaCd, IglPreferences.getPrefString(ActivityBorrowerKyc.this, SEILIGL.USER_ID, ""));
         borrowerExtra=new BorrowerExtra();
+        borrower.setPicture("");
         //borrowerExtraBank=new BorrowerExtraBank(manager.Creator,manager.TAG);
         borrower.associateExtraBank(new BorrowerExtraBank(manager.Creator, manager.TAG));
         //borrower.fi
         borrower.isAadharVerified = "N";
-        rlaMarritalStatus = new AdapterListRange(this,
-                SQLite.select().from(RangeCategory.class).where(RangeCategory_Table.cat_key.eq("marrital_status")).queryList(), false);
+        rlaMarritalStatus = new AdapterListRange(this, RangeCategory.getRangesByCatKey("marrital_status"), false);
         spinnerMarritalStatus = (Spinner) findViewById(R.id.spinLoanAppPersonalMarritalStatus);
         spinnerMarritalStatus.setAdapter(rlaMarritalStatus);
         schemeNameForVH=getIntent().getStringExtra(Global.SCHEME_TAG);
@@ -807,6 +810,7 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
 
         genders = new ArrayList<>();
 
+        genders.add(new RangeCategory("--Select--", "Gender"));
         genders.add(new RangeCategory("Female", "Gender"));
         genders.add(new RangeCategory("Male", "Gender"));
         genders.add(new RangeCategory("Transgender", "Gender"));
@@ -871,6 +875,7 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
         myCalendar.setTime(new Date());
         acspRelationship = findViewById(R.id.acspRelationship);
         ArrayList<RangeCategory> relationSips = new ArrayList<>();
+        relationSips.add(new RangeCategory("--Select--", ""));
         relationSips.add(new RangeCategory("Husband", ""));
         relationSips.add(new RangeCategory("Father", ""));
         relationSips.add(new RangeCategory("Mother", ""));
@@ -1054,7 +1059,7 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                 adapterView.getId();
                 rangeCategory = (RangeCategory) adapterView.getSelectedItem();
                 Spinner spinnerMaritalStatus = (Spinner) findViewById(R.id.spinMARITAL_STATUS);
-
+                    maritalStatus=rangeCategory.DescriptionEn;
                 if (rangeCategory.RangeCode.equals("Unmarried")) {
                     linearLayout433.setVisibility(View.GONE);
                     cardView_SpouseFirstName.setVisibility(View.GONE);
@@ -1072,7 +1077,20 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
             }
         });
 
+        acspRelationship.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                RangeCategory rangeCategory;
+                adapterView.getId();
+                rangeCategory = (RangeCategory) adapterView.getSelectedItem();
+                relationShipData=rangeCategory.DescriptionEn;
+            }
 
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
 
         chkTvTopup = findViewById(R.id.chkTopup);
         chkTvTopup.setChecked(false);
@@ -1088,26 +1106,77 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
         });
 
         tietAadharId = findViewById(R.id.tietAadhar);
-//        tietAadharId.addTextChangedListener(aadharTextChangeListner);
-//        aadharTextChangeListner = new MyTextWatcher(tietAadharId) {
-//            @Override
-//            public void validate(EditText editText, String text) {
-//                String aadharId = editText.getText().toString();
-//                if (validateControls(editText, text)) {
-//                    llTopupCode.setVisibility(View.VISIBLE);
-//                    Borrower borrower1 = Borrower.getBorrower(aadharId);
-//                    if (borrower1 != null) {
-//                        borrower = borrower1;
-//                        setDataToView(activity.findViewById(android.R.id.content).getRootView());
-//                        aadharNumberentry=false;
-//                    } else {
-//                        fetchAadharDetails(aadharId);
-//                    }
-//                } else {
-//                    llTopupCode.setVisibility(View.INVISIBLE);
-//                }
-//            }
-//        };
+        tietAadharId.addTextChangedListener(new MyTextWatcher(tietAadharId) {
+            @Override
+            public void validate(EditText editText, String text) {
+                String aadharId = editText.getText().toString();
+                if (aadharId.trim().length()==12){
+                    ProgressDialog progressBar = new ProgressDialog(ActivityBorrowerKyc.this);
+                    progressBar.setCancelable(false);//you can cancel it by pressing back button.
+                    progressBar.setMessage(" Please wait...");
+                    progressBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                    progressBar.show();
+
+                    HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+                    logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+                    OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+                    httpClient.connectTimeout(1, TimeUnit.MINUTES);
+                    httpClient.readTimeout(1,TimeUnit.MINUTES);
+                    httpClient.addInterceptor(logging);
+                    Retrofit retrofit = new Retrofit.Builder()
+                            .baseUrl("https://erpservice.paisalo.in:980/")
+                            .addConverterFactory(GsonConverterFactory.create())
+                            .client(httpClient.build())
+                            .build();
+                    ApiInterface apiInterface=retrofit.create(ApiInterface.class);
+                    Call<DeDupeResponse> call=apiInterface.checkAdharDeDupe(aadharId.trim());
+                    call.enqueue(new Callback<DeDupeResponse>() {
+                        @Override
+                        public void onResponse(Call<DeDupeResponse> call, Response<DeDupeResponse> response) {
+                            progressBar.dismiss();
+                            DeDupeResponse deDupeResponse= response.body();
+                            String msg="";
+                            int accountOpened=0;
+                            if (deDupeResponse.getData().size()>0){
+                                for (DeDupeData deDupeData:deDupeResponse.getData()){
+                                    msg+=("=>Loan with ficode="+deDupeData.getCode()+" and creator="+deDupeData.getCreator()+" (CaseCode: "+deDupeData.getSmCode()+"), for a duration of "+deDupeData.getLoanDuration()+" months starting from "+deDupeData.getDtFin().split("T")[0]+", with a sanctioned amount of ₹"+deDupeData.getSanctionedAmt()+" and "+deDupeData.getCountEmi()+" EMIs have been paid.\n");
+                                    if (deDupeData.getSanctionedAmt()>Integer.parseInt(deDupeData.getEmiAmount()))
+                                    {
+                                        accountOpened=1;
+                                    }
+                                }
+                                if (accountOpened==1){
+
+                                    msg+=("\n\nSorry!! The case will not proceed with this Aadhaar number.");
+                                    AlertDialog.Builder builder = new AlertDialog.Builder(ActivityBorrowerKyc.this);
+                                    builder.setTitle("Previous Loan Details");
+                                    builder.setMessage(msg);
+                                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            finish();
+                                        }
+                                    });
+                                    AlertDialog dialog = builder.create();
+
+                                    dialog.show();
+                                }
+
+                            }
+
+                        }
+
+                        @Override
+                        public void onFailure(Call<DeDupeResponse> call, Throwable t) {
+                            progressBar.dismiss();
+
+                        }
+                    });
+
+                }
+            }
+        });
+
 
         tietAge = findViewById(R.id.tietAge);
         tietAge.setOnFocusChangeListener(new View.OnFocusChangeListener() {
@@ -2936,11 +3005,18 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
     }
 
     private void  updateBorrower() {
-        if(stateData.equalsIgnoreCase("APO Address")){
+        Log.d("TAG", "updateBorrower: "+borrower.getPicture());
+        if(stateData.equalsIgnoreCase("APO Address") || stateData.equalsIgnoreCase("--Select--") ){
             Toast.makeText(activity, "Select State Name", Toast.LENGTH_SHORT).show();
+        }else if(genderData.equalsIgnoreCase("--Select--") ){
+            Toast.makeText(activity, "Select Gender", Toast.LENGTH_SHORT).show();
+        }else if(maritalStatus.equalsIgnoreCase("--Select--") ){
+            Toast.makeText(activity, "Select Marital Status", Toast.LENGTH_SHORT).show();
+        }else if( relationShipData.equalsIgnoreCase("--Select--") ){
+            Toast.makeText(activity, "Select Relationship", Toast.LENGTH_SHORT).show();
         }else if( otpVerified==0){
             Toast.makeText(activity, "Please verify mobile number vis OTP", Toast.LENGTH_SHORT).show();
-        }else if( borrower.getPicture().getPath().length()<5){
+        }else if( borrower.getPicture()==null ||  borrower.getPicture().toString().isEmpty()){
             Toast.makeText(activity, "Please upload borrower's picture first", Toast.LENGTH_SHORT).show();
         }else{
             if (borrower != null) {
