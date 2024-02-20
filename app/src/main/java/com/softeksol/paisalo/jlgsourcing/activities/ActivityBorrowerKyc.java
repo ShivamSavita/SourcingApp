@@ -1715,7 +1715,7 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
         borrower.setNames(Utils.getNotNullText(tietName));
         borrower.Age = Utils.getNotNullInt(tietAge);
         borrower.DOB = myCalendar.getTime();
-        borrower.setGuardianNames(Utils.getNotNullText(tietGuardian).replace("S/O:","").replace("D/O:","").replace("W/O:","").replace("S/O","").replace("D/O","").replace("W/O","").replace("\"",""));
+        borrower.setGuardianNames(Utils.getNotNullText(tietGuardian).replace("S/O:","").replace("D/O:","").replace("W/O:","").replace("C/O:","").replace("S/O","").replace("D/O","").replace("W/O","").replace("C/O","").replace("\"",""));
         borrower.P_Add1 = Utils.getNotNullText(tietAddress1);
         borrower.P_add2 = Utils.getNotNullText(tietAddress2);
         borrower.P_add3 = Utils.getNotNullText(tietAddress3);
@@ -2166,7 +2166,7 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                                     String[] address1 = response.body().get("data").getAsJsonArray().get(0).getAsJsonObject().get("address1").getAsString().split(",");
                                     for (int i = 0; i < address1.length; i++) {
                                         if (address1[i].toUpperCase().contains("S/O") || address1[i].toUpperCase().contains("D/O") || address1[i].toUpperCase().contains("W/O")){
-                                            borrower.setGuardianNames(address1[i].replace("S/O:","").replace("D/O:","").replace("W/O:","").replace("S/O","").replace("D/O","").replace("W/O","").replace("\"",""));
+                                            borrower.setGuardianNames(address1[i].replace("S/O:","").replace("D/O:","").replace("W/O:","").replace("C/O:","").replace("S/O","").replace("D/O","").replace("W/O","").replace("C/O","").replace("\"",""));
                                             if (address1[i].toUpperCase().contains("S/O") || address1[i].toUpperCase().contains("D/O")){
                                                 String[] fatherName=address1[i].split(" ");
                                                 switch (fatherName.length){
@@ -2207,7 +2207,7 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                                                             tietSpouseLName.setText(spouseName[3]);
                                                             break;
                                                         default:
-                                                            tietSpouseFName.setText(address1[i].toUpperCase().replace("W/O","").replace("W/O:","").replace("\"",""));
+                                                            tietSpouseFName.setText(address1[i].toUpperCase().replace("W/O","").replace("W/O:","").replace("C/O:","").replace("\"",""));
                                                             break;
                                                     }
 
@@ -2252,7 +2252,7 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                                                     tietSpouseLName.setText(spouseName[3]);
                                                     break;
                                                 default:
-                                                    tietSpouseFName.setText(address1[i].toUpperCase().replace("S/O","").replace("D/O","").replace("W/O","").replace("\"",""));
+                                                    tietSpouseFName.setText(address1[i].toUpperCase().replace("S/O","").replace("D/O","").replace("W/O","").replace("C/O","").replace("\"",""));
                                                     break;
                                             }
 
@@ -2273,7 +2273,7 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                                                     tietFatherLName.setText(fatherName[3]);
                                                     break;
                                                 default:
-                                                    tietFatherFName.setText(response.body().get("data").getAsJsonArray().get(0).getAsJsonObject().get("address1").getAsString().split(",")[0].toUpperCase().replace("S/O","").replace("D/O","").replace("W/O","").replace("\"",""));
+                                                    tietFatherFName.setText(response.body().get("data").getAsJsonArray().get(0).getAsJsonObject().get("address1").getAsString().split(",")[0].toUpperCase().replace("S/O","").replace("D/O","").replace("W/O","").replace("C/O","").replace("\"",""));
                                                     break;
                                             }
                                         }
@@ -2392,7 +2392,7 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
             borrower.DOB = aadharData.DOB;
             borrower.Age = aadharData.Age;
             borrower.Gender = aadharData.Gender;
-            borrower.setGuardianNames(aadharData.GurName==null?"":aadharData.GurName.replace("S/O:","").replace("D/O:","").replace("W/O:","").replace("S/O","").replace("D/O","").replace("W/O","").replace("\"",""));
+            borrower.setGuardianNames(aadharData.GurName==null?"":aadharData.GurName.replace("S/O:","").replace("D/O:","").replace("W/O:","").replace("C/O:","").replace("S/O","").replace("D/O","").replace("W/O","").replace("C/O","").replace("\"",""));
             borrower.P_city = aadharData.City;
             borrower.p_pin = aadharData.Pin;
             borrower.P_Add1 = aadharData.Address1;
@@ -2687,7 +2687,7 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
 
         }else{
             if (decodedData.get(6-inc).startsWith("S/O:") ||decodedData.get(6-inc).startsWith("D/O:") ||decodedData.get(6-inc).startsWith("W/O:")){
-                borrower.setGuardianNames(decodedData.get(6-inc).split(":")[1].replace("S/O:","").replace("D/O:","").replace("W/O:","").replace("S/O","").replace("D/O","").replace("\"","").replace("W/O","").trim());
+                borrower.setGuardianNames(decodedData.get(6-inc).split(":")[1].replace("S/O:","").replace("D/O:","").replace("W/O:","").replace("C/O:","").replace("S/O","").replace("D/O","").replace("\"","").replace("W/O","").replace("C/O","").trim());
                 if (decodedData.get(6-inc).toUpperCase().startsWith("W/O:")){
                     Utils.setSpinnerPosition(spinnerMarritalStatus, "Married", false);
                     String[] spouseName=decodedData.get(6-inc).split(" ");
@@ -2713,11 +2713,11 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
             }else if (decodedData.get(6-inc).startsWith("S/O,") ||decodedData.get(6-inc).startsWith("D/O,") ||decodedData.get(6-inc).startsWith("W/O,")){
                 borrower.setGuardianNames(decodedData.get(6-inc).split(",")[1].trim());
             }else{
-                borrower.setGuardianNames(decodedData.get(6-inc).replace("S/O:","").replace("D/O:","").replace("W/O:","").replace("S/O","").replace("D/O","").replace("W/O","").replace("\"",""));
+                borrower.setGuardianNames(decodedData.get(6-inc).replace("S/O:","").replace("D/O:","").replace("W/O:","").replace("C/O:","").replace("C/O:","").replace("S/O","").replace("D/O","").replace("W/O","").replace("C/O","").replace("\"",""));
 
             }
             if (decodedData.get(6-inc).startsWith("S/O:") ||decodedData.get(6-inc).startsWith("D/O:") ||decodedData.get(6-inc).startsWith("W/O:")){
-                borrower.setGuardianNames(decodedData.get(6-inc).split(":")[1].replace("S/O:","").replace("D/O:","").replace("W/O:","").replace("S/O","").replace("D/O","").replace("\"","").replace("W/O","").trim());
+                borrower.setGuardianNames(decodedData.get(6-inc).split(":")[1].replace("S/O:","").replace("D/O:","").replace("W/O:","").replace("C/O:","").replace("S/O","").replace("D/O","").replace("\"","").replace("W/O","").replace("C/O","").trim());
                 if (decodedData.get(6-inc).toUpperCase().startsWith("W/O:")){
                     Utils.setSpinnerPosition(spinnerMarritalStatus, "Married", false);
                     String[] spouseName=decodedData.get(6-inc).split(" ");
@@ -2743,7 +2743,7 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
             }else if (decodedData.get(6-inc).startsWith("S/O,") ||decodedData.get(6-inc).startsWith("D/O,") ||decodedData.get(6-inc).startsWith("W/O,")){
                 borrower.setGuardianNames(decodedData.get(6-inc).split(",")[1].trim());
             }else{
-                borrower.setGuardianNames(decodedData.get(6-inc).replace("S/O:","").replace("D/O:","").replace("W/O:","").replace("S/O","").replace("D/O","").replace("W/O","").replace("\"",""));
+                borrower.setGuardianNames(decodedData.get(6-inc).replace("S/O:","").replace("D/O:","").replace("W/O:","").replace("C/O:","").replace("S/O","").replace("D/O","").replace("W/O","").replace("C/O","").replace("\"",""));
 
             }
             if (decodedData.get(6-inc).startsWith("S/O") ||decodedData.get(6-inc).startsWith("D/O")){
