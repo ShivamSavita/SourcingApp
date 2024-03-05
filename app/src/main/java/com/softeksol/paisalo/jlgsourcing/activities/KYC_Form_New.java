@@ -71,6 +71,10 @@ String FatherFName, FatherLName,FatherMName, MotherFName,MotherLName, MotherMNam
 String VoterIdName="",tilPAN_Name="",tilDL_Name="",tietName="",AddressCodes="";
 TextView textViewTotalAnnualIncome;
     String schemeNameForVH;
+    String lastCaseCode="";
+    String lastLoanAmt="";
+    String lastDuration="";
+    String lastPaidEmi="";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +95,10 @@ TextView textViewTotalAnnualIncome;
         tilDL_Name=i.getStringExtra("DLName").length()<1?"":i.getStringExtra("DLName");
         tietName=i.getStringExtra("AadharName").length()<1?"":i.getStringExtra("AadharName");
         AddressCodes=i.getStringExtra("AddressCodes").length()<1?"":i.getStringExtra("AddressCodes");
+        lastCaseCode=i.getStringExtra("lastCaseCode");
+        lastLoanAmt=i.getStringExtra("lastLoanAmt");
+        lastDuration=i.getStringExtra("lastDuration");
+        lastPaidEmi=i.getStringExtra("lastPaidEmi");
 
         Log.d("TAG", "onCreate: "+AddressCodes);
 
@@ -99,7 +107,7 @@ TextView textViewTotalAnnualIncome;
 
         manager = (Manager) i.getSerializableExtra("manager");
         borrower = (Borrower) i.getSerializableExtra("borrower");
-        borrowerImagePath=borrower.getPicture().getPath();
+      //  borrowerImagePath=borrower.getPicture().getPath();
 
         tietAgricultureIncome=findViewById(R.id.tietAgricultureIncome);
         tietFutureIncome=findViewById(R.id.tietFutureIncome);
@@ -334,9 +342,6 @@ TextView textViewTotalAnnualIncome;
             }else if(tietExpenseMonthly.getText().toString().trim().equals("")){
                 tietExpenseMonthly.setError("Please Enter Expense");
                 Utils.showSnakbar(findViewById(android.R.id.content),"Please enter Expense");
-            }else if(((Double.parseDouble(tietIncomeMonthly.getText().toString().trim()))* 0.25)>Double.parseDouble(tietExpenseMonthly.getText().toString().trim())){
-                tietExpenseMonthly.setError("Expense should be greater than 25 % of Income");
-                Utils.showSnakbar(findViewById(android.R.id.content),"Expense should be greater than 25 % of Income");
             }else if(tietFutureIncome.getText().toString().trim().equals("")){
                 tietFutureIncome.setError("Please Enter Future Income");
                 Utils.showSnakbar(findViewById(android.R.id.content),"Please enter Future Income");
@@ -362,9 +367,12 @@ TextView textViewTotalAnnualIncome;
             } else if(Integer.parseInt(acspLoanAppFinanceLoanAmount.getText().toString().trim())>maxLoanAmt ||Integer.parseInt(acspLoanAppFinanceLoanAmount.getText().toString().trim())<5000){
                 acspLoanAppFinanceLoanAmount.setError("Please Enter Loan Amount Less than "+maxLoanAmtStr+" and Greater than 5 thousand");
                 Utils.showSnakbar(findViewById(android.R.id.content),"Please enter Loan Amount Less than "+maxLoanAmtStr+" and Greater than 5 thousand");
-            }else if(((Double.parseDouble(tietIncomeMonthly.getText().toString().trim())))<(0.15*Double.parseDouble(acspLoanAppFinanceLoanAmount.getText().toString().trim()))){
+            }else if(!manager.Creator.startsWith("VH") && ((Double.parseDouble(tietIncomeMonthly.getText().toString().trim())))<(0.15*Double.parseDouble(acspLoanAppFinanceLoanAmount.getText().toString().trim()))){
                 tietIncomeMonthly.setError("Income should be greater than 15% of Loan Amount");
                 Utils.showSnakbar(findViewById(android.R.id.content),"Income should be greater than 15% of Loan Amount");
+            }else if(!manager.Creator.startsWith("VH") && ((Double.parseDouble(tietIncomeMonthly.getText().toString().trim()))* 0.25)>Double.parseDouble(tietExpenseMonthly.getText().toString().trim())){
+                tietExpenseMonthly.setError("Expense should be greater than 25 % of Income");
+                Utils.showSnakbar(findViewById(android.R.id.content),"Expense should be greater than 25 % of Income");
             }
             else{
 
@@ -441,7 +449,7 @@ TextView textViewTotalAnnualIncome;
                                                 borrower.Oth_Prop_Det = "U";
 
                                                 borrower.save();
-                                                saveDataOfImages(borrower,borrowerImagePath,"B");
+                                              //  saveDataOfImages(borrower,borrowerImagePath,"B");
 
                                             } catch (JSONException e) {
                                                 e.printStackTrace();
@@ -459,9 +467,9 @@ TextView textViewTotalAnnualIncome;
                                         saveFIWithSchemeName(manager.Creator,FiCode);
                                     }
                                     if (AddressCodes.length()>1){
-                                        saveAddressCodeOfFi(manager.Creator,FiCode,AddressCodes);
+                                       //saveAddressCodeOfFi();
+                                        UpdatefiVerificationDocName(FiCode,manager.Creator,AddressCodes);
                                     }
-
                                     AlertDialog.Builder builder = new AlertDialog.Builder(KYC_Form_New.this);
                                     builder.setTitle("Borrower KYC");
                                     builder.setCancelable(false);
@@ -489,7 +497,7 @@ TextView textViewTotalAnnualIncome;
                                     });
                                     builder.create().show();
 
-                                    UpdatefiVerificationDocName(FiCode,manager.Creator);
+
 
                                 } catch (JSONException jo) {
                                     Log.d("TAG", "onSuccess: "+jo.getMessage());
@@ -667,6 +675,7 @@ TextView textViewTotalAnnualIncome;
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                 Log.d("TAG", "onResponse: "+response.body());
+
             }
 
             @Override
@@ -713,10 +722,11 @@ TextView textViewTotalAnnualIncome;
       }
     }
 
-    private void UpdatefiVerificationDocName(long fiCode, String creator) {
+    private void UpdatefiVerificationDocName(long fiCode, String creator,String addressCodes) {
+
         ApiInterface apiInterface= ApiClient.getClient(SEILIGL.NEW_SERVERAPI).create(ApiInterface.class);
-        Log.d("TAG", "checkCrifScore: "+getJsonOfDocName(fiCode, creator));
-        Call<JsonObject> call=apiInterface.getDocNameDate(getJsonOfDocName(fiCode,creator));
+        //Log.d("TAG", "checkCrifScore: "+getJsonOfDocName(fiCode, creator,addressCodes));
+        Call<JsonObject> call=apiInterface.getDocNameDate(getJsonOfDocName(fiCode,creator,addressCodes));
         call.enqueue(new Callback<JsonObject>(){
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response){
@@ -732,15 +742,19 @@ TextView textViewTotalAnnualIncome;
             }
         });
     }
-    private JsonObject getJsonOfDocName(long fiCode, String creator) {
+    private JsonObject getJsonOfDocName(long fiCode, String creator,String addressCodes) {
+        String[] codes=addressCodes.split("_");
         JsonObject jsonObject=new JsonObject();
-        jsonObject.addProperty("type","basic");
         jsonObject.addProperty("pan_Name",tilPAN_Name);
         jsonObject.addProperty("voterId_Name",VoterIdName);
         jsonObject.addProperty("aadhar_Name",tietName);
         jsonObject.addProperty("drivingLic_Name",tilDL_Name);
         jsonObject.addProperty("bankAcc_Name","");
         jsonObject.addProperty("bank_Name","");
+        jsonObject.addProperty("villagE_CODE",codes[3]);
+        jsonObject.addProperty("suB_DIST_CODE",codes[2]);
+        jsonObject.addProperty("disT_CODE",codes[1]);
+        jsonObject.addProperty("statE_CODE",codes[0]);
         jsonObject.addProperty("fiCode",fiCode+"");
         jsonObject.addProperty("creator",creator);
         return jsonObject;

@@ -12,13 +12,13 @@ public class PosInstRcvNew {
     @Expose
     private String IMEI;
     @Expose
-    private String CaseCode;
+    private String caseCode;
     @Expose
     private int RcptNo;
     @Expose
     private int InstRcvAmt;
     @Expose
-    private Date InstRcvDateTimeUTC;
+    private Date date;
     @Expose
     private String Flag;
     @Expose
@@ -28,26 +28,26 @@ public class PosInstRcvNew {
     @Expose
     private Date BatchDate;
     @Expose
-    private String FoCode;
+    private String foCode;
     @Expose
     private String DataBaseName;
     @Expose
-    private String Creator;
+    private String creator;
     @Expose
     private String CustName;
     @Expose
-    private String PartyCd;
+    private String partyCd;
     @Expose
-    private String PayFlag;
+    private String payFlag;
     @Expose
     private String SmsMobNo;
     @Expose
     private int InterestAmt;
 
     @Expose
-    private String CollPoint;
+    private String collPoint;
     @Expose
-    private String PaymentMode;
+    private String paymentMode;
     @Expose
     private String collBranchCode;
 
@@ -61,19 +61,19 @@ public class PosInstRcvNew {
     }
 
     public String getCollPoint() {
-        return CollPoint;
+        return collPoint;
     }
 
     public void setCollPoint(String collPoint) {
-        CollPoint = collPoint;
+        this.collPoint = collPoint;
     }
 
     public String getPaymentMode() {
-        return PaymentMode;
+        return paymentMode;
     }
 
     public void setPaymentMode(String paymentMode) {
-        PaymentMode = paymentMode;
+        this.paymentMode = paymentMode;
     }
 
 
@@ -93,7 +93,7 @@ public class PosInstRcvNew {
     }
 
     public void setInstRcvID(int instRcvID) {
-        InstRcvID = instRcvID;
+        this. InstRcvID = instRcvID;
     }
 
     public String getIMEI() {
@@ -105,11 +105,11 @@ public class PosInstRcvNew {
     }
 
     public String getCaseCode() {
-        return CaseCode;
+        return caseCode;
     }
 
     public void setCaseCode(String caseCode) {
-        CaseCode = caseCode;
+        this.caseCode = caseCode;
     }
 
     public int getRcptNo() {
@@ -117,7 +117,7 @@ public class PosInstRcvNew {
     }
 
     public void setRcptNo(int rcptNo) {
-        RcptNo = rcptNo;
+        this.RcptNo = rcptNo;
     }
 
     public int getInstRcvAmt() {
@@ -125,15 +125,15 @@ public class PosInstRcvNew {
     }
 
     public void setInstRcvAmt(int instRcvAmt) {
-        InstRcvAmt = instRcvAmt;
+        this.InstRcvAmt = instRcvAmt;
     }
 
     public Date getInstRcvDateTimeUTC() {
-        return InstRcvDateTimeUTC;
+        return date;
     }
 
-    public void setInstRcvDateTimeUTC(Date instRcvDateTimeUTC) {
-        InstRcvDateTimeUTC = instRcvDateTimeUTC;
+    public void setInstRcvDateTimeUTC(Date date) {
+        this. date = date;
     }
 
     public String getFlag() {
@@ -141,7 +141,7 @@ public class PosInstRcvNew {
     }
 
     public void setFlag(String flag) {
-        Flag = flag;
+        this.Flag = flag;
     }
 
     public Date getCreationDate() {
@@ -149,7 +149,7 @@ public class PosInstRcvNew {
     }
 
     public void setCreationDate(Date creationDate) {
-        CreationDate = creationDate;
+        this.CreationDate = creationDate;
     }
 
     public byte getBatchNo() {
@@ -157,7 +157,7 @@ public class PosInstRcvNew {
     }
 
     public void setBatchNo(byte batchNo) {
-        BatchNo = batchNo;
+        this.BatchNo = batchNo;
     }
 
     public Date getBatchDate() {
@@ -165,15 +165,15 @@ public class PosInstRcvNew {
     }
 
     public void setBatchDate(Date batchDate) {
-        BatchDate = batchDate;
+        this.BatchDate = batchDate;
     }
 
     public String getFoCode() {
-        return FoCode;
+        return foCode;
     }
 
     public void setFoCode(String foCode) {
-        FoCode = foCode;
+        this.foCode = foCode;
     }
 
     public String getDataBaseName() {
@@ -185,35 +185,35 @@ public class PosInstRcvNew {
     }
 
     public String getCreator() {
-        return Creator;
+        return creator;
     }
 
     public void setCreator(String creator) {
-        Creator = creator;
+        this.creator = creator;
     }
 
     public String getCustName() {
         return CustName;
     }
 
-    public void setCustName(String custName) {
-        CustName = custName;
+    public void setCustName(String CustName) {
+        this. CustName = CustName;
     }
 
     public String getPartyCd() {
-        return PartyCd;
+        return partyCd;
     }
 
     public void setPartyCd(String partyCd) {
-        PartyCd = partyCd;
+        this.partyCd = partyCd;
     }
 
     public String getPayFlag() {
-        return PayFlag;
+        return payFlag;
     }
 
     public void setPayFlag(String payFlag) {
-        PayFlag = payFlag;
+        this.payFlag = payFlag;
     }
 
     public String getSmsMobNo() {
@@ -221,7 +221,7 @@ public class PosInstRcvNew {
     }
 
     public void setSmsMobNo(String smsMobNo) {
-        SmsMobNo = smsMobNo;
+        this.SmsMobNo = smsMobNo;
     }
 
     public int getInterestAmt() {
@@ -229,7 +229,7 @@ public class PosInstRcvNew {
     }
 
     public void setInterestAmt(int interestAmt) {
-        InterestAmt = interestAmt;
+        this.InterestAmt = interestAmt;
     }
 
     @Override
@@ -237,20 +237,20 @@ public class PosInstRcvNew {
         return "PosInstRcv{" +
                 "InstRcvID=" + InstRcvID +
                 ", IMEI='" + IMEI + '\'' +
-                ", CaseCode='" + CaseCode + '\'' +
+                ", caseCode='" + caseCode + '\'' +
                 ", RcptNo=" + RcptNo +
                 ", InstRcvAmt=" + InstRcvAmt +
-                ", InstRcvDateTimeUTC=" + InstRcvDateTimeUTC +
+                ", date=" + date +
                 ", Flag='" + Flag + '\'' +
                 ", CreationDate=" + CreationDate +
                 ", BatchNo=" + BatchNo +
                 ", BatchDate=" + BatchDate +
-                ", FoCode='" + FoCode + '\'' +
+                ", foCode='" + foCode + '\'' +
                 ", DataBaseName='" + DataBaseName + '\'' +
-                ", Creator='" + Creator + '\'' +
+                ", creator='" + creator + '\'' +
                 ", CustName='" + CustName + '\'' +
-                ", PartyCd='" + PartyCd + '\'' +
-                ", PayFlag='" + PayFlag + '\'' +
+                ", partyCd='" + partyCd + '\'' +
+                ", payFlag='" + payFlag + '\'' +
                 ", SmsMobNo='" + SmsMobNo + '\'' +
                 ", InterestAmt='" + InterestAmt + '\'' +
                 '}';

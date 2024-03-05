@@ -180,6 +180,7 @@ Contact Email <i>DELHI@PAISALO.IN</i>
     <string name="report.9"> यह सुनिचित करें कि आवेदित राशि ऋण के उदेश्य के अनुकूल है।</string>
 
     <string name="imageTitle">आवेदक के साथ घर की तस्वीर खींचें</string>
+    <string name="imageupload">यदि क्यूआर कोड पर भुगतान सफल हो गया है लेकिन स्थिति नहीं मिल रही है तो लेनदेन आईडी के साथ स्क्रीनशॉट अपलोड करें।</string>
 
     <string name="choose_scheme_prompt">Choose a Scheme</string>
     <string name="apply">Apply Scheme</string>

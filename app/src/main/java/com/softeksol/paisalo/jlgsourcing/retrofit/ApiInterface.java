@@ -2,6 +2,7 @@ package com.softeksol.paisalo.jlgsourcing.retrofit;
 
 
 import com.google.gson.JsonObject;
+import com.softeksol.paisalo.jlgsourcing.collectionreport.CollectionReportModel;
 import com.softeksol.paisalo.jlgsourcing.entities.BREResponse;
 import com.softeksol.paisalo.jlgsourcing.entities.CityModelList;
 import com.softeksol.paisalo.jlgsourcing.entities.CreatorModel;
@@ -12,6 +13,7 @@ import com.softeksol.paisalo.jlgsourcing.entities.HomeVisitListModel;
 import com.softeksol.paisalo.jlgsourcing.entities.PosInstRcv;
 import com.softeksol.paisalo.jlgsourcing.entities.PosInstRcvNew;
 import com.softeksol.paisalo.jlgsourcing.entities.ProcessingEmiData;
+import com.softeksol.paisalo.jlgsourcing.entities.QRCollStatus;
 import com.softeksol.paisalo.jlgsourcing.entities.SubDistrictModel;
 import com.softeksol.paisalo.jlgsourcing.entities.VillageListModel;
 import com.softeksol.paisalo.jlgsourcing.entities.dto.OCRResponseModel;
@@ -55,6 +57,8 @@ public interface ApiInterface {
     @POST("CrifReport/GetCrifReport")
     public  Call<ScrifData> getCrifScore(@Body JsonObject object);
 
+    @GET("LiveTrack/CollectionStatus")
+    public Call<CollectionReportModel> getCollectionReprt(@Query("Smcode") String Smcode);
 
     @POST("IdentityVerification/Get")
     public Call<JsonObject> cardValidate(@Body JsonObject object);
@@ -166,8 +170,8 @@ public interface ApiInterface {
                                              @Header("dbname") String dbname,
                                              @Header("userid") String userid);
 
-    @POST("InstCollection/IsQrPaySuccess")
-    Call<JsonObject> insertQRPayment(@Body PosInstRcvNew jsonObject,
+    @POST("InstCollection/UpdateQrRcCollection")
+    Call<JsonObject> insertQRPayment(@Body QRCollStatus jsonObject,
                                              @Header("dbname") String dbname,
                                              @Header("userid") String userid);
 

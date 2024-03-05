@@ -36,9 +36,10 @@
                 android:id="@+id/qrpayment"
                 android:icon="@drawable/submit_files"
                 android:title="Payment Details" />
-           <!-- <item
-                android:icon="@drawable/send"
-                android:title="Send" />-->
+            <item
+                android:id="@+id/collectionreport"
+                android:icon="@drawable/old_e_kyc"
+                android:title="Collection Report" />
 
         </menu>
     </item>

@@ -7,25 +7,52 @@
 
     <LinearLayout
         android:orientation="vertical"
-        android:padding="10dp"
+        android:padding="5dp"
         android:background="@color/colorPrimaryDark"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        <TextView
-            android:textSize="18dp"
-            android:textColor="@color/white"
-            android:text="QR CODE PAYMENT"
+        <LinearLayout
+            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_weight="1"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:textSize="16dp"
+                    android:textColor="@color/white"
+                    android:text="QR CODE PAYMENT"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_weight="5"
+                android:gravity="end"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <ImageView
+                    android:src="@drawable/crossbutton"
+                    android:id="@+id/img_close"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"/>
+            </LinearLayout>
+
+        </LinearLayout>
+
         <TextView
             android:id="@+id/text_smcode"
-            android:textSize="18dp"
+            android:textSize="16dp"
             android:textColor="@color/white"
             android:text="QR CODE PAYMENT"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
         <TextView
-            android:layout_marginTop="10dp"
             android:textSize="14dp"
             android:textColor="@color/white"
             android:text="@string/hindiqr"
@@ -60,29 +87,37 @@
     <LinearLayout
         android:layout_marginTop="10dp"
         android:padding="5dp"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-
-        <Button
-            android:id="@+id/button_Closedialog"
-            android:layout_weight="1"
-            android:text="CLOSE"
-            android:textColor="@color/red"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
 
         <Button
             android:id="@+id/button_saveEmi"
             android:layout_weight="1"
             android:textStyle="bold"
-            android:layout_marginLeft="10dp"
-            android:text="Get Payment Status"
+            android:text="Get Status"
             android:textColor="@color/dull_green2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+        <TextView
+            android:textSize="12dp"
+            android:textColor="#BF0303"
+            android:id="@+id/text_uploadimage"
+            android:layout_marginTop="5dp"
+            android:text="@string/imageupload"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+        <Button
+            android:textColor="@color/black"
+            android:layout_gravity="center"
+            android:id="@+id/button_Closedialog"
+            android:layout_weight="1"
+            android:text="Upload Image"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
     </LinearLayout>
+
 
 
 

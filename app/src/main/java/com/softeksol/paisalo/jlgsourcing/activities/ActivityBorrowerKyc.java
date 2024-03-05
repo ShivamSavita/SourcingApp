@@ -217,6 +217,10 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
     Spinner spinnerMarritalStatus;
     String requestforVerification="";
     String ResponseforVerification="";
+    String lastCaseCode="";
+    String lastLoanAmt="";
+    String lastDuration="";
+    String lastPaidEmi="";
     boolean panaadharDOBMatched=false;
     boolean isgetPanwithOCR=false;
     String schemeNameForVH;
@@ -884,7 +888,7 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
         //acspRelationship.setVisibility(View.GONE);
         //findViewById(R.id.llUidRelationship).setVisibility(View.GONE);
 
-        findViewById(R.id.imgViewAadharPhoto).setVisibility(View.VISIBLE);
+        findViewById(R.id.imgViewAadharPhoto).setVisibility(View.GONE);
 
         acspAadharState = findViewById(R.id.acspAadharState);
         Log.d("TAG", "onCreate: "+RangeCategory.getRangesByCatKey("state", "RangeCode", false));
@@ -1141,26 +1145,32 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                             if (deDupeResponse.getData().size()>0){
                                 for (DeDupeData deDupeData:deDupeResponse.getData()){
                                     msg+=("=>Loan with ficode="+deDupeData.getCode()+" and creator="+deDupeData.getCreator()+" (CaseCode: "+deDupeData.getSmCode()+"), for a duration of "+deDupeData.getLoanDuration()+" months starting from "+deDupeData.getDtFin().split("T")[0]+", with a sanctioned amount of ₹"+deDupeData.getSanctionedAmt()+" and "+deDupeData.getCountEmi()+" EMIs have been paid.\n");
-                                    if (deDupeData.getSanctionedAmt()>Integer.parseInt(deDupeData.getEmiAmount()))
+                                    if ((deDupeData.getSanctionedAmt()*0.4)>Integer.parseInt(deDupeData.getEmiAmount()))
                                     {
+                                        lastCaseCode=deDupeData.getSmCode();
+                                        lastLoanAmt=deDupeData.getSanctionedAmt()+"";
+                                        lastDuration=deDupeData.getLoanDuration();
+                                        lastPaidEmi=deDupeData.getCountEmi();
                                         accountOpened=1;
                                     }
                                 }
                                 if (accountOpened==1){
 
-                                    msg+=("\n\nSorry!! The case will not proceed with this Aadhaar number.");
+
+                                    /*msg+=("\n\nSorry!! The case will not proceed with this Aadhaar number.");
                                     AlertDialog.Builder builder = new AlertDialog.Builder(ActivityBorrowerKyc.this);
                                     builder.setTitle("Previous Loan Details");
                                     builder.setMessage(msg);
+                                    builder.setCancelable(false);
                                     builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialogInterface, int i) {
                                             finish();
                                         }
                                     });
-                                    AlertDialog dialog = builder.create();
+                                    AlertDialog dialog = builder.create();*/
 
-                                    dialog.show();
+                                   // dialog.show();
                                 }
 
                             }
@@ -2328,8 +2338,8 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
     }
 
     public static boolean containsOnlyAllowedCharacters(String input) {
-        String A = "[,:./]";
-        String allowedCharactersRegex = "[a-zA-Z0-9 ,:./\\-]+";
+        String A = "[,:./()]";
+        String allowedCharactersRegex = "[a-zA-Z0-9 ,:./()\\-]+";
 
         return ( input.matches(allowedCharactersRegex) && !(input.startsWith(".") ||input.startsWith(":") || input.startsWith("/") ||input.startsWith("-") ||input.startsWith(",")));
 
@@ -3008,6 +3018,10 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
     }
 
     private void  updateBorrower() {
+
+//        else if( otpVerified==0){
+//            Toast.makeText(activity, "Please verify mobile number vis OTP", Toast.LENGTH_SHORT).show();
+//        }
         Log.d("TAG", "updateBorrower: "+borrower.getPicture());
         if(stateData.equalsIgnoreCase("APO Address") || stateData.equalsIgnoreCase("--Select--") ){
             Toast.makeText(activity, "Select State Name", Toast.LENGTH_SHORT).show();
@@ -3017,10 +3031,6 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
             Toast.makeText(activity, "Select Marital Status", Toast.LENGTH_SHORT).show();
         }else if( relationShipData.equalsIgnoreCase("--Select--") ){
             Toast.makeText(activity, "Select Relationship", Toast.LENGTH_SHORT).show();
-        }else if( otpVerified==0){
-            Toast.makeText(activity, "Please verify mobile number vis OTP", Toast.LENGTH_SHORT).show();
-        }else if( borrower.getPicture()==null ||  borrower.getPicture().toString().isEmpty()){
-            Toast.makeText(activity, "Please upload borrower's picture first", Toast.LENGTH_SHORT).show();
         }else{
             if (borrower != null) {
                 getDataFromView(this.findViewById(android.R.id.content).getRootView());
@@ -3114,6 +3124,10 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                 intent.putExtra("manager", manager);
                 intent.putExtra("borrower", borrower);
                 intent.putExtra(Global.SCHEME_TAG, schemeNameForVH);
+                intent.putExtra("lastCaseCode",  lastCaseCode);
+                intent.putExtra("lastLoanAmt",   lastLoanAmt);
+                intent.putExtra("lastDuration",   lastDuration);
+                intent.putExtra("lastPaidEmi",   lastPaidEmi);
                 intent.putExtra("AddressCodes",cityData.getCitYCODE()+"_"+districtDat.getDisTCODE()+"_"+subDistrictData.getSuBDISTCODE()+"_"+villageData.getVillagECODE());
                 startActivity(intent);
             }else{
@@ -3139,6 +3153,10 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
                 intent.putExtra("manager", manager);
                 intent.putExtra("borrower", borrower);
                 intent.putExtra(Global.SCHEME_TAG, schemeNameForVH);
+                intent.putExtra("lastCaseCode",  lastCaseCode);
+                intent.putExtra("lastLoanAmt",   lastLoanAmt);
+                intent.putExtra("lastDuration",   lastDuration);
+                intent.putExtra("lastPaidEmi",   lastPaidEmi);
                 intent.putExtra("AddressCodes",cityData.getCitYCODE()+"_"+districtDat.getDisTCODE()+"_"+subDistrictData.getSuBDISTCODE()+"_"+villageData.getVillagECODE());
 
                 startActivity(intent);

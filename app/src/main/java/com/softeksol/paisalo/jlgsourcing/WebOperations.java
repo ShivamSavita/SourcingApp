@@ -32,12 +32,11 @@ import cz.msebera.android.httpclient.Header;
 import cz.msebera.android.httpclient.entity.StringEntity;
 import cz.msebera.android.httpclient.message.BasicHeader;
 
-/**
- * Created by sachindra on 2016-10-07.
- */
+
 public class WebOperations {
 
-    static  String deviceId="2234514145687247";
+    static  String deviceId="";
+    //GRST000257
     public static <E> String convertToJson(E object) {
         String jsonString;
         Gson gson = new GsonBuilder().serializeNulls().setExclusionStrategies(new DbFlowExclusionStrategy()).excludeFieldsWithoutExposeAnnotation().create();

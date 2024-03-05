@@ -77,7 +77,7 @@ public class ApiClient {
 //            });
 
             retrofit = new Retrofit.Builder()
-                    .baseUrl("https://predeptest.paisalo.in:8084/")
+                    .baseUrl("https://erpservice.paisalo.in:980/")
                     .addConverterFactory(GsonConverterFactory.create())
                     .client(client)
                     .build();

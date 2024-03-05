@@ -245,6 +245,7 @@
                 </androidx.cardview.widget.CardView>
                 <!--android:digits="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"-->
                 <ImageView
+                    android:visibility="gone"
                     android:id="@+id/imgViewAadharPhoto"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
@@ -1165,6 +1166,7 @@
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:layout_marginEnd="8dp"
+                    android:visibility="gone"
                     android:background="@drawable/check_sign_ic"
                     app:layout_constraintBottom_toBottomOf="@+id/tilMobile"
                     app:layout_constraintEnd_toEndOf="parent"

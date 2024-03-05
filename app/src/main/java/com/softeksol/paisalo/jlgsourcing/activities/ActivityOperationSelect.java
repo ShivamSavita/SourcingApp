@@ -40,6 +40,7 @@ import com.softeksol.paisalo.jlgsourcing.Utilities.IglPreferences;
 import com.softeksol.paisalo.jlgsourcing.WebOperations;
 import com.softeksol.paisalo.jlgsourcing.adapters.AdapterListManager;
 import com.softeksol.paisalo.jlgsourcing.adapters.AdapterOperation;
+import com.softeksol.paisalo.jlgsourcing.collectionreport.CollectionReportActivity;
 import com.softeksol.paisalo.jlgsourcing.entities.DataEMI;
 import com.softeksol.paisalo.jlgsourcing.entities.Manager;
 import com.softeksol.paisalo.jlgsourcing.entities.ProcessingEmiData;
@@ -348,9 +349,14 @@ public class ActivityOperationSelect extends AppCompatActivity implements Naviga
                 Intent intentQrPayments = new Intent(ActivityOperationSelect.this,QrPayments.class);
                 intentQrPayments.putExtra("UserID",IglPreferences.getPrefString(this, SEILIGL.USER_ID, ""));
                 startActivity(intentQrPayments);
-
-
                 break;
+
+            case R.id.collectionreport:
+                Intent intentcollectionreport = new Intent(ActivityOperationSelect.this, CollectionReportActivity.class);
+                //intentcollectionreport.putExtra("UserID",IglPreferences.getPrefString(this, SEILIGL.USER_ID, ""));
+                startActivity(intentcollectionreport);
+                break;
+
 
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.my_drawer_layout);

@@ -58,7 +58,6 @@ public class ActivityLoanDetails extends AppCompatActivity implements View.OnCli
         ((TextView) findViewById(R.id.tvLoanDetailAmount)).setText(String.valueOf(eSignBorrower.SanctionedAmt));
         ((TextView) findViewById(R.id.tvLoanDetailPeriod)).setText(String.valueOf(eSignBorrower.Period));
         ((TextView) findViewById(R.id.tvLoanDetailInterestRate)).setText(String.valueOf(eSignBorrower.IntRate));
-
         Button btnDownloadDoc = (Button) findViewById(R.id.btnLoanDetailsDownloadDoc);
         btnDownloadDoc.setOnClickListener(new View.OnClickListener() {
             @Override
