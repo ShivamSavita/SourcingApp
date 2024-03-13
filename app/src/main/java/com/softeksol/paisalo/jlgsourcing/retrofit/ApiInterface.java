@@ -97,7 +97,8 @@ public interface ApiInterface {
     Call<JsonObject> getIfscCode(@Path("ifsccode") String ifsccode);
 
     @POST("OCR/DocVerifyByOCR")
-    Call<OCRResponseModel> getFileValidateByOCR(@Query("imgData") String type, @Body RequestBody file);
+    Call<OCRResponseModel>
+    getFileValidateByOCR(@Query("imgData") String type, @Body RequestBody file);
 
     @GET("FI/AadharSehmatiFromPdf")
     Call<JsonObject> getFile(@Header ("Authorization") String token,@Query("creator") String creator, @Query("ficode") int ficode);
@@ -108,7 +109,7 @@ public interface ApiInterface {
     @POST("OCR/GetAdhardata")
     Call<JsonObject> getAdharDataByOCR(@Query("imgData") String imgData,@Query("doctype") String docType,@Body RequestBody file);
 
- @POST("LiveTrack/UpdateFiStatus")
+    @POST("LiveTrack/UpdateFiStatus")
     Call<JsonObject> restrictBorrower(@Query("ficode") String ficode,@Query("creator") String creator,@Query("Approved") String Approved);
 
 

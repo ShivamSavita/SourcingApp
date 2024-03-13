@@ -343,7 +343,7 @@ public class CrifScore extends AppCompatActivity {
 
     private void updateSourcingStatus(){
         ApiInterface apiInterface= ApiClient.getClient(SEILIGL.NEW_SERVERAPI).create(ApiInterface.class);
-        Call<JsonObject> call=apiInterface.updateStatus(checkCrifData.getData().getFiCode()+"",checkCrifData.getData().getCreator());
+        Call<JsonObject> call=apiInterface.updateStatus(eSignerborower.FiCode+"",eSignerborower.Creator);
         call.enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {

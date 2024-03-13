@@ -79,10 +79,10 @@
             android:name="com.softeksol.paisalo.jlgsourcing.homevisit.SecondPage"
             android:exported="false" />
         <activity
-            android:name=".Morpho_Recharge_Entry"
+            android:name="com.softeksol.paisalo.jlgsourcing.activities.Morpho_Recharge_Entry"
             android:exported="false" />
         <activity
-            android:name=".OnlinePaymentActivity"
+            android:name="com.softeksol.paisalo.jlgsourcing.activities.OnlinePaymentActivity"
             android:exported="false">
             <meta-data
                 android:name="android.app.lib_name"

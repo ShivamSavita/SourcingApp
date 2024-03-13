@@ -717,7 +717,12 @@ public class FragmentCollection extends AbsCollectionFragment {
                         //String st=  String.valueOf((totCollectAmt+latePmtIntAmt)+" money received");
                       //  textToSpeech.speak(st,TextToSpeech.QUEUE_FLUSH,null);
                        // saveDeposit(SchmCode,dueData, totCollectAmt,latePmtIntAmt,tglBtnPaidBy.isChecked() ? "F" : "B");
-                        saveRecipetNewAmount(SchmCode,dueData, totCollectAmt,latePmtIntAmt,tglBtnPaidBy.isChecked() ? "F" : "B");
+                        if(IglPreferences.getPrefString(getContext(), SEILIGL.DATABASE_NAME, BuildConfig.DATABASE_NAME).equalsIgnoreCase("SBIPDLCOL")){
+                            saveRecipetNewAmount(SchmCode,dueData, totCollectAmt,latePmtIntAmt,tglBtnPaidBy.isChecked() ? "F" : "B");
+                        }else{
+                            saveDeposit(SchmCode,dueData, totCollectAmt,latePmtIntAmt,tglBtnPaidBy.isChecked() ? "F" : "B");
+                        }
+
                         //Toast.makeText(MainActivity.this, "okay clicked", Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -770,7 +775,7 @@ public class FragmentCollection extends AbsCollectionFragment {
 
 
         // progressDialog = ProgressDialog.show(getContext(), "", "Loading...", true, false);
-         ApiInterface apiInterface= getClientNew("https://erpservice.paisalo.in:980/PDL.SourcingApp.Api/api/").create(ApiInterface.class);
+         ApiInterface apiInterface= getClientNew("https://pdlpay.paisalo.in:946/PDL.SourcingApp.Api/api/").create(ApiInterface.class);
          Call<JsonObject> call=apiInterface.insertQRPayment(instRcv,"yfMerfC6mRvfr0AOoHmOJ8Et9Q9MPwNEKzFdLsfEs1A=",IglPreferences.getPrefString(getContext(), SEILIGL.USER_ID, ""));
          call.enqueue(new Callback<JsonObject>() {
              @Override
@@ -868,7 +873,7 @@ public class FragmentCollection extends AbsCollectionFragment {
         httpClient.readTimeout(1,TimeUnit.MINUTES);
         httpClient.addInterceptor(logging);
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://erpservice.paisalo.in:980/PDL.SourcingApp.Api/api/")
+                .baseUrl("https://pdlpay.paisalo.in:946/PDL.SourcingApp.Api/api/")
                // .baseUrl("https://predeptest.paisalo.in:8084/PDL.SourcingApp.Api/api/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(httpClient.build())
@@ -926,6 +931,8 @@ public class FragmentCollection extends AbsCollectionFragment {
                 if (response.body()!=null){
                     if (response.body().get("statusCode").getAsInt()==200){
                         Utils.alert(getContext(),response.body().get("message").getAsString());
+                        ((ActivityCollection) getActivity()).refreshData(FragmentCollection.this);
+                        getLoginLocation("Collection","");
 
                     }
                 }
@@ -1022,39 +1029,6 @@ public class FragmentCollection extends AbsCollectionFragment {
         instRcv.setCaseCode(dueData.getCaseCode());
         instRcv.setCreator(dueData.getCreator());
         instRcv.setDataBaseName(dueData.getDb());
-        instRcv.setIMEI(IglPreferences.getPrefString(getContext(), SEILIGL.DEVICE_IMEI, "0"));
-        instRcv.setInstRcvAmt(collectedAmount - latePmtAmount);
-        instRcv.setInstRcvDateTimeUTC(new Date());
-        instRcv.setFoCode(dueData.getFoCode());
-        instRcv.setCustName(dueData.getCustName());
-        instRcv.setPartyCd(dueData.getPartyCd());
-        instRcv.setInterestAmt(latePmtAmount);
-        instRcv.setPayFlag(depBy);
-        //Log.d("Json", String.valueOf(instRcv.getInstRcvDateTimeUTC()));
-        Log.d("JsonInstRcv", String.valueOf(WebOperations.convertToJson(instRcv)));
-        (new WebOperations()).postEntity(getContext(), "POSDATA", "instcollection", "savereceipt", WebOperations.convertToJson(instRcv),asyncResponseHandler);
-    }
-
-
-    private void saveDepositOwn(String SchmCode,DueData dueData, int collectedAmount, int latePmtAmount, String depBy) {
-        DataAsyncResponseHandler asyncResponseHandler = new DataAsyncResponseHandler(getContext(), "Loan Collection", "Saving Collection Entry") {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                if (statusCode == 200) {
-                    // ((ActivityCollection) getActivity()).refreshData(FragmentCollection.this);
-                }
-            }
-            @Override
-            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                Toast.makeText(getContext(), error.getMessage() + "\n" + (new String(responseBody)), Toast.LENGTH_LONG).show();
-                Log.d("eKYC Response",error.getLocalizedMessage());
-            }
-        };
-
-        PosInstRcv instRcv = new PosInstRcv();
-        instRcv.setCaseCode(dueData.getCaseCode());
-        instRcv.setCreator(dueData.getCreator());
-        instRcv.setDataBaseName("PDL_OWN");
         instRcv.setIMEI(IglPreferences.getPrefString(getContext(), SEILIGL.DEVICE_IMEI, "0"));
         instRcv.setInstRcvAmt(collectedAmount - latePmtAmount);
         instRcv.setInstRcvDateTimeUTC(new Date());
