@@ -235,7 +235,7 @@ public class CrifScore extends AppCompatActivity {
             }
         });
 
-
+        updateSourcingStatus();
     }
 
     private JsonObject getJsonForCrif(String ficode, String creator, String amount, String emi,String bank) {

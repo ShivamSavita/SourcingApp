@@ -23,16 +23,7 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="777f62d9-0b07-46ca-b68d-a5630df9eb8e" name="Changes" comment="15-03-2024">
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/softeksol/paisalo/jlgsourcing/entities/SmCode_DateModel.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/app/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/softeksol/paisalo/jlgsourcing/Utilities/IglPreferences.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/softeksol/paisalo/jlgsourcing/Utilities/IglPreferences.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/softeksol/paisalo/jlgsourcing/activities/ActivityBorrowerKyc.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/softeksol/paisalo/jlgsourcing/activities/ActivityBorrowerKyc.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/softeksol/paisalo/jlgsourcing/activities/ActivityCollection.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/softeksol/paisalo/jlgsourcing/activities/ActivityCollection.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/softeksol/paisalo/jlgsourcing/activities/KYC_Form_New.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/softeksol/paisalo/jlgsourcing/activities/KYC_Form_New.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/softeksol/paisalo/jlgsourcing/fragments/FragmentCollection.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/softeksol/paisalo/jlgsourcing/fragments/FragmentCollection.java" afterDir="false" />
-    </list>
+    <list default="true" id="777f62d9-0b07-46ca-b68d-a5630df9eb8e" name="Changes" comment="03-04-2024" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -261,20 +252,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1677736548092</updated>
-    </task>
-    <task id="LOCAL-00043" summary="App live 07-07-23">
-      <created>1688732895322</created>
-      <option name="number" value="00043" />
-      <option name="presentableId" value="LOCAL-00043" />
-      <option name="project" value="LOCAL" />
-      <updated>1688732895322</updated>
-    </task>
-    <task id="LOCAL-00044" summary="App live 28-07-23">
-      <created>1690546601065</created>
-      <option name="number" value="00044" />
-      <option name="presentableId" value="LOCAL-00044" />
-      <option name="project" value="LOCAL" />
-      <updated>1690546601065</updated>
     </task>
     <task id="LOCAL-00045" summary="App live 02-08-23">
       <created>1690970800221</created>
@@ -605,7 +582,21 @@
       <option name="project" value="LOCAL" />
       <updated>1710503489257</updated>
     </task>
-    <option name="localTasksCounter" value="92" />
+    <task id="LOCAL-00092" summary="03-04-2024">
+      <created>1712118843592</created>
+      <option name="number" value="00092" />
+      <option name="presentableId" value="LOCAL-00092" />
+      <option name="project" value="LOCAL" />
+      <updated>1712118843592</updated>
+    </task>
+    <task id="LOCAL-00093" summary="03-04-2024">
+      <created>1712119023091</created>
+      <option name="number" value="00093" />
+      <option name="presentableId" value="LOCAL-00093" />
+      <option name="project" value="LOCAL" />
+      <updated>1712119023091</updated>
+    </task>
+    <option name="localTasksCounter" value="94" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -685,7 +676,6 @@
     <ignored-roots>
       <path value="$PROJECT_DIR$" />
     </ignored-roots>
-    <MESSAGE value="01-11-2023-2 Ver33" />
     <MESSAGE value="03-11-2023-2 Ver33" />
     <MESSAGE value="04-11-2023-2 Ver33" />
     <MESSAGE value="04-11-2023-2 Ver34" />
@@ -710,7 +700,8 @@
     <MESSAGE value="05-03-2024" />
     <MESSAGE value="13-03-2024" />
     <MESSAGE value="15-03-2024" />
-    <option name="LAST_COMMIT_MESSAGE" value="15-03-2024" />
+    <MESSAGE value="03-04-2024" />
+    <option name="LAST_COMMIT_MESSAGE" value="03-04-2024" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
