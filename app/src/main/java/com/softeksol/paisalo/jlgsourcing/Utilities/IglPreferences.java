@@ -5,11 +5,17 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.preference.PreferenceManager;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import com.softeksol.paisalo.jlgsourcing.SEILIGL;
+import com.softeksol.paisalo.jlgsourcing.entities.SmCode_DateModel;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Type;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
@@ -107,5 +113,34 @@ public class IglPreferences {
         }
 
         return jo;
+    }
+
+
+    public static void saveList(Context context, List<SmCode_DateModel> list) {
+        SharedPreferences prefs = context.getSharedPreferences("payment_case", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        Gson gson = new GsonBuilder().create();
+        String json = gson.toJson(list);
+        editor.putString("payment_list", json);
+        editor.apply();
+    }
+
+    public static List<SmCode_DateModel> getList(Context context) {
+        SharedPreferences prefs = context.getSharedPreferences("payment_case", Context.MODE_PRIVATE);
+        Gson gson = new GsonBuilder().create();
+        String json = prefs.getString("payment_list", null);
+        Type type = new TypeToken<List<SmCode_DateModel>>() {}.getType();
+        return gson.fromJson(json, type);
+    }
+
+    public static void removeItem(Context context, String propertyValueToRemove) {
+        List<SmCode_DateModel> list = getList(context);
+        for (SmCode_DateModel obj : list) {
+            if (obj.getTranDate().equals(propertyValueToRemove)) {
+                list.remove(obj);
+                break;
+            }
+        }
+        saveList(context, list);
     }
 }

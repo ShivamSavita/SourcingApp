@@ -2079,8 +2079,6 @@ public class ActivityBorrowerKyc extends AppCompatActivity  implements View.OnCl
 
         RequestBody surveyBody = RequestBody.create(MediaType.parse("*/*"), croppedImage);
         builder.addFormDataPart("file",croppedImage.getName(),surveyBody);
-
-
         RequestBody requestBody = builder.build();
         ApiInterface apiInterface=retrofit.create(ApiInterface.class);
         Call<JsonObject> call=apiInterface.getAdharDataByOCR(imageData,type,requestBody);

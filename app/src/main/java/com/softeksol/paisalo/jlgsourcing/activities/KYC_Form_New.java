@@ -700,7 +700,7 @@ TextView textViewTotalAnnualIncome;
 
 
 
-        try{
+    try{
     Log.d("TAG", "getDataFromView: "+ borrower.Latitude);
     Log.d("TAG", "getDataFromView: "+ borrower.Longitude);
     Log.d("TAG", "getDataFromView: "+ borrower.Gender);

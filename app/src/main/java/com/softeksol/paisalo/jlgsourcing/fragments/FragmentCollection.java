@@ -59,6 +59,7 @@ import com.softeksol.paisalo.jlgsourcing.entities.InstallmentTemp;
 import com.softeksol.paisalo.jlgsourcing.entities.PosInstRcv;
 import com.softeksol.paisalo.jlgsourcing.entities.PosInstRcvNew;
 import com.softeksol.paisalo.jlgsourcing.entities.QRCollStatus;
+import com.softeksol.paisalo.jlgsourcing.entities.SmCode_DateModel;
 import com.softeksol.paisalo.jlgsourcing.handlers.DataAsyncResponseHandler;
 import com.softeksol.paisalo.jlgsourcing.location.GpsTracker;
 import com.softeksol.paisalo.jlgsourcing.models.QrUrlData;
@@ -177,26 +178,52 @@ public class FragmentCollection extends AbsCollectionFragment {
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                ArrayList<String> menuOptions = new ArrayList<>();
-                menuOptions.add("EMI Paying");
-                menuOptions.add("EMI Not Paying");
+                int checked=0;
+                AdapterDueData adapterDueData = (AdapterDueData) parent.getAdapter();
+                final DueData dueData = (DueData) adapterDueData.getItem(position);
+                List<SmCode_DateModel> list=IglPreferences.getList(getActivity());
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                String[] mOptions = new String[menuOptions.size()];
-                mOptions = menuOptions.toArray(mOptions);
-                builder.setItems(mOptions, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                        if (which==0){
-                            showPaymentDialog(parent,position);
-                        }else{
-                            DialogForEMINotPaying(getContext(),parent,position);
+                if (list!=null){
+                    Log.d("TAG", "onItemClick: "+list.size());
+                    Log.d("TAG", "onItemClick: "+list.get(0).getSmcode());
+                    for (int i=0;i<list.size();i++) {
+                        if (list.get(i).getSmcode().trim().equals(dueData.getCaseCode())){
+                            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+                            if (list.get(i).getTranDate().equals(sdf.format(new Date()))){
+                                Utils.alert(getActivity(),"You already get payment of this case. please wait at least 24 hours");
+                                checked=1;
+                                break;
+                            }else{
+                                checked=0;
+                            }
                         }
 
                     }
-                });
-                builder.create().show();
+                }
+
+                if (checked==0){
+                    ArrayList<String> menuOptions = new ArrayList<>();
+                    menuOptions.add("EMI Paying");
+                    menuOptions.add("EMI Not Paying");
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                    String[] mOptions = new String[menuOptions.size()];
+                    mOptions = menuOptions.toArray(mOptions);
+                    builder.setItems(mOptions, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                            if (which==0){
+                                showPaymentDialog(parent,position);
+                            }else{
+                                DialogForEMINotPaying(getContext(),parent,position);
+                            }
+
+                        }
+                    });
+                    builder.create().show();
+                }
+
 
 
             }
@@ -378,6 +405,11 @@ public class FragmentCollection extends AbsCollectionFragment {
         final LinearLayout llLatePayment = dialogView.findViewById(R.id.llLatePmtInterest);
         final Button onlinepayment = dialogView.findViewById(R.id.onlinepayment);
         final Button prossingFees = dialogView.findViewById(R.id.prossingFees);
+        if(IglPreferences.getPrefString(getContext(), SEILIGL.DATABASE_NAME, BuildConfig.DATABASE_NAME).equalsIgnoreCase("SBIPDLCOL")){
+            prossingFees.setVisibility(View.VISIBLE);
+        }else{
+            prossingFees.setVisibility(View.INVISIBLE);
+        }
         final CheckBox chkLatePayment = dialogView.findViewById(R.id.chkLatePmtInterest);
         final TextView tvLatePayAmount = dialogView.findViewById(R.id.tvLatePmtInterestAmt);
 
@@ -432,7 +464,7 @@ public class FragmentCollection extends AbsCollectionFragment {
                         text_uploadimage.setVisibility(View.VISIBLE);
                         btncancel.setVisibility(View.VISIBLE);
                         qrCodePaymentConfirmAPI(dueData);
-                    /*  dialogConfirm.dismiss();
+                    /* dialogConfirm.dismiss();
                         saveDeposit(SchmCode,dueData, totCollectAmt,latePmtIntAmt,tglBtnPaidBy.isChecked() ? "F" : "B");
                         //Toast.makeText(MainActivity.this, "okay clicked", Toast.LENGTH_SHORT).show();*/
                     }
@@ -784,6 +816,15 @@ public class FragmentCollection extends AbsCollectionFragment {
                 // progressDialog.dismiss();
                  if (response.body()!=null){
                      if (response.body().get("statusCode").getAsInt()==200){
+                         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+                         List<SmCode_DateModel> list=IglPreferences.getList(getActivity());
+                         if (list==null){
+                             list=new ArrayList<>();
+                         }
+                         SmCode_DateModel smCodeDateModel=new SmCode_DateModel(dueData.getCaseCode(),sdf.format(new Date()));
+                         list.add(smCodeDateModel);
+                         IglPreferences.saveList(getActivity(),list);
+
                          dialogQrcodePayment.show();
                          dialogQrcode.dismiss();
                          Glide.with(getContext())
