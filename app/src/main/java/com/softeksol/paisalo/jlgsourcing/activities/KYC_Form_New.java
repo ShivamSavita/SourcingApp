@@ -334,6 +334,8 @@ TextView textViewTotalAnnualIncome;
         if (borrower != null) {
             getDataFromView(this.findViewById(android.R.id.content).getRootView());
 
+            double totalincode=Double.parseDouble(tietIncomeMonthly.getText().toString())+Double.parseDouble(tietFutureIncome.getText().toString())+Double.parseDouble(tietAgricultureIncome.getText().toString())+Double.parseDouble(tietOtherIncome.getText().toString())+Double.parseDouble(EditEarningMemberIncome.getText().toString())+Double.parseDouble(tietPensionIncome.getText().toString())+Double.parseDouble(tietInterestIncome.getText().toString());
+
             if (checkSpinnerData()){
                 Utils.showSnakbar(findViewById(android.R.id.content),"Please check all fields");
             }else if (tietIncomeMonthly.getText().toString().trim().equals("")){
@@ -342,6 +344,8 @@ TextView textViewTotalAnnualIncome;
             }else if(tietExpenseMonthly.getText().toString().trim().equals("")){
                 tietExpenseMonthly.setError("Please Enter Expense");
                 Utils.showSnakbar(findViewById(android.R.id.content),"Please enter Expense");
+            }else if(loanbanktype.getSelectedItem() =="SBI" && totalincode>25000){
+                Utils.showSnakbar(findViewById(android.R.id.content),"Income should be less than 25000 for SBI");
             }else if(tietFutureIncome.getText().toString().trim().equals("")){
                 tietFutureIncome.setError("Please Enter Future Income");
                 Utils.showSnakbar(findViewById(android.R.id.content),"Please enter Future Income");

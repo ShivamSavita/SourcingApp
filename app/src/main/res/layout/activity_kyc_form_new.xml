@@ -51,6 +51,7 @@
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/tietIncomeMonthly"
+                        android:text="0"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@color/white"
@@ -91,7 +92,7 @@
                         android:layout_height="wrap_content"
                         android:background="@color/white"
                         android:hint="@string/expense_monthly"
-
+                        android:text="0"
                         android:inputType="number"
                         android:textSize="15dp" />
                 </com.google.android.material.textfield.TextInputLayout>
@@ -145,7 +146,7 @@
                         android:layout_height="wrap_content"
                         android:background="@color/white"
                         android:hint="@string/future_income"
-
+                        android:text="0"
                         android:inputType="number"
                         android:textSize="15dp" />
                 </com.google.android.material.textfield.TextInputLayout>
@@ -182,7 +183,7 @@
                         android:layout_height="wrap_content"
                         android:background="@color/white"
                         android:hint="@string/agriculture_income"
-
+                        android:text="0"
                         android:inputType="number"
                         android:textSize="15dp" />
                 </com.google.android.material.textfield.TextInputLayout>
@@ -232,7 +233,7 @@
                         android:layout_height="wrap_content"
                         android:background="@color/white"
                         android:hint="Pension Income(Annual)"
-
+                        android:text="0"
                         android:inputType="number"
                         android:textSize="15dp" />
                 </com.google.android.material.textfield.TextInputLayout>
@@ -268,7 +269,7 @@
                         android:layout_height="wrap_content"
                         android:background="@color/white"
                         android:hint="Interest Income(Annual)"
-
+                        android:text="0"
                         android:inputType="number"
                         android:textSize="15dp" />
                 </com.google.android.material.textfield.TextInputLayout>
@@ -309,6 +310,7 @@
                     android:layout_height="15dp"
                     android:background="@color/white"
                     android:hint="Other Income(Annual)"
+                    android:text="0"
                     android:inputType="number"
                     android:textSize="15dp" />
             </com.google.android.material.textfield.TextInputLayout>
@@ -416,6 +418,7 @@
                             android:layout_height="match_parent"
                             android:background="@color/white"
                             android:inputType="number"
+                            android:text="0"
                             android:textSize="15dp" />
                     </com.google.android.material.textfield.TextInputLayout>
 
