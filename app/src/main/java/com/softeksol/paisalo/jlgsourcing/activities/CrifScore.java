@@ -235,7 +235,7 @@ public class CrifScore extends AppCompatActivity {
             }
         });
 
-
+        updateSourcingStatus();
     }
 
     private JsonObject getJsonForCrif(String ficode, String creator, String amount, String emi,String bank) {
@@ -343,7 +343,7 @@ public class CrifScore extends AppCompatActivity {
 
     private void updateSourcingStatus(){
         ApiInterface apiInterface= ApiClient.getClient(SEILIGL.NEW_SERVERAPI).create(ApiInterface.class);
-        Call<JsonObject> call=apiInterface.updateStatus(checkCrifData.getData().getFiCode()+"",checkCrifData.getData().getCreator());
+        Call<JsonObject> call=apiInterface.updateStatus(eSignerborower.FiCode+"",eSignerborower.Creator);
         call.enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
@@ -555,7 +555,7 @@ public class CrifScore extends AppCompatActivity {
                             textView5.setText(score);
 
                             if (Integer.parseInt(score)>650 || Integer.parseInt(score)<300){
-                                if (Double.parseDouble(amount)>0 && response.body().getStatusCode()==200){
+                                if (response.body().getStatusCode()==200){  //Double.parseDouble(amount)>=0 &&
                                     gifImageView.setImageResource(R.drawable.checksign);
                                     textView8.setText("Congrats!!");
                                     textView8.setTextColor(ContextCompat.getColor(CrifScore.this,R.color.green));
@@ -569,8 +569,8 @@ public class CrifScore extends AppCompatActivity {
                                     btnSrifScoreSave.setVisibility(View.VISIBLE);
                                     btnSrifScore.setVisibility(View.GONE);
                                     saveBREData(score);
-                                    updateSourcingStatus();
-                                    //spinner.setEnabled(false);
+                                  //updateSourcingStatus();
+                                  //spinner.setEnabled(false);
                                 }
                                 else{
                                     gifImageView.setImageResource(R.drawable.crosssign);
@@ -584,7 +584,6 @@ public class CrifScore extends AppCompatActivity {
                                     btnSrifScoreSave.setVisibility(View.GONE);
                                     btnSrifScore.setVisibility(View.VISIBLE);
                                     btnSrifScore.setText("TRY AGAIN");
-
                                 }
                             }else{
 

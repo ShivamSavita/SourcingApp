@@ -32,10 +32,11 @@ import cz.msebera.android.httpclient.Header;
 import cz.msebera.android.httpclient.entity.StringEntity;
 import cz.msebera.android.httpclient.message.BasicHeader;
 
-/**
- * Created by sachindra on 2016-10-07.
- */
+
 public class WebOperations {
+
+    static  String deviceId="";
+    //GRST000257
     public static <E> String convertToJson(E object) {
         String jsonString;
         Gson gson = new GsonBuilder().serializeNulls().setExclusionStrategies(new DbFlowExclusionStrategy()).excludeFieldsWithoutExposeAnnotation().create();
@@ -149,8 +150,8 @@ public class WebOperations {
         // client.addHeader("imeino","8639350502262");
         Log.e("DeviceId","CheckingOnHttpheader: "+IglPreferences.getPrefString(context, SEILIGL.DEVICE_ID, "0")+"");
 
-        client.addHeader("devid", IglPreferences.getPrefString(context, SEILIGL.DEVICE_ID, "0"));
-        // client.addHeader("devid","2234514145687247");
+        client.addHeader("devid", deviceId.length()<10?IglPreferences.getPrefString(context, SEILIGL.DEVICE_ID, "0"):deviceId);
+        // client.addHeader("devid","1917494835455248");
         // my client.addHeader("devid","4374793985786243");
         client.addHeader("userid", IglPreferences.getPrefString(context, SEILIGL.USER_ID, ""));
         client.addHeader("procname", BuildConfig.PROC_NAME);
@@ -170,11 +171,11 @@ public class WebOperations {
             client.addHeader("Authorization", "bearer " + bearerString);
         }
         client.addHeader("Content-Encoding", "gzip,deflate,compress");
-         client.addHeader("imeino",IglPreferences.getPrefString(context, SEILIGL.DEVICE_IMEI, "0"));
+        client.addHeader("imeino",IglPreferences.getPrefString(context, SEILIGL.DEVICE_IMEI, "0"));
         // client.addHeader("imeino","8639350502262");
         Log.e("DeviceId","CheckingOnHttpheader: "+IglPreferences.getPrefString(context, SEILIGL.DEVICE_ID, "0")+"");
-        client.addHeader("devid", IglPreferences.getPrefString(context, SEILIGL.DEVICE_ID, "0"));
-        //client.addHeader("devid","2234514145687247");
+        client.addHeader("devid", deviceId.length()<10?IglPreferences.getPrefString(context, SEILIGL.DEVICE_ID, "0"):deviceId);
+        // client.addHeader("devid","1917494835455248");
         // my client.addHeader("devid","2239713985787243");
         client.addHeader("userid", IglPreferences.getPrefString(context, SEILIGL.USER_ID, ""));
         client.addHeader("procname", BuildConfig.PROC_NAME);
@@ -195,9 +196,9 @@ public class WebOperations {
         }
         client.addHeader("Content-Encoding", "gzip,deflate,compress");
         client.addHeader("imeino", IglPreferences.getPrefString(context, SEILIGL.DEVICE_IMEI, "0"));
-       // client.addHeader("imeino", "8639350502262");
-        client.addHeader("devid", IglPreferences.getPrefString(context, SEILIGL.DEVICE_ID, "0"));
-       // client.addHeader("devid","2234514145687247");
+        // client.addHeader("imeino", "8639350502262");
+        client.addHeader("devid", deviceId.length()<10?IglPreferences.getPrefString(context, SEILIGL.DEVICE_ID, "0"):deviceId);
+        // client.addHeader("devid","1917494835455248");
         client.addHeader("dbname", IglPreferences.getPrefString(context, SEILIGL.DATABASE_NAME, BuildConfig.DATABASE_NAME));
         client.setTimeout(70000);
     }
@@ -207,6 +208,8 @@ public class WebOperations {
             String bearerString = "";
             try {
                 bearerString = IglPreferences.getAccesstoken(context).getString("access_token");
+
+
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -215,8 +218,8 @@ public class WebOperations {
         headers.add(new BasicHeader("Content-Encoding", "gzip,deflate,compress"));
         headers.add(new BasicHeader("imeino", IglPreferences.getPrefString(context, SEILIGL.DEVICE_IMEI, "0")));
         //headers.add(new BasicHeader("imeino", "8639350502262"));
-        headers.add(new BasicHeader("devid", IglPreferences.getPrefString(context, SEILIGL.DEVICE_ID, "0")));
-       // headers.add(new BasicHeader("devid","2234514145687247"));
+        headers.add(new BasicHeader("devid", deviceId.length()<10?IglPreferences.getPrefString(context, SEILIGL.DEVICE_ID, "0"):deviceId));
+        // headers.add(new BasicHeader("devid","1917494835455248"));
         headers.add(new BasicHeader("dbname", IglPreferences.getPrefString(context, SEILIGL.DATABASE_NAME, "")));
         headers.add(new BasicHeader("userid", IglPreferences.getPrefString(context, SEILIGL.USER_ID, "")));
         headers.add(new BasicHeader("procname", BuildConfig.PROC_NAME));
@@ -321,8 +324,30 @@ public class WebOperations {
     public void postEntityESign(Context context, String controller, String method, String jsonString, ResponseHandlerInterface responseHandler) {
         try {
             //Log.d("Json Data",jsonString);
-           // String url = "https://agra.seil.in:8444/ESignSBIAV1/" + "api/" + controller + "/" + method;
+            // String url = "https://agra.seil.in:8444/ESignSBIAV1/" + "api/" + controller + "/" + method;
             String url = "https://agra.Paisalo.in:8444/ESignSBIAV1/" + "api/" + controller + "/" + method;
+            Log.d("TAG", "postEntity: "+ "https://agra.seil.in:8444/ESignSBIAV1/" + "api/" + controller + "/" + method);
+            StringEntity entity = new StringEntity(Utils.cleanTextContent(jsonString));
+            AsyncHttpClient client = new AsyncHttpClient();
+            client.setThreadPool(Executors.newSingleThreadExecutor());
+            setHttpHeadersJsonESign(context, client, true);
+            Log.d("Url", url+"///post entity:///"+entity+"/////response hendler:"+responseHandler);
+            client.post(context, url, entity, "application/json", responseHandler);
+            //client.getLogInterface().setLoggingEnabled(1);
+            //client.setLoggingEnabled(true);
+            //client.setLoggingLevel(9);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+    public void postEntityESignTest(Context context, String controller, String method, String jsonString, ResponseHandlerInterface responseHandler) {
+        try {
+            //Log.d("Json Data",jsonString);
+            // String url = "https://agra.seil.in:8444/ESignSBIAV1/" + "api/" + controller + "/" + method;
+            String url = "https://agra.Paisalo.in:8444/ESignSBIAV1TEST/" + "api/" + controller + "/" + method;
             Log.d("TAG", "postEntity: "+ "https://agra.seil.in:8444/ESignSBIAV1/" + "api/" + controller + "/" + method);
             StringEntity entity = new StringEntity(Utils.cleanTextContent(jsonString));
             AsyncHttpClient client = new AsyncHttpClient();
@@ -474,7 +499,7 @@ public class WebOperations {
             ArrayList<Header> headers = getHttpHeaders(context, new ArrayList<Header>(), true);
             for (Header header : headers) {
                 if (header.getName().equals("dbname")) {
-                  header = new BasicHeader("dbname", dbname);
+                    header = new BasicHeader("dbname", dbname);
 //                    header = new BasicHeader("dbname", "SBIPDL_TEST");
                 }
                 client.addHeader(header.getName(), header.getValue());

@@ -79,6 +79,7 @@ public class ActivityGuarantor extends AppCompatActivity implements View.OnClick
         ((EditText) v.findViewById(R.id.etLoanAppGuarantorMobile)).setText(guarantor.getPerMob1());
         ((EditText) v.findViewById(R.id.etLoanAppGuarantorVoter)).setText(guarantor.getVoterid());
         showPicture();
+
     }
 
     private void getDataFromView(View v) {

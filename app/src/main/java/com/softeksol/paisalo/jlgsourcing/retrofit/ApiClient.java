@@ -40,7 +40,7 @@ public class ApiClient {
 
 
 
-    public static  Retrofit getClientdynamic(String deviceId,String databaseName) {
+    public static  Retrofit getClientdynamic(String dbname,String deviceId) {
         Retrofit retrofit = null;
         if (retrofit==null) {
             OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
@@ -50,11 +50,8 @@ public class ApiClient {
                                               Request original = chain.request();
 
                                               Request request = original.newBuilder()
-                                                      .header("procname", "")
-                                                      .header("Content-Encoding", "gzip,deflate,compress")
-                                                      .header("imeino", "354690572942373")
-                                                      .header("devid", deviceId)
-                                                      .header("dbname", databaseName)
+                                                      .header("userid", deviceId)
+                                                      .header("dbname", dbname)
                                                       .method(original.method(), original.body())
                                                       .build();
 
@@ -80,7 +77,7 @@ public class ApiClient {
 //            });
 
             retrofit = new Retrofit.Builder()
-                    .baseUrl(BASE_URL)
+                    .baseUrl("https://erpservice.paisalo.in:980/")
                     .addConverterFactory(GsonConverterFactory.create())
                     .client(client)
                     .build();

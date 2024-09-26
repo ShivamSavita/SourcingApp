@@ -234,6 +234,7 @@ public class ActivityLogin extends AppCompatActivity implements View.OnClickList
                             List<Manager> managers = WebOperations.convertToObjectArray(loginData.getString("folist"), listType);
                             loginData.remove("folist");
                             //Log.d("Login Resp",loginData.toString());
+                            
 
                         /*IglPreferences.removePref(getBaseContext(), SEILESign.APP_SETTINGS);
                         IglPreferences.removePref(getBaseContext(), SEILESign.IS_ACTUAL);
@@ -444,7 +445,7 @@ public class ActivityLogin extends AppCompatActivity implements View.OnClickList
         DatabaseName.add(new RangeCategory("SBI COLENDING", "Database"));
         DatabaseName.add(new RangeCategory("PDL OWN", "Database"));
         DatabaseName.add(new RangeCategory("GROUP FINANCE", "Database"));
-        // DatabaseName.add(new RangeCategory("SBI PDL", "Database"));
+        DatabaseName.add(new RangeCategory("SBI PDL", "Database"));
         // DatabaseName.add(new RangeCategory("PNB COLENDING", "Database"));
 
         database.setAdapter(new AdapterListRange(this, R.layout.spinner_card_orange,DatabaseName));

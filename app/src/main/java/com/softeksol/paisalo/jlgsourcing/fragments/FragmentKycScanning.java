@@ -570,7 +570,7 @@ FragmentKycScanning extends AbsFragment implements AdapterView.OnItemClickListen
         }
 
         documentStores.add(documentStore.getDocumentStore(borrower, 2, "PassbookFirst"));
-        documentStores.add(documentStore.getDocumentStore(borrower, 2, "PassbookLast"));
+       // documentStores.add(documentStore.getDocumentStore(borrower, 2, "PassbookLast"));
         //documentStores.add(documentStore.getDocumentStore(borrower,4,"Mandate"));
         for (Guarantor guarantor : borrower.getFiGuarantors()) {
             //documentStores.add(documentStore.getDocumentStore(guarantor,0,"Picture"));

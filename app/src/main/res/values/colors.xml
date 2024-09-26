@@ -16,6 +16,7 @@
     <color name="defaultTextColor">#515151</color>
     <color name="blueTextColor">#1DA1F2</color>
     <color name="red">#FF0000</color>
+    <color name="darkred">#B31212</color>
     <color name="green">#52D600</color>
     <color name="dull_green">#42BD00</color>
     <color name="dull_green2">#347512</color>

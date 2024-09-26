@@ -14,6 +14,11 @@
     <string name="earning_member_type">Earning Member Type<font color='red'>*</font></string>
     <string name="select_bank">Select Bank<font color='red'>*</font></string>
     <string name="loan_duration_month">Loan Duration(month)<font color='red'>*</font></string>
+
+    <string name="hindiconfirmation">क्या आप निश्चित रूप से उधारकर्ता से नीचे दी गई राशि वसूल रहे हैं?</string>
+    <string name="hindiqr">दिए गए QR कोड को स्कैन करें और ग्राहक द्वारा किए गए भुगतान के बाद स्थिति(Status) प्राप्त करें।</string>
+
+
     <string name="term_and_conditions"><b><u>TERMS &amp; CONDITIONS FOR ONLINE PAYMENTS TO BE MADE TO PAISALO DIGITAL LTD</u></b> \n
           Name of NBFC:. <b>PAISALO DIGITAL LTD</b>\n\tCSC POCKET 52 CR PARK NEAR POLICE STATION \n\tNEW DELHI -110019\n\tWWW.PAISALO.IN
         \n\n<b>Online Charges Payments</b>:
@@ -175,6 +180,7 @@ Contact Email <i>DELHI@PAISALO.IN</i>
     <string name="report.9"> यह सुनिचित करें कि आवेदित राशि ऋण के उदेश्य के अनुकूल है।</string>
 
     <string name="imageTitle">आवेदक के साथ घर की तस्वीर खींचें</string>
+    <string name="imageupload">यदि क्यूआर कोड पर भुगतान सफल हो गया है लेकिन स्थिति नहीं मिल रही है तो लेनदेन आईडी के साथ स्क्रीनशॉट अपलोड करें।</string>
 
     <string name="choose_scheme_prompt">Choose a Scheme</string>
     <string name="apply">Apply Scheme</string>
@@ -188,4 +194,10 @@ Contact Email <i>DELHI@PAISALO.IN</i>
         <item>"Don't have money"</item>
         <item>"Others"</item>
     </array>
+
+
+    <string-array name="choice_array">
+        <item>Choose from Gallery</item>
+        <item>Take a Photo</item>
+    </string-array>
 </resources>

@@ -17,6 +17,7 @@ import com.softeksol.paisalo.jlgsourcing.handlers.DataAsyncResponseHandler;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 
 import cz.msebera.android.httpclient.Header;
@@ -115,18 +116,27 @@ public class RangeCategory extends BaseModel {
     }
 
     public static List<RangeCategory> getRangesByCatKey(String categoryKey) {
-        return SQLite.select()
+        List<RangeCategory> rangeCategories=new ArrayList<>();
+        RangeCategory rangeCategory=new RangeCategory("","--Select--", "--Select--","--Select--", "--Select--", 0, "--Select--", 0);
+        rangeCategories.add(rangeCategory);
+        rangeCategories.addAll(SQLite.select()
                 .from(RangeCategory.class)
                 .where(RangeCategory_Table.cat_key.eq(categoryKey))
-                .queryList();
+                .queryList());
+        return rangeCategories;
+
     }
 
     public static List<RangeCategory> getRangesByCatKey(String categoryKey, String sortField, boolean ascending) {
-        return SQLite.select()
+        List<RangeCategory> rangeCategories=new ArrayList<>();
+        RangeCategory rangeCategory=new RangeCategory("","--Select--", "--Select--","--Select--", "--Select--", 0, "--Select--", 0);
+        rangeCategories.add(rangeCategory);
+        rangeCategories.addAll(SQLite.select()
                 .from(RangeCategory.class)
                 .where(RangeCategory_Table.cat_key.eq(categoryKey))
                 .orderBy(RangeCategory_Table.getProperty(sortField), ascending)
-                .queryList();
+                .queryList());
+        return rangeCategories;
     }
 
     public static String getRangesByCatKeyName(String categoryKey, String sortField, boolean ascending) {

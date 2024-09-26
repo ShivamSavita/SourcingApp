@@ -41,8 +41,7 @@ public class SplashScreenPage extends AppCompatActivity {
         }
         getAppUpdate();
 
-     /* new
-     ().postDelayed(new Runnable() {
+      /*new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 Intent intent = new Intent(SplashScreenPage.this, ActivityLogin.class);
@@ -78,11 +77,6 @@ public class SplashScreenPage extends AppCompatActivity {
                         }
                     }, 1200);
                 }else{
-
-                    Intent clearCache = new Intent();
-                    clearCache.setAction(ACTION_CLEAR_APP_CACHE);
-                    startActivity(clearCache);
-
                     AlertDialog.Builder builder = new AlertDialog.Builder(SplashScreenPage.this);
                     builder.setTitle("Need Update");
                     builder.setCancelable(false);
@@ -99,8 +93,6 @@ public class SplashScreenPage extends AppCompatActivity {
                         // this method is called when user click on negative button.
                         dialog.cancel();
                         finish();
-
-
                     });
                     // below line is used to display our dialog
                     builder.show();

@@ -19,6 +19,7 @@ import android.widget.Toast;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.gson.JsonObject;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
+import com.softeksol.paisalo.jlgsourcing.BuildConfig;
 import com.softeksol.paisalo.jlgsourcing.Global;
 import com.softeksol.paisalo.jlgsourcing.R;
 import com.softeksol.paisalo.jlgsourcing.SEILIGL;
@@ -27,12 +28,18 @@ import com.softeksol.paisalo.jlgsourcing.WebOperations;
 import com.softeksol.paisalo.jlgsourcing.adapters.AdapterListRange;
 import com.softeksol.paisalo.jlgsourcing.entities.Borrower;
 import com.softeksol.paisalo.jlgsourcing.entities.BorrowerExtra;
+import com.softeksol.paisalo.jlgsourcing.entities.DocumentStore;
 import com.softeksol.paisalo.jlgsourcing.entities.Manager;
 import com.softeksol.paisalo.jlgsourcing.entities.RangeCategory;
 import com.softeksol.paisalo.jlgsourcing.entities.RangeCategory_Table;
 import com.softeksol.paisalo.jlgsourcing.entities.dto.BorrowerDTO;
+import com.softeksol.paisalo.jlgsourcing.entities.dto.DocumentStoreDTO;
 import com.softeksol.paisalo.jlgsourcing.entities.dto.OperationItem;
+import com.softeksol.paisalo.jlgsourcing.enums.EnumApiPath;
+import com.softeksol.paisalo.jlgsourcing.enums.EnumFieldName;
+import com.softeksol.paisalo.jlgsourcing.enums.EnumImageTags;
 import com.softeksol.paisalo.jlgsourcing.handlers.AsyncResponseHandler;
+import com.softeksol.paisalo.jlgsourcing.handlers.DataAsyncResponseHandler;
 import com.softeksol.paisalo.jlgsourcing.retrofit.ApiClient;
 import com.softeksol.paisalo.jlgsourcing.retrofit.ApiInterface;
 
@@ -57,12 +64,17 @@ EditText acspLoanAppFinanceLoanAmount;
     private Manager manager;
 Button BtnSaveKYCData;
 Borrower borrower;
+    String borrowerImagePath;
 private AdapterListRange rlaBankType, rlaPurposeType, rlaLoanAmount, rlaEarningMember, rlaSchemeType ,rlsOccupation,rlaBussiness;
 Intent i;
 String FatherFName, FatherLName,FatherMName, MotherFName,MotherLName, MotherMName,SpouseLName,SpouseMName,SpouseFName;
-String VoterIdName="",tilPAN_Name="",tilDL_Name="",tietName="";
+String VoterIdName="",tilPAN_Name="",tilDL_Name="",tietName="",AddressCodes="";
 TextView textViewTotalAnnualIncome;
     String schemeNameForVH;
+    String lastCaseCode="";
+    String lastLoanAmt="";
+    String lastDuration="";
+    String lastPaidEmi="";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,13 +94,21 @@ TextView textViewTotalAnnualIncome;
         tilPAN_Name=i.getStringExtra("PANName").length()<1?"":i.getStringExtra("PANName");
         tilDL_Name=i.getStringExtra("DLName").length()<1?"":i.getStringExtra("DLName");
         tietName=i.getStringExtra("AadharName").length()<1?"":i.getStringExtra("AadharName");
+        AddressCodes=i.getStringExtra("AddressCodes").length()<1?"":i.getStringExtra("AddressCodes");
+        lastCaseCode=i.getStringExtra("lastCaseCode");
+        lastLoanAmt=i.getStringExtra("lastLoanAmt");
+        lastDuration=i.getStringExtra("lastDuration");
+        lastPaidEmi=i.getStringExtra("lastPaidEmi");
+
+        Log.d("TAG", "onCreate: "+AddressCodes);
 
         schemeNameForVH=i.getStringExtra(Global.SCHEME_TAG);
 
 
-
         manager = (Manager) i.getSerializableExtra("manager");
         borrower = (Borrower) i.getSerializableExtra("borrower");
+      //  borrowerImagePath=borrower.getPicture().getPath();
+
         tietAgricultureIncome=findViewById(R.id.tietAgricultureIncome);
         tietFutureIncome=findViewById(R.id.tietFutureIncome);
         tietExpenseMonthly=findViewById(R.id.tietExpenseMonthly);
@@ -107,27 +127,19 @@ TextView textViewTotalAnnualIncome;
         textViewTotalAnnualIncome=findViewById(R.id.textViewTotalAnnualIncome);
         BtnSaveKYCData=findViewById(R.id.BtnFinalSaveKYCData);
 
-        rlaSchemeType = new AdapterListRange(this,
-                SQLite.select().from(RangeCategory.class).where(RangeCategory_Table.cat_key.eq("DISBSCH")).queryList(), false);
+        rlaSchemeType = new AdapterListRange(this,RangeCategory.getRangesByCatKey("DISBSCH"), false);
 
-        rlaPurposeType = new AdapterListRange(this,
-                SQLite.select().from(RangeCategory.class).where(RangeCategory_Table.cat_key.eq("loan_purpose"))
-                        .orderBy(RangeCategory_Table.SortOrder, true).queryList(), true);
+        rlaPurposeType = new AdapterListRange(this,RangeCategory.getRangesByCatKey("loan_purpose"), true);
 
-        rlaBankType = new AdapterListRange(this,
-                SQLite.select().from(RangeCategory.class).where(RangeCategory_Table.cat_key.eq("banks")).queryList(), false);
+        rlaBankType = new AdapterListRange(this,RangeCategory.getRangesByCatKey("banks"), false);
 
-        rlaLoanAmount= new AdapterListRange(this,
-                SQLite.select().from(RangeCategory.class).where(RangeCategory_Table.cat_key.eq("loan_amt")).queryList(), false);
+        rlaLoanAmount= new AdapterListRange(this,RangeCategory.getRangesByCatKey("loan_amt"), false);
 
-        rlsOccupation= new AdapterListRange(this,
-                SQLite.select().from(RangeCategory.class).where(RangeCategory_Table.cat_key.eq("occupation-type")).queryList(), false);
+        rlsOccupation= new AdapterListRange(this,RangeCategory.getRangesByCatKey("occupation-type"), false);
 
-        rlaBussiness= new AdapterListRange(this,
-                SQLite.select().from(RangeCategory.class).where(RangeCategory_Table.cat_key.eq("loan_purpose")).queryList(), false);
+        rlaBussiness= new AdapterListRange(this,RangeCategory.getRangesByCatKey("other_employment"), false);
 
-        rlaEarningMember = new AdapterListRange(this,
-                SQLite.select().from(RangeCategory.class).where(RangeCategory_Table.cat_key.eq("other_income")).queryList(), false);
+        rlaEarningMember = new AdapterListRange(this,RangeCategory.getRangesByCatKey("other_income"), false);
 
 
         loanbanktype.setAdapter(rlaBankType);
@@ -309,7 +321,9 @@ TextView textViewTotalAnnualIncome;
 
 
     }
+
     private void  updateBorrower() {
+
         int maxLoanAmt=300000;
         String maxLoanAmtStr="Three lacks";
         Log.d("TAG", "updateBorrower: "+manager.Creator);
@@ -320,15 +334,18 @@ TextView textViewTotalAnnualIncome;
         if (borrower != null) {
             getDataFromView(this.findViewById(android.R.id.content).getRootView());
 
-            if (tietIncomeMonthly.getText().toString().trim().equals("")){
+            double totalincode=Double.parseDouble(tietIncomeMonthly.getText().toString())+Double.parseDouble(tietFutureIncome.getText().toString())+Double.parseDouble(tietAgricultureIncome.getText().toString())+Double.parseDouble(tietOtherIncome.getText().toString())+Double.parseDouble(EditEarningMemberIncome.getText().toString())+Double.parseDouble(tietPensionIncome.getText().toString())+Double.parseDouble(tietInterestIncome.getText().toString());
+
+            if (checkSpinnerData()){
+                Utils.showSnakbar(findViewById(android.R.id.content),"Please check all fields");
+            }else if (tietIncomeMonthly.getText().toString().trim().equals("")){
                 tietIncomeMonthly.setError("Please Enter Income");
                 Utils.showSnakbar(findViewById(android.R.id.content),"Please enter Income");
             }else if(tietExpenseMonthly.getText().toString().trim().equals("")){
                 tietExpenseMonthly.setError("Please Enter Expense");
                 Utils.showSnakbar(findViewById(android.R.id.content),"Please enter Expense");
-            }else if(((Double.parseDouble(tietIncomeMonthly.getText().toString().trim()))* 0.25)>Double.parseDouble(tietExpenseMonthly.getText().toString().trim())){
-                tietExpenseMonthly.setError("Expense should be greater than 25 % of Income");
-                Utils.showSnakbar(findViewById(android.R.id.content),"Expense should be greater than 25 % of Income");
+            }else if(loanbanktype.getSelectedItem() =="SBI" && totalincode>25000){
+                Utils.showSnakbar(findViewById(android.R.id.content),"Income should be less than 25000 for SBI");
             }else if(tietFutureIncome.getText().toString().trim().equals("")){
                 tietFutureIncome.setError("Please Enter Future Income");
                 Utils.showSnakbar(findViewById(android.R.id.content),"Please enter Future Income");
@@ -354,10 +371,12 @@ TextView textViewTotalAnnualIncome;
             } else if(Integer.parseInt(acspLoanAppFinanceLoanAmount.getText().toString().trim())>maxLoanAmt ||Integer.parseInt(acspLoanAppFinanceLoanAmount.getText().toString().trim())<5000){
                 acspLoanAppFinanceLoanAmount.setError("Please Enter Loan Amount Less than "+maxLoanAmtStr+" and Greater than 5 thousand");
                 Utils.showSnakbar(findViewById(android.R.id.content),"Please enter Loan Amount Less than "+maxLoanAmtStr+" and Greater than 5 thousand");
-            }
-            if(((Double.parseDouble(tietIncomeMonthly.getText().toString().trim())))<(0.15*Double.parseDouble(acspLoanAppFinanceLoanAmount.getText().toString().trim()))){
+            }else if(!manager.Creator.startsWith("VH") && ((Double.parseDouble(tietIncomeMonthly.getText().toString().trim())))<(0.15*Double.parseDouble(acspLoanAppFinanceLoanAmount.getText().toString().trim()))){
                 tietIncomeMonthly.setError("Income should be greater than 15% of Loan Amount");
                 Utils.showSnakbar(findViewById(android.R.id.content),"Income should be greater than 15% of Loan Amount");
+            }else if(!manager.Creator.startsWith("VH") && ((Double.parseDouble(tietIncomeMonthly.getText().toString().trim()))* 0.25)>Double.parseDouble(tietExpenseMonthly.getText().toString().trim())){
+                tietExpenseMonthly.setError("Expense should be greater than 25 % of Income");
+                Utils.showSnakbar(findViewById(android.R.id.content),"Expense should be greater than 25 % of Income");
             }
             else{
 
@@ -415,7 +434,7 @@ TextView textViewTotalAnnualIncome;
                                     Log.d("TAG", "onSuccess: "+WebOperations.convertToJson(borrower.fiExtraBank));
                                     Log.d("TAG", "onSuccess: "+WebOperations.convertToJson(borrower));
 
-                                    AsyncResponseHandler dataAsyncResponseHandlerUpdateFI = new AsyncResponseHandler(KYC_Form_New.this, "Loan Financing\nSubmittiong Loan Application","Submitting Borrower Information") {
+                                    AsyncResponseHandler dataAsyncResponseHandlerUpdateFI = new AsyncResponseHandler(KYC_Form_New.this, "Loan Financing\nSubmitting Loan Application","Submitting Borrower Information") {
                                         @Override
                                         public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                                             String jsonString = new String(responseBody);
@@ -434,6 +453,7 @@ TextView textViewTotalAnnualIncome;
                                                 borrower.Oth_Prop_Det = "U";
 
                                                 borrower.save();
+                                              //  saveDataOfImages(borrower,borrowerImagePath,"B");
 
                                             } catch (JSONException e) {
                                                 e.printStackTrace();
@@ -450,7 +470,10 @@ TextView textViewTotalAnnualIncome;
                                     if (schemeNameForVH.length()>1){
                                         saveFIWithSchemeName(manager.Creator,FiCode);
                                     }
-
+                                    if (AddressCodes.length()>1){
+                                       //saveAddressCodeOfFi();
+                                        UpdatefiVerificationDocName(FiCode,manager.Creator,AddressCodes);
+                                    }
                                     AlertDialog.Builder builder = new AlertDialog.Builder(KYC_Form_New.this);
                                     builder.setTitle("Borrower KYC");
                                     builder.setCancelable(false);
@@ -478,7 +501,7 @@ TextView textViewTotalAnnualIncome;
                                     });
                                     builder.create().show();
 
-                                    UpdatefiVerificationDocName(FiCode,manager.Creator);
+
 
                                 } catch (JSONException jo) {
                                     Log.d("TAG", "onSuccess: "+jo.getMessage());
@@ -505,6 +528,169 @@ TextView textViewTotalAnnualIncome;
         }
     }
 
+    private boolean checkSpinnerData() {
+//        loanbanktype
+//                acspLoanReason
+//        acspBusinessDetail
+//                acspOccupation
+//        earningMemberTypeSpin
+        if (((RangeCategory)earningMemberTypeSpin.getSelectedItem()).DescriptionEn.equalsIgnoreCase("--Select--"))
+        {
+            Toast.makeText(this, "Please select earning member type", Toast.LENGTH_SHORT).show();
+            return true;
+        }else if (((RangeCategory)acspBusinessDetail.getSelectedItem()).DescriptionEn.equalsIgnoreCase("--Select--"))
+        {
+            Toast.makeText(this, "Please select business type", Toast.LENGTH_SHORT).show();
+            return true;
+        }else  if (((RangeCategory)acspLoanReason.getSelectedItem()).DescriptionEn.equalsIgnoreCase("--Select--"))
+        {
+            Toast.makeText(this, "Please select loan reason type", Toast.LENGTH_SHORT).show();
+            return true;
+        }else  if (((RangeCategory)acspOccupation.getSelectedItem()).DescriptionEn.equalsIgnoreCase("--Select--"))
+        {
+            Toast.makeText(this, "Please select occupation type", Toast.LENGTH_SHORT).show();
+            return true;
+        }else if (loanDuration.getSelectedItem().toString().equalsIgnoreCase("--Select--"))
+        {
+            Toast.makeText(this, "Please select loan duration", Toast.LENGTH_SHORT).show();
+            return true;
+        }else if (((RangeCategory)loanbanktype.getSelectedItem()).DescriptionEn.equalsIgnoreCase("--Select--"))
+        {
+            Toast.makeText(this, "Please select bank type", Toast.LENGTH_SHORT).show();
+            return true;
+        }else{
+            return false;
+        }
+
+
+    }
+
+    private void saveDataOfImages(Borrower borrower, String borrowerProfilePic,String imgTag) {
+        DocumentStore documentStore = new DocumentStore();
+//        {"ChecklistID":0,"Creator":"AGRA","DocRemark":"Picture","Document":"",
+//                "FICode":272664,"GrNo":0,"ImageTag":"CUSTIMG",
+//                "Tag":"CLAG","UserID":"GRST000223","latitude":0.0,
+//                "longitude":0.0,"timestamp":"01-Jul-1996"}
+
+//        {"ChecklistID":0,"Creator":"AGRA","DocRemark":"Picture","Document":"","FICode":272678,
+//                "GrNo":1,"ImageTag":"GUARPIC","Tag":"CLAG",
+//                "UserID":"GRST000223","latitude":0.0,"longitude":0.0,"timestamp":"01-Jul-1996"}
+
+//        {"ChecklistID":0,"Creator":"AGRA","DocRemark":"Picture","Document":"",
+//                "FICode":266173,"GrNo":1,"ImageTag":"GUARPIC",
+//                "Tag":"CLAG","UserID":"","latitude":0.0,"longitude":0.0,"timestamp":"01-Jul-1996"}
+
+        documentStore.Creator = borrower.Creator;
+        documentStore.ficode = borrower.Code;
+        documentStore.fitag = borrower.Tag;
+
+        documentStore.remarks = "Picture";
+        documentStore.checklistid = 0;
+        documentStore.userid = borrower.UserID;
+        documentStore.latitude = 0;
+        documentStore.longitude = 0;
+        documentStore.DocId = 0;
+        documentStore.FiID =0;
+        documentStore.updateStatus = false;
+        //documentStore.imagePath = mDocumentStore.imagePath;
+        //documentStore.imagePath = "file:" + mDocumentStore.imagePath;
+        if (imgTag.equals("B")){
+            documentStore.GuarantorSerial = 0;
+            documentStore.imageTag = EnumImageTags.Borrower.getImageTag();
+            documentStore.fieldname = EnumFieldName.Borrower.getFieldName();
+            documentStore.apiRelativePath = EnumApiPath.BorrowerApiJson.getApiPath();
+        }else{
+            documentStore.GuarantorSerial = 1;
+            documentStore.imageTag = EnumImageTags.Guarantor.getImageTag();
+            documentStore.fieldname = EnumFieldName.Guarantor.getFieldName();
+            documentStore.apiRelativePath = EnumApiPath.GuarantorApi.getApiPath();
+        }
+
+
+        documentStore.imagePath = borrowerProfilePic;
+        Toast.makeText(this, documentStore.imagePath+"", Toast.LENGTH_SHORT).show();
+        Log.d("TAG", "saveDataOfImages: "+documentStore.imagePath);
+
+
+
+        DataAsyncResponseHandler responseHandler = new DataAsyncResponseHandler(KYC_Form_New.this, "Loan Financing", "Uploading " + DocumentStore.getDocumentName(documentStore.checklistid)) {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                String responseString = new String(responseBody);
+                //Utils.showSnakbar( findViewById(android.R.id.content).getRootView(), responseString);
+                //if(responseString.equals("")) {
+
+
+                Log.d("TAG", "onSuccess: "+responseString);
+
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                super.onFailure(statusCode, headers, responseBody, error);
+
+            }
+        };
+        DocumentStoreDTO documentStore1=documentStore.getDocumentDTO();
+        documentStore1.Document="";
+        Log.d("TAG", "uploadKycJson: "+WebOperations.convertToJson(documentStore1));
+
+        String jsonString = WebOperations.convertToJson(documentStore.getDocumentDTO());
+        // Log.d("Document Json",jsonString);
+        String apiPath = documentStore.checklistid == 0 ? "/api/uploaddocs/savefipicjson" : "/api/uploaddocs/savefidocsjson";
+        (new WebOperations()).postEntity(KYC_Form_New.this, BuildConfig.BASE_URL + apiPath, jsonString, responseHandler);
+
+
+
+
+
+
+
+
+
+
+    }
+
+    private void saveAddressCodeOfFi(String creator, long fiCode,String addressCodes) {
+
+        String[] codes=addressCodes.split("_");
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+        httpClient.connectTimeout(1, TimeUnit.MINUTES);
+        httpClient.readTimeout(1,TimeUnit.MINUTES);
+        httpClient.addInterceptor(logging);
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://erpservice.paisalo.in:980/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(httpClient.build())
+                .build();
+
+        JsonObject jsonObject=new JsonObject();
+        jsonObject.addProperty("FiCode",String.valueOf(fiCode));
+        jsonObject.addProperty("Creator",creator);
+        jsonObject.addProperty("villagE_CODE",codes[3]);
+        jsonObject.addProperty("suB_DIST_CODE",codes[2]);
+        jsonObject.addProperty("DIST_CODE",codes[1]);
+        jsonObject.addProperty("STATE_CODE",codes[0]);
+        ApiInterface apiInterface=retrofit.create(ApiInterface.class);
+        Call<JsonObject> call=apiInterface.insertAddressCodes(jsonObject);
+        call.enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                Log.d("TAG", "onResponse: "+response.body());
+
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                Log.d("TAG", "onFailure: "+t.getMessage());
+
+            }
+        });
+
+    }
+
     private void getDataFromView(View view) {
         borrower.Income= Utils.getNotNullInt(tietIncomeMonthly);
         borrower.Expense=Utils.getNotNullInt(tietExpenseMonthly);
@@ -518,7 +704,7 @@ TextView textViewTotalAnnualIncome;
 
 
 
-        try{
+    try{
     Log.d("TAG", "getDataFromView: "+ borrower.Latitude);
     Log.d("TAG", "getDataFromView: "+ borrower.Longitude);
     Log.d("TAG", "getDataFromView: "+ borrower.Gender);
@@ -540,10 +726,11 @@ TextView textViewTotalAnnualIncome;
       }
     }
 
-    private void UpdatefiVerificationDocName(long fiCode, String creator) {
+    private void UpdatefiVerificationDocName(long fiCode, String creator,String addressCodes) {
+
         ApiInterface apiInterface= ApiClient.getClient(SEILIGL.NEW_SERVERAPI).create(ApiInterface.class);
-        Log.d("TAG", "checkCrifScore: "+getJsonOfDocName(fiCode, creator));
-        Call<JsonObject> call=apiInterface.getDocNameDate(getJsonOfDocName(fiCode,creator));
+        //Log.d("TAG", "checkCrifScore: "+getJsonOfDocName(fiCode, creator,addressCodes));
+        Call<JsonObject> call=apiInterface.getDocNameDate(getJsonOfDocName(fiCode,creator,addressCodes));
         call.enqueue(new Callback<JsonObject>(){
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response){
@@ -559,15 +746,19 @@ TextView textViewTotalAnnualIncome;
             }
         });
     }
-    private JsonObject getJsonOfDocName(long fiCode, String creator) {
+    private JsonObject getJsonOfDocName(long fiCode, String creator,String addressCodes) {
+        String[] codes=addressCodes.split("_");
         JsonObject jsonObject=new JsonObject();
-        jsonObject.addProperty("type","basic");
         jsonObject.addProperty("pan_Name",tilPAN_Name);
         jsonObject.addProperty("voterId_Name",VoterIdName);
         jsonObject.addProperty("aadhar_Name",tietName);
         jsonObject.addProperty("drivingLic_Name",tilDL_Name);
         jsonObject.addProperty("bankAcc_Name","");
         jsonObject.addProperty("bank_Name","");
+        jsonObject.addProperty("villagE_CODE",codes[3]);
+        jsonObject.addProperty("suB_DIST_CODE",codes[2]);
+        jsonObject.addProperty("disT_CODE",codes[1]);
+        jsonObject.addProperty("statE_CODE",codes[0]);
         jsonObject.addProperty("fiCode",fiCode+"");
         jsonObject.addProperty("creator",creator);
         return jsonObject;

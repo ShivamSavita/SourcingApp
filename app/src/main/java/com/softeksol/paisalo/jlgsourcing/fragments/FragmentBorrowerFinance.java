@@ -236,7 +236,7 @@ public class FragmentBorrowerFinance extends AbsFragment implements View.OnClick
                                 String dateInString = dayOfMonth + "-" + (monthOfYear + 1) + "-" + year;
                                 try {
                                     Date date = formatter.parse(dateInString);
-                                    Log.e("DATATIMEhowOldAccountSTRING",formatter.format(date));
+                                  //  Log.e("DATATIMEhowOldAccountSTRING",formatter.format(date));
                                     howOldAccount.setText(formatter.format(date));
                                 } catch (ParseException e) {
                                     e.printStackTrace();
@@ -305,11 +305,13 @@ public class FragmentBorrowerFinance extends AbsFragment implements View.OnClick
                             showDialog(etBankAccount);
                             tilBankAccountName.setVisibility(View.VISIBLE);
                             tilBankAccountName.setText("BANK not Verify");
+                            checkBankAccountNuber.setEnabled(true);
                             //tilBankAccountName.setTextColor(getResources().getColor(R.color.green));
 
 
                         }
                     }catch (Exception e){
+                         checkBankAccountNuber.setEnabled(true);
                         showDialog(etBankAccount);
                         tilBankAccountName.setVisibility(View.VISIBLE);
                         tilBankAccountName.setText("BANK API not Working");
@@ -324,6 +326,7 @@ public class FragmentBorrowerFinance extends AbsFragment implements View.OnClick
             public void onFailure(Call<JsonObject> call, Throwable t) {
                 tilBankAccountName.setText(t.getMessage());
                     progressDialog.cancel();
+                     checkBankAccountNuber.setEnabled(true);
                     checkBankAccountNuber.setBackground(getResources().getDrawable(R.drawable.check_sign_ic));
 
 
@@ -356,9 +359,11 @@ public class FragmentBorrowerFinance extends AbsFragment implements View.OnClick
                      isAccountVerify="V";
                      UpdatefiVerificationDocName();
                 }else{
+                    checkBankAccountNuber.setEnabled(true);
                     Toast.makeText(activity, "Account Number Did not Match. Please Enter Again!!", Toast.LENGTH_SHORT).show();
                 }
             } else {
+                checkBankAccountNuber.setEnabled(true);
                 Toast.makeText(getContext(), "Please Enter Account number", Toast.LENGTH_SHORT).show();
             }
         });
@@ -395,7 +400,7 @@ public class FragmentBorrowerFinance extends AbsFragment implements View.OnClick
         call.enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                Log.d("TAG", "checkCrifScore: "+response.body());
+              //  Log.d("TAG", "checkCrifScore: "+response.body());
             }
             @Override
             public void onFailure(Call<JsonObject> call, Throwable t) {
@@ -630,7 +635,7 @@ public class FragmentBorrowerFinance extends AbsFragment implements View.OnClick
         call.enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                Log.d("TAG", "onResponse: "+response.body());
+              //  Log.d("TAG", "onResponse: "+response.body());
                 TextView tvBankName = (TextView) getView().findViewById(R.id.tvLoanAppFinanceBankName);
                 TextView tvBankBranch = (TextView) getView().findViewById(R.id.tvLoanAppFinanceBankBranch);
                 if(response.body() != null){
@@ -643,7 +648,7 @@ public class FragmentBorrowerFinance extends AbsFragment implements View.OnClick
                         String address=jo.getString("ADDRESS");
                         if (borrower != null) {
                             for (String restrictBank:restrictBanks) {
-                                Log.d("TAG", "onResponse: "+restrictBank+"///"+bankname);
+                               // Log.d("TAG", "onResponse: "+restrictBank+"///"+bankname);
                                 if (bankname.toUpperCase().trim().contains(restrictBank)){
                                     bankNotAllowed =true;
                                     break;
@@ -724,12 +729,12 @@ public class FragmentBorrowerFinance extends AbsFragment implements View.OnClick
 
     private void UpdatefiVerificationDocName() {
         ApiInterface apiInterface= ApiClient.getClient(SEILIGL.NEW_SERVERAPI).create(ApiInterface.class);
-        Log.d("TAG", "checkCrifScore: "+getJsonOfDocName());
+      //  Log.d("TAG", "checkCrifScore: "+getJsonOfDocName());
         Call<JsonObject> call=apiInterface.getDocNameDate(getJsonOfDocName());
         call.enqueue(new Callback<JsonObject>(){
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response){
-                Log.d("TAG", "onResponse: "+response.body());
+              //  Log.d("TAG", "onResponse: "+response.body());
                 if(response.body() != null){
 
                 }
@@ -743,11 +748,6 @@ public class FragmentBorrowerFinance extends AbsFragment implements View.OnClick
     }
     private JsonObject getJsonOfDocName() {
         JsonObject jsonObject=new JsonObject();
-        jsonObject.addProperty("type","bank");
-        jsonObject.addProperty("pan_Name","");
-        jsonObject.addProperty("voterId_Name","");
-        jsonObject.addProperty("aadhar_Name","");
-        jsonObject.addProperty("drivingLic_Name","");
         jsonObject.addProperty("bankAcc_Name",tilBankAccountName.getText().toString());
         jsonObject.addProperty("bank_Name",tvBankName.getText().toString());
         jsonObject.addProperty("fiCode",String.valueOf(borrower.Code));

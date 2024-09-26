@@ -1266,7 +1266,18 @@ private void setAadharContent(String aadharDataString) throws Exception {
             if (guarantor.getPictureStore() == null) {
                 Toast.makeText(this,"Guarantor Picture not captured",Toast.LENGTH_SHORT).show();
                 //Utils.alert(this, "Guarantor Picture not captured");
-            } else {
+            }
+            else if (tietAadharId.getError() != null && tietAadharId.getError().toString().length() > 2) {
+                Toast.makeText(this, "Please update Aadhar No properly!!", Toast.LENGTH_SHORT).show();
+            }else if (acspGender.getSelectedItem().toString().contains("--Select--")) {
+                Toast.makeText(this, "Please select Gender properly!!", Toast.LENGTH_SHORT).show();
+            }
+            else if (acspRelationship.getSelectedItem().toString().contains("--Select--")) {
+                Toast.makeText(this, "Please select Relationship properly!!", Toast.LENGTH_SHORT).show();
+            }
+            else if (acspAadharState.getSelectedItem().toString().contains("--Select--")) {
+                Toast.makeText(this, "Please select AadharState properly!!", Toast.LENGTH_SHORT).show();
+            }else {
                 if (validateGuarantor()) {
                     guarantor.save();
                     finish();

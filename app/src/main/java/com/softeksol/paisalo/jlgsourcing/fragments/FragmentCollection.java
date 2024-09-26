@@ -1,15 +1,14 @@
 package com.softeksol.paisalo.jlgsourcing.fragments;
 
-import static com.softeksol.paisalo.jlgsourcing.Global.ESIGN_TYPE_TAG;
-
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.media.Image;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,12 +33,14 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.fragment.app.Fragment;
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.gson.JsonObject;
 import com.softeksol.paisalo.jlgsourcing.BuildConfig;
 import com.softeksol.paisalo.jlgsourcing.R;
 import com.softeksol.paisalo.jlgsourcing.SEILIGL;
+import com.softeksol.paisalo.jlgsourcing.Utilities.DateUtils;
 import com.softeksol.paisalo.jlgsourcing.Utilities.IglPreferences;
 import com.softeksol.paisalo.jlgsourcing.Utilities.MyTextWatcher;
 import com.softeksol.paisalo.jlgsourcing.Utilities.Utils;
@@ -47,13 +48,26 @@ import com.softeksol.paisalo.jlgsourcing.WebOperations;
 import com.softeksol.paisalo.jlgsourcing.activities.ActivityCollection;
 import com.softeksol.paisalo.jlgsourcing.activities.ActivityLogin;
 import com.softeksol.paisalo.jlgsourcing.activities.OnlinePaymentActivity;
+import com.softeksol.paisalo.jlgsourcing.activities.SplashScreenPage;
+import com.softeksol.paisalo.jlgsourcing.activities.Upload_Payslip_page;
 import com.softeksol.paisalo.jlgsourcing.adapters.AdapterDueData;
 import com.softeksol.paisalo.jlgsourcing.adapters.AdapterInstallment;
+import com.softeksol.paisalo.jlgsourcing.adapters.AdapterInstallmentTemp;
 import com.softeksol.paisalo.jlgsourcing.entities.DueData;
 import com.softeksol.paisalo.jlgsourcing.entities.Installment;
+import com.softeksol.paisalo.jlgsourcing.entities.InstallmentTemp;
 import com.softeksol.paisalo.jlgsourcing.entities.PosInstRcv;
+import com.softeksol.paisalo.jlgsourcing.entities.PosInstRcvNew;
+import com.softeksol.paisalo.jlgsourcing.entities.QRCollStatus;
+import com.softeksol.paisalo.jlgsourcing.entities.SmCode_DateModel;
 import com.softeksol.paisalo.jlgsourcing.handlers.DataAsyncResponseHandler;
+import com.softeksol.paisalo.jlgsourcing.location.GpsTracker;
+import com.softeksol.paisalo.jlgsourcing.models.QrUrlData;
+import com.softeksol.paisalo.jlgsourcing.retrofit.ApiClient;
 import com.softeksol.paisalo.jlgsourcing.retrofit.ApiInterface;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -94,7 +108,16 @@ public class FragmentCollection extends AbsCollectionFragment {
     private boolean isProcessingEMI=false;
     String userid;
     private String SchmCode;
-
+    private String SMCode;
+    GpsTracker gpsTracker;
+    Dialog dialogConfirm;
+    Dialog dialogQrcode;
+    Dialog dialogQrcodePayment;
+    AlertDialog dialog;
+    ImageView  righticon;
+    private ProgressDialog progressDialog;
+    ArrayList<InstallmentTemp> insttemplist;
+   // TextToSpeech textToSpeech;
     public FragmentCollection() {
         // Required empty public constructor
     }
@@ -134,29 +157,73 @@ public class FragmentCollection extends AbsCollectionFragment {
         View view = inflater.inflate(R.layout.fragment_collection, container, false);
         userid=IglPreferences.getPrefString(getContext(), SEILIGL.USER_ID, "");
         lv = (ListView) view.findViewById(R.id.lvDueData);
+        gpsTracker=new GpsTracker(getContext());
+        dialogConfirm = new Dialog(getContext());
+        dialogQrcode = new Dialog(getContext());
+        dialogQrcodePayment = new Dialog(getContext());
+
+        /*textToSpeech = new TextToSpeech(getContext(), new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int i) {
+
+                // if No error is found then only it will run
+                if(i!=TextToSpeech.ERROR){
+                    // To Choose language of speech
+                    textToSpeech.setLanguage(Locale.UK);
+                }
+            }
+        });*/
+
+
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                ArrayList<String> menuOptions = new ArrayList<>();
-                menuOptions.add("EMI Paying");
-                menuOptions.add("EMI Not Paying");
+                int checked=0;
+                AdapterDueData adapterDueData = (AdapterDueData) parent.getAdapter();
+                final DueData dueData = (DueData) adapterDueData.getItem(position);
+                List<SmCode_DateModel> list=IglPreferences.getList(getActivity());
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                String[] mOptions = new String[menuOptions.size()];
-                mOptions = menuOptions.toArray(mOptions);
-                builder.setItems(mOptions, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                        if (which==0){
-                            showPaymentDialog(parent,position);
-                        }else{
-                            DialogForEMINotPaying(getContext(),parent,position);
+                if (list!=null){
+                    Log.d("TAG", "onItemClick: "+list.size());
+                    Log.d("TAG", "onItemClick: "+list.get(0).getSmcode());
+                    for (int i=0;i<list.size();i++) {
+                        if (list.get(i).getSmcode().trim().equals(dueData.getCaseCode())){
+                            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+                            if (list.get(i).getTranDate().equals(sdf.format(new Date()))){
+                                Utils.alert(getActivity(),"You already get payment of this case. please wait at least 24 hours");
+                                checked=1;
+                                break;
+                            }else{
+                                checked=0;
+                            }
                         }
 
                     }
-                });
-                builder.create().show();
+                }
+
+                if (checked==0){
+                    ArrayList<String> menuOptions = new ArrayList<>();
+                    menuOptions.add("EMI Paying");
+                    menuOptions.add("EMI Not Paying");
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                    String[] mOptions = new String[menuOptions.size()];
+                    mOptions = menuOptions.toArray(mOptions);
+                    builder.setItems(mOptions, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                            if (which==0){
+                                showPaymentDialog(parent,position);
+                            }else{
+                                DialogForEMINotPaying(getContext(),parent,position);
+                            }
+
+                        }
+                    });
+                    builder.create().show();
+                }
+
 
 
             }
@@ -279,14 +346,46 @@ public class FragmentCollection extends AbsCollectionFragment {
 
 
 
+    private JsonObject getdataQr(String smcode) {
+        JsonObject jsonObject=new JsonObject();
+        jsonObject.addProperty("mid", "randomId");
+        jsonObject.addProperty("terminalId", smcode);
+        jsonObject.addProperty("req", "abc");
+        return jsonObject;
+    }
+
+
+    public static Retrofit getClientNew(String BASE_URL) {
+        Retrofit retrofit = null;
+        if (retrofit==null) {
+            HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+            logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+            OkHttpClient.Builder httpClient = new OkHttpClient.Builder(
+
+            );
+            httpClient.connectTimeout(1, TimeUnit.MINUTES);
+            httpClient.readTimeout(1,TimeUnit.MINUTES);
+            httpClient.addInterceptor(logging);
+            retrofit = new Retrofit.Builder()
+                    .baseUrl(BASE_URL)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .client(httpClient.build())
+                    .build();
+        }
+        return retrofit;
+    }
+
 
 
     private void showPaymentDialog(AdapterView<?> parent,int position) {
+
         AdapterDueData adapterDueData = (AdapterDueData) parent.getAdapter();
         final DueData dueData = (DueData) adapterDueData.getItem(position);
         Log.d("DueData",dueData.toString());
         Log.d("DueDataSchmCode",dueData.getSchmCode());
+        insttemplist=new ArrayList<>();
         SchmCode=dueData.getSchmCode();
+        SMCode=dueData.getCaseCode();
         latePmtIntAmt=0;
         adapterDueData.notifyDataSetChanged();
         final int maxDue = dueData.getMaxDueAmount();
@@ -306,8 +405,14 @@ public class FragmentCollection extends AbsCollectionFragment {
         final LinearLayout llLatePayment = dialogView.findViewById(R.id.llLatePmtInterest);
         final Button onlinepayment = dialogView.findViewById(R.id.onlinepayment);
         final Button prossingFees = dialogView.findViewById(R.id.prossingFees);
+        if(IglPreferences.getPrefString(getContext(), SEILIGL.DATABASE_NAME, BuildConfig.DATABASE_NAME).equalsIgnoreCase("SBIPDLCOL")){
+            prossingFees.setVisibility(View.VISIBLE);
+        }else{
+            prossingFees.setVisibility(View.INVISIBLE);
+        }
         final CheckBox chkLatePayment = dialogView.findViewById(R.id.chkLatePmtInterest);
         final TextView tvLatePayAmount = dialogView.findViewById(R.id.tvLatePmtInterestAmt);
+
         if (latePaymentInterest > 0) {
             llLatePayment.setVisibility(View.VISIBLE);
             tvLatePayAmount.setText(String.valueOf(latePaymentInterest));
@@ -329,12 +434,105 @@ public class FragmentCollection extends AbsCollectionFragment {
                 getActivity().startActivity(intent);
             }
         });
-        if(isProcessingEMI==false){
+       /* if(isProcessingEMI==false){
             prossingFees.setVisibility(View.INVISIBLE);
-        }
+        }*/
         prossingFees.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //getQrCode(SMCode);
+                dialog.dismiss();
+                dialogQrcode.setContentView(R.layout.dialogqr_layout);
+                dialogQrcode.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                dialogQrcode.setCancelable(false);
+                // dialogConfirm.getWindow().getAttributes().windowAnimations = R.style.animation;
+                ImageView  imageQrCode=dialogQrcode.findViewById(R.id.qrcode);
+                TextView  tv_heading=dialogQrcode.findViewById(R.id.text_smcode);
+                TextView  text_uploadimage=dialogQrcode.findViewById(R.id.text_uploadimage);
+                text_uploadimage.setVisibility(View.GONE);
+                tv_heading.setText("Loan A/C- "+SMCode);
+                righticon=dialogQrcode.findViewById(R.id.righticon);
+                righticon.setVisibility(View.GONE);
+                Button btnSave = dialogQrcode.findViewById(R.id.button_saveEmi);
+                Button btncancel = dialogQrcode.findViewById(R.id.button_Closedialog);
+                btncancel.setVisibility(View.GONE);
+                ImageView img_close = dialogQrcode.findViewById(R.id.img_close);
+
+                btnSave.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        text_uploadimage.setVisibility(View.VISIBLE);
+                        btncancel.setVisibility(View.VISIBLE);
+                        qrCodePaymentConfirmAPI(dueData);
+                    /* dialogConfirm.dismiss();
+                        saveDeposit(SchmCode,dueData, totCollectAmt,latePmtIntAmt,tglBtnPaidBy.isChecked() ? "F" : "B");
+                        //Toast.makeText(MainActivity.this, "okay clicked", Toast.LENGTH_SHORT).show();*/
+                    }
+                });
+
+                btncancel.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent=new Intent(getContext(), Upload_Payslip_page.class);
+                        intent.putExtra("SMCODE",dueData.getCaseCode());
+                        startActivity(intent);
+                        dialogQrcode.dismiss();
+                        // Toast.makeText(MainActivity.this, "Cancel clicked", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+                img_close.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialogQrcode.dismiss();
+                        // Toast.makeText(MainActivity.this, "Cancel clicked", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+                dialogQrcode.show();
+                progressDialog = ProgressDialog.show(getContext(), "", "Loading...", true, false);
+                ApiInterface apiInterface= getClientNew("https://erpservice.paisalo.in:980/PDL.USERSERvice.API/api/").create(ApiInterface.class);
+                // Log.d("TAG", "checkCrifScore: "+getdatalocation(login, login));
+                Call<QrUrlData> call=apiInterface.getCheckQrCode(SMCode);
+                call.enqueue(new Callback<QrUrlData>() {
+                    @Override
+                    public void onResponse(Call<QrUrlData> call, Response<QrUrlData> response) {
+                        Log.d("TAG", "onResponse: "+response.body());
+                        progressDialog.dismiss();
+                        if(response.body().getStatusCode().equals("200")){
+                            Glide.with(getContext())
+                                    .load(response.body().getData())
+                                    // .asGif()
+                                  //  .placeholder(R.drawable.ic_qr_code)
+                                    .into(imageQrCode);
+                        }else{
+                            dialogQrcode.dismiss();
+                            Toast.makeText(getContext(), "QR code not found", Toast.LENGTH_SHORT).show();
+                        }
+
+                      /*  if(response.body().getStatusCode().equals("200")){
+                            try {
+                                JSONObject Qrjo=new JSONObject(response.body().getData());
+                                String qr=Qrjo.getString("QrCodeUrl");
+                                Glide.with(getContext())
+                                        .load(qr)
+                                        // .asGif()
+                                        .placeholder(R.drawable.ic_qr_code)
+                                        .into(imageQrCode);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }*/
+                    }
+
+                    @Override
+                    public void onFailure(Call<QrUrlData> call, Throwable t) {
+                        Log.d("TAG", "onFailure: "+t.getMessage());
+                        Toast.makeText(getContext(), "QR code not generated", Toast.LENGTH_SHORT).show();
+                        progressDialog.dismiss();
+                        dialogQrcode.dismiss();
+                    }
+                });
 
             }
         });
@@ -438,6 +636,15 @@ public class FragmentCollection extends AbsCollectionFragment {
                 onlinepayment.setEnabled(collectionAmount + latePmtIntAmt> (latePmtIntAmt>0?latePmtIntAmt-1:0));
 
                 tvTotDue.setText(String.valueOf(collectionAmount+ latePmtIntAmt));
+                if(installment.isSelected()==true){
+                    InstallmentTemp intemp=new InstallmentTemp();
+                    intemp.setAmount(installment.getAmount());
+                    intemp.setDueDate(installment.getDueDate());
+                    insttemplist.add(intemp);
+                }else{
+                    insttemplist.remove(position);
+                }
+
             }
         });
 
@@ -491,7 +698,7 @@ public class FragmentCollection extends AbsCollectionFragment {
             }
         });
 
-        final AlertDialog dialog = builder.create();
+        dialog = builder.create();
         cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -499,7 +706,7 @@ public class FragmentCollection extends AbsCollectionFragment {
             }
         });
         collect.setOnClickListener(new View.OnClickListener() {
-            @Override
+
             public void onClick(View v) {
                 dueData.setEnabled(false);
                 collect.setEnabled(false);
@@ -513,12 +720,233 @@ public class FragmentCollection extends AbsCollectionFragment {
                 if(radioGroup.getCheckedRadioButtonId()==R.id.rbLumpSumAmount) {
                     saveDepositeWithPFAndEmiAmount(dueData.getCreator(), dueData.getCustName(), dueData.getCaseCode(), dueData.getMobile(), totCollectAmt, Utils.getNotNullInt(tietEMIAmount), Utils.getNotNullInt(tietPFAmount), Utils.getNotNullInt(tietOtherEMIAmount));
                 }
-                saveDeposit(SchmCode,dueData, totCollectAmt,latePmtIntAmt,tglBtnPaidBy.isChecked() ? "F" : "B");
-                dialog.dismiss();
+
+
+               // ConfirmationDialog(totCollectAmt,latePmtIntAmt);
+
+                ////////////////////////////////////////////////////////// ALERT /////////////////////////////////////////////////////
+
+                dialogConfirm.setContentView(R.layout.dialogconfirmation_layout);
+                dialogConfirm.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                dialogConfirm.setCancelable(false);
+                // dialogConfirm.getWindow().getAttributes().windowAnimations = R.style.animation;
+
+                ListView  list_dialog=dialogConfirm.findViewById(R.id.list_dialog);
+                TextView text_instamt = dialogConfirm.findViewById(R.id.text_instamt);
+                TextView text_totalamt = dialogConfirm.findViewById(R.id.text_totalamt);
+                list_dialog.setAdapter(new AdapterInstallmentTemp(getContext(), R.layout.layout_item_installmenttemp, insttemplist));
+                text_totalamt.setText(totCollectAmt+"");
+                text_instamt.setText(latePmtIntAmt+"");
+
+                Button btnSave = dialogConfirm.findViewById(R.id.button_saveEmi);
+                Button btncancel = dialogConfirm.findViewById(R.id.button_Closedialog);
+
+                btnSave.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                        dialogConfirm.dismiss();
+                        //String st=  String.valueOf((totCollectAmt+latePmtIntAmt)+" money received");
+                      //  textToSpeech.speak(st,TextToSpeech.QUEUE_FLUSH,null);
+                       // saveDeposit(SchmCode,dueData, totCollectAmt,latePmtIntAmt,tglBtnPaidBy.isChecked() ? "F" : "B");
+                        if(IglPreferences.getPrefString(getContext(), SEILIGL.DATABASE_NAME, BuildConfig.DATABASE_NAME).equalsIgnoreCase("SBIPDLCOL")){
+                            saveRecipetNewAmount(SchmCode,dueData, totCollectAmt,latePmtIntAmt,tglBtnPaidBy.isChecked() ? "F" : "B");
+                        }else{
+                            saveDeposit(SchmCode,dueData, totCollectAmt,latePmtIntAmt,tglBtnPaidBy.isChecked() ? "F" : "B");
+                        }
+
+                        //Toast.makeText(MainActivity.this, "okay clicked", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+                btncancel.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialogConfirm.dismiss();
+                        // Toast.makeText(MainActivity.this, "Cancel clicked", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                dialogConfirm.show();
             }
         });
         dialog.show();
     }
+
+
+     private  void qrCodePaymentConfirmAPI(DueData dueData){
+         Date currentDate = new Date();
+         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+         String dateString = dateFormat.format(currentDate);
+         QRCollStatus instRcv = new QRCollStatus();
+         instRcv.setCaseCode(dueData.getCaseCode());
+         instRcv.setCreator(dueData.getCreator());
+         instRcv.setDate(dateString);
+         instRcv.setFoCode(dueData.getFoCode());
+         instRcv.setBorrowerName(dueData.getCustName());
+         instRcv.setPartyCd(dueData.getPartyCd());
+         instRcv.setPayFlag("E");
+         instRcv.setCollPoint("FIELD");
+         instRcv.setPaymentMode("QR");
+         Log.d("JsonInstRcv", String.valueOf(WebOperations.convertToJson(instRcv)));
+         dialogQrcodePayment.setContentView(R.layout.dialogqrpayment_layout);
+         dialogQrcodePayment.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+         dialogQrcodePayment.setCancelable(false);
+         // dialogConfirm.getWindow().getAttributes().windowAnimations = R.style.animation;
+         ImageView  imagesuccess=dialogQrcodePayment.findViewById(R.id.success_sign);
+         Button btnSave = dialogQrcodePayment.findViewById(R.id.button_qrClosedialog);
+        // Button btncancel = dialogQrcode.findViewById(R.id.button_Closedialog);
+         btnSave.setOnClickListener(new View.OnClickListener() {
+             @Override
+             public void onClick(View v) {
+                 dialogQrcodePayment.dismiss();
+                 dialogConfirm.dismiss();
+                 ((ActivityCollection) getActivity()).refreshData(FragmentCollection.this);
+                 getLoginLocation("Collection","");
+             }
+         });
+
+
+        // progressDialog = ProgressDialog.show(getContext(), "", "Loading...", true, false);
+         ApiInterface apiInterface= getClientNew("https://pdlpay.paisalo.in:946/PDL.SourcingApp.Api/api/").create(ApiInterface.class);
+         Call<JsonObject> call=apiInterface.insertQRPayment(instRcv,"yfMerfC6mRvfr0AOoHmOJ8Et9Q9MPwNEKzFdLsfEs1A=",IglPreferences.getPrefString(getContext(), SEILIGL.USER_ID, ""));
+         call.enqueue(new Callback<JsonObject>() {
+             @Override
+             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                 Log.d("TAG", "onResponse UpdateQrRcCollection: "+response.body());
+                // progressDialog.dismiss();
+                 if (response.body()!=null){
+                     if (response.body().get("statusCode").getAsInt()==200){
+                         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+                         List<SmCode_DateModel> list=IglPreferences.getList(getActivity());
+                         if (list==null){
+                             list=new ArrayList<>();
+                         }
+                         SmCode_DateModel smCodeDateModel=new SmCode_DateModel(dueData.getCaseCode(),sdf.format(new Date()));
+                         list.add(smCodeDateModel);
+                         IglPreferences.saveList(getActivity(),list);
+
+                         dialogQrcodePayment.show();
+                         dialogQrcode.dismiss();
+                         Glide.with(getContext())
+                                 .asGif()
+                                 .load(R.drawable.righticon)
+                                 .into(imagesuccess);
+                     }else{
+                         new Handler().postDelayed(new Runnable() {
+                             @Override
+                             public void run() {
+                                 qrCodePaymentConfirmAPI(dueData);
+                             }
+                         }, 9000);
+                        // failAlert(dueData);
+                     }
+                 } else{
+                    // Toast.makeText(getContext(), "Payment not found try again", Toast.LENGTH_SHORT).show();
+                 }
+             }
+
+             @Override
+             public void onFailure(Call<JsonObject> call, Throwable t) {
+                // Log.d("TAG", "onFailure: "+t.getMessage());
+                // Toast.makeText(getContext(), "Try to get Status again", Toast.LENGTH_SHORT).show();
+                // progressDialog.dismiss();
+                // failAlert(dueData);
+             }
+         });
+
+     }
+
+     private void failAlert(DueData dueData){
+         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+         // Set the dialog title and message
+         builder.setTitle("Payment not received")
+                 .setMessage("Try again to get status or Upload payment receipt.");
+         // Add OK button
+         builder.setPositiveButton("Close", new DialogInterface.OnClickListener() {
+             @Override
+             public void onClick(DialogInterface dialog, int which) {
+                 // Perform any action here when OK is clicked
+                 qrCodePaymentConfirmAPI(dueData);
+                 dialog.dismiss(); // Dismiss the dialog
+             }
+         });
+         builder.setNegativeButton("Upload Image", new DialogInterface.OnClickListener() {
+             @Override
+             public void onClick(DialogInterface dialog, int which) {
+                 Intent intent=new Intent(getContext(), Upload_Payslip_page.class);
+                 intent.putExtra("SMCODE",dueData.getCaseCode());
+                 startActivity(intent);
+                 dialog.dismiss();
+
+                 // Dismiss the dialog
+             }
+         });
+         // Create and show the AlertDialog
+         AlertDialog alertDialog = builder.create();
+         alertDialog.show();
+     }
+
+    private void saveRecipetNewAmount(String schmCode, DueData dueData, int totCollectAmt, int latePmtIntAmt, String s) {
+        ProgressDialog progressDialog = new ProgressDialog(getContext());
+        progressDialog.setMessage("Loading...");
+        progressDialog.setCancelable(false); // This will prevent users from cancelling the dialog by tapping outside
+        progressDialog.show();
+        PosInstRcvNew instRcv = new PosInstRcvNew();
+        instRcv.setCaseCode(dueData.getCaseCode());
+        instRcv.setCreator(dueData.getCreator());
+        instRcv.setDataBaseName(dueData.getDb());
+        instRcv.setIMEI(IglPreferences.getPrefString(getContext(), SEILIGL.DEVICE_IMEI, "0"));
+        instRcv.setInstRcvAmt(totCollectAmt - latePmtIntAmt);
+        instRcv.setInstRcvDateTimeUTC(new Date());
+        instRcv.setFoCode(dueData.getFoCode());
+        instRcv.setCustName(dueData.getCustName());
+        instRcv.setPartyCd(dueData.getPartyCd());
+        instRcv.setInterestAmt(latePmtIntAmt);
+        instRcv.setPayFlag("E");
+        instRcv.setCollPoint("FIELD");
+        instRcv.setPaymentMode("CASH");
+        instRcv.setCollBranchCode("");
+        Log.d("JsonInstRcv", String.valueOf(WebOperations.convertToJson(instRcv)));
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+        httpClient.connectTimeout(1, TimeUnit.MINUTES);
+        httpClient.readTimeout(1,TimeUnit.MINUTES);
+        httpClient.addInterceptor(logging);
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://pdlpay.paisalo.in:946/PDL.SourcingApp.Api/api/")
+               // .baseUrl("https://predeptest.paisalo.in:8084/PDL.SourcingApp.Api/api/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(httpClient.build())
+                .build();
+        ApiInterface apiInterface=retrofit.create(ApiInterface.class);
+        Call<JsonObject> call=apiInterface.insertRcDistributionNew(instRcv,"yfMerfC6mRvfr0AOoHmOJ8Et9Q9MPwNEKzFdLsfEs1A=",IglPreferences.getPrefString(getContext(), SEILIGL.USER_ID, ""));
+        call.enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                Log.d("TAG", "insertRcDistributionNew: "+response.body());
+              //  Toast.makeText(getContext(), "Data is valid. Saving...", Toast.LENGTH_SHORT).show();
+                progressDialog.dismiss();
+                if (response.body()!=null){
+                    if (response.body().get("statusCode").getAsInt()==200){
+                        Utils.alert(getContext(),response.body().get("message").getAsString());
+                        ((ActivityCollection) getActivity()).refreshData(FragmentCollection.this);
+                        getLoginLocation("Collection","");
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                Log.d("TAG", "onFailure: "+t.getMessage());
+                progressDialog.dismiss();
+                Utils.alert(getContext(),t.getMessage());
+
+
+            }
+        });
+    }
+
 
     private void saveDepositeWithPFAndEmiAmount(String creator, String custName, String caseCode, String mobile, int totCollectAmt, int EmiAmt, int pfAmt, int otherAmt) {
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
@@ -544,6 +972,8 @@ public class FragmentCollection extends AbsCollectionFragment {
                 if (response.body()!=null){
                     if (response.body().get("statusCode").getAsInt()==200){
                         Utils.alert(getContext(),response.body().get("message").getAsString());
+                        ((ActivityCollection) getActivity()).refreshData(FragmentCollection.this);
+                        getLoginLocation("Collection","");
 
                     }
                 }
@@ -626,6 +1056,7 @@ public class FragmentCollection extends AbsCollectionFragment {
                         saveDepositOwn(SchmCode,dueData, collectedAmount,latePmtAmount,depBy);
                     }*/
                     ((ActivityCollection) getActivity()).refreshData(FragmentCollection.this);
+                    getLoginLocation("Collection","");
                 }
             }
             @Override
@@ -639,39 +1070,6 @@ public class FragmentCollection extends AbsCollectionFragment {
         instRcv.setCaseCode(dueData.getCaseCode());
         instRcv.setCreator(dueData.getCreator());
         instRcv.setDataBaseName(dueData.getDb());
-        instRcv.setIMEI(IglPreferences.getPrefString(getContext(), SEILIGL.DEVICE_IMEI, "0"));
-        instRcv.setInstRcvAmt(collectedAmount - latePmtAmount);
-        instRcv.setInstRcvDateTimeUTC(new Date());
-        instRcv.setFoCode(dueData.getFoCode());
-        instRcv.setCustName(dueData.getCustName());
-        instRcv.setPartyCd(dueData.getPartyCd());
-        instRcv.setInterestAmt(latePmtAmount);
-        instRcv.setPayFlag(depBy);
-        //Log.d("Json", String.valueOf(instRcv.getInstRcvDateTimeUTC()));
-        Log.d("JsonInstRcv", String.valueOf(WebOperations.convertToJson(instRcv)));
-        (new WebOperations()).postEntity(getContext(), "POSDATA", "instcollection", "savereceipt", WebOperations.convertToJson(instRcv),asyncResponseHandler);
-    }
-
-
-    private void saveDepositOwn(String SchmCode,DueData dueData, int collectedAmount, int latePmtAmount, String depBy) {
-        DataAsyncResponseHandler asyncResponseHandler = new DataAsyncResponseHandler(getContext(), "Loan Collection", "Saving Collection Entry") {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                if (statusCode == 200) {
-                    // ((ActivityCollection) getActivity()).refreshData(FragmentCollection.this);
-                }
-            }
-            @Override
-            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                Toast.makeText(getContext(), error.getMessage() + "\n" + (new String(responseBody)), Toast.LENGTH_LONG).show();
-                Log.d("eKYC Response",error.getLocalizedMessage());
-            }
-        };
-
-        PosInstRcv instRcv = new PosInstRcv();
-        instRcv.setCaseCode(dueData.getCaseCode());
-        instRcv.setCreator(dueData.getCreator());
-        instRcv.setDataBaseName("PDL_OWN");
         instRcv.setIMEI(IglPreferences.getPrefString(getContext(), SEILIGL.DEVICE_IMEI, "0"));
         instRcv.setInstRcvAmt(collectedAmount - latePmtAmount);
         instRcv.setInstRcvDateTimeUTC(new Date());
@@ -720,6 +1118,75 @@ public class FragmentCollection extends AbsCollectionFragment {
             mDbName = savedInstanceState.getString(ARG_DB_NAME);
             mDbDesc = savedInstanceState.getString(ARG_DB_DESC);
         }
+    }
+
+
+    private void ConfirmationDialog(int totCollectAmt, int latePmtIntAmt){
+        dialogConfirm.setContentView(R.layout.dialogconfirmation_layout);
+        dialogConfirm.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialogConfirm.setCancelable(false);
+       // dialogConfirm.getWindow().getAttributes().windowAnimations = R.style.animation;
+
+        ListView  list_dialog=dialogConfirm.findViewById(R.id.list_dialog);
+        TextView text_instamt = dialogConfirm.findViewById(R.id.text_instamt);
+        TextView text_totalamt = dialogConfirm.findViewById(R.id.text_totalamt);
+        list_dialog.setAdapter(new AdapterInstallmentTemp(getContext(), R.layout.layout_item_installmenttemp, insttemplist));
+        text_totalamt.setText(totCollectAmt+"");
+        text_instamt.setText(latePmtIntAmt+"");
+
+        Button btnSave = dialogConfirm.findViewById(R.id.button_saveEmi);
+        Button btncancel = dialogConfirm.findViewById(R.id.button_Closedialog);
+
+        btnSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                dialogConfirm.dismiss();
+                //Toast.makeText(MainActivity.this, "okay clicked", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        btncancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialogConfirm.dismiss();
+               // Toast.makeText(MainActivity.this, "Cancel clicked", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        dialogConfirm.show();
+
+    }
+
+    private void getLoginLocation(String login,String address){
+        ApiInterface apiInterface= ApiClient.getClient(SEILIGL.NEW_SERVERAPI).create(ApiInterface.class);
+        Log.d("TAG", "checkCrifScore: "+getdatalocation(login, address));
+        Call<JsonObject> call=apiInterface.livetrack(getdatalocation(login,address));
+        call.enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                Log.d("TAG", "onResponse: "+response.body());
+            }
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                Log.d("TAG", "onFailure: "+t.getMessage());
+
+            }
+        });
+    }
+
+    private JsonObject getdatalocation(String login, String address) {
+        JsonObject jsonObject=new JsonObject();
+        jsonObject.addProperty("userId", IglPreferences.getPrefString(getContext(), SEILIGL.USER_ID, ""));
+        jsonObject.addProperty("deviceId", IglPreferences.getPrefString(getContext(), SEILIGL.DEVICE_ID, ""));
+        jsonObject.addProperty("Creator", IglPreferences.getPrefString(getContext(), SEILIGL.CREATOR, ""));
+        jsonObject.addProperty("trackAppVersion", BuildConfig.VERSION_NAME);
+        jsonObject.addProperty("latitude",gpsTracker.getLatitude()+"");
+        jsonObject.addProperty("longitude", gpsTracker.getLongitude()+"");
+        jsonObject.addProperty("appInBackground",login);
+        jsonObject.addProperty("Activity",SMCode);
+        jsonObject.addProperty("Address",Utils.getAddress(gpsTracker.getLatitude(),gpsTracker.getLongitude(),getContext()));
+        return jsonObject;
     }
 
 }

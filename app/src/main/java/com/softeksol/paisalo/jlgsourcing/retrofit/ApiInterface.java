@@ -2,18 +2,29 @@ package com.softeksol.paisalo.jlgsourcing.retrofit;
 
 
 import com.google.gson.JsonObject;
+import com.softeksol.paisalo.jlgsourcing.collectionreport.CollectionReportModel;
 import com.softeksol.paisalo.jlgsourcing.entities.BREResponse;
+import com.softeksol.paisalo.jlgsourcing.entities.CityModelList;
 import com.softeksol.paisalo.jlgsourcing.entities.CreatorModel;
+import com.softeksol.paisalo.jlgsourcing.entities.DeDupeResponse;
+import com.softeksol.paisalo.jlgsourcing.entities.DistrictListModel;
 import com.softeksol.paisalo.jlgsourcing.entities.HomeVisitFiList;
 import com.softeksol.paisalo.jlgsourcing.entities.HomeVisitListModel;
+import com.softeksol.paisalo.jlgsourcing.entities.PosInstRcv;
+import com.softeksol.paisalo.jlgsourcing.entities.PosInstRcvNew;
 import com.softeksol.paisalo.jlgsourcing.entities.ProcessingEmiData;
+import com.softeksol.paisalo.jlgsourcing.entities.QRCollStatus;
+import com.softeksol.paisalo.jlgsourcing.entities.SubDistrictModel;
+import com.softeksol.paisalo.jlgsourcing.entities.VillageListModel;
 import com.softeksol.paisalo.jlgsourcing.entities.dto.OCRResponseModel;
 import com.softeksol.paisalo.jlgsourcing.homevisit.FIDataModel;
 import com.softeksol.paisalo.jlgsourcing.models.AccountDetails_Model;
+import com.softeksol.paisalo.jlgsourcing.models.QrUrlData;
 
 import java.util.Calendar;
 import java.util.List;
 
+import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Response;
@@ -46,6 +57,8 @@ public interface ApiInterface {
     @POST("CrifReport/GetCrifReport")
     public  Call<ScrifData> getCrifScore(@Body JsonObject object);
 
+    @GET("LiveTrack/CollectionStatus")
+    public Call<CollectionReportModel> getCollectionReprt(@Query("Smcode") String Smcode);
 
     @POST("IdentityVerification/Get")
     public Call<JsonObject> cardValidate(@Body JsonObject object);
@@ -56,8 +69,16 @@ public interface ApiInterface {
     @POST("LiveTrack/CreateLiveTrack")
     public Call<JsonObject> livetrack(@Body JsonObject object);
 
+    @POST("FiWip/CheckQrCode")
+    public Call<QrUrlData> getQrCode(@Body JsonObject object);
+
+    @GET("GenerateQr/CheckQrCode")
+    Call<QrUrlData> getCheckQrCode(@Query("smcode") String SmCode);
+
     @GET("LiveTrack/GetAppLink")
     Call<AppUpdateResponse> getAppLinkStatus(@Query("version") String version, @Query("AppName") String AppName, @Query("action") int action);
+
+
 
     @POST("LiveTrack/SourcingStatus")
     Call<JsonObject> updateStatus(@Query("ficode") String Ficode, @Query("creator") String Creator);
@@ -76,7 +97,8 @@ public interface ApiInterface {
     Call<JsonObject> getIfscCode(@Path("ifsccode") String ifsccode);
 
     @POST("OCR/DocVerifyByOCR")
-    Call<OCRResponseModel> getFileValidateByOCR(@Query("imgData") String type, @Body RequestBody file);
+    Call<OCRResponseModel>
+    getFileValidateByOCR(@Query("imgData") String type, @Body RequestBody file);
 
     @GET("FI/AadharSehmatiFromPdf")
     Call<JsonObject> getFile(@Header ("Authorization") String token,@Query("creator") String creator, @Query("ficode") int ficode);
@@ -87,7 +109,7 @@ public interface ApiInterface {
     @POST("OCR/GetAdhardata")
     Call<JsonObject> getAdharDataByOCR(@Query("imgData") String imgData,@Query("doctype") String docType,@Body RequestBody file);
 
- @POST("LiveTrack/UpdateFiStatus")
+    @POST("LiveTrack/UpdateFiStatus")
     Call<JsonObject> restrictBorrower(@Query("ficode") String ficode,@Query("creator") String creator,@Query("Approved") String Approved);
 
 
@@ -116,6 +138,25 @@ public interface ApiInterface {
     @GET("PDL.Userservice.api/api/DDLHelper/GetCreator")
     Call<List<CreatorModel>> getCreatorList();
 
+    @GET("PDL.Userservice.api/api/DDLHelper/GetSBIVillageMaster")
+    Call<VillageListModel> getVillageList(@Query("stcode") String stcode, @Query("discode") String discode, @Query("subdiscode") String subdiscode);
+
+
+    @GET("PDL.Userservice.api/api/DDLHelper/GetSBICityMaster")
+    Call<CityModelList> getCityList(@Query("ststecode") String stcode);
+
+
+    @GET("PDL.Userservice.api/api/DDLHelper/GetSBIDistrictMaster")
+    Call<DistrictListModel> getDistictList(@Query("ststecode") String subDistrict);
+
+
+    @GET("PDL.Userservice.api/api/DDLHelper/GetSBISubDistrictMaster")
+    Call<SubDistrictModel> getSubDistrictList(@Query("subDistrict") String subDistrict);
+
+
+
+    @POST("PDL.Userservice.api/api/DDLHelper/InsertVillDistCode")
+    Call<JsonObject> insertAddressCodes(@Body JsonObject jsonObject);
 
 
     @POST("PDL.Mobile.API/api/IMEIMapping/RcPromiseToPay")
@@ -123,6 +164,18 @@ public interface ApiInterface {
 
     @POST("PDL.Mobile.API/api/IMEIMapping/InsertRcDistribution")
     Call<JsonObject> insertRcDistribution(@Body JsonObject jsonObject);
+
+
+    @POST("InstCollection/SaveReceipt")
+    Call<JsonObject> insertRcDistributionNew(@Body PosInstRcvNew jsonObject,
+                                             @Header("dbname") String dbname,
+                                             @Header("userid") String userid);
+
+    @POST("InstCollection/UpdateQrRcCollection")
+    Call<JsonObject> insertQRPayment(@Body QRCollStatus jsonObject,
+                                             @Header("dbname") String dbname,
+                                             @Header("userid") String userid);
+
 
     @POST("PDL.Mobile.API/api/Crif/InitilizeCrif")
     Call<JsonObject> generateCrifForVehicle(@Body JsonObject jsonObject);
@@ -143,7 +196,19 @@ public interface ApiInterface {
     @POST("LiveTrack/FiForUdhan")
     Call<JsonObject> saveSchemeForVH(@Body JsonObject jsonObject);
 
+    @POST("PDL.SMS.API/api/Sms/SendSms?MessageType=otp")
+    Call<JsonObject> getOtp(@Body JsonObject jsonObject);
 
+
+    @GET("PDL.SMS.API/api/Sms/SendOtp")
+    Call<JsonObject> verifyOTP(@Query("MobileNo") String MobileNo,@Query("Otp") String Otp);
+
+    @GET("PDL.Mobile.Api/api/LiveTrack/CheckLoanByAadhar")
+    Call<DeDupeResponse> checkAdharDeDupe(@Query("Aadharno") String Aadharno);
+
+    @Multipart
+    @POST("PDL.SourcingApp.Api/api/InstCollection/QrPaymentSettlement")
+    Call<JsonObject> saveReciptOnpayment(@Part MultipartBody.Part FileName, @Part("SmCode") RequestBody SmCode); // Other parts, if any)
 
 /*
     @Field("ficode") String fiCode, @Field("full_name") String fullName, @Field("dob") String dob,

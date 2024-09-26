@@ -23,6 +23,7 @@ import com.softeksol.paisalo.jlgsourcing.adapters.AdapterCollectionFragmentPager
 import com.softeksol.paisalo.jlgsourcing.entities.DueData;
 import com.softeksol.paisalo.jlgsourcing.entities.Manager;
 import com.softeksol.paisalo.jlgsourcing.entities.PosInstRcv;
+import com.softeksol.paisalo.jlgsourcing.entities.SmCode_DateModel;
 import com.softeksol.paisalo.jlgsourcing.fragments.AbsCollectionFragment;
 import com.softeksol.paisalo.jlgsourcing.fragments.FragmentCollection;
 import com.softeksol.paisalo.jlgsourcing.fragments.FragmentCollectionSettlement;
@@ -33,12 +34,16 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.Type;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import cz.msebera.android.httpclient.Header;
@@ -79,8 +84,32 @@ public class ActivityCollection extends AppCompatActivity {
         mViewPager.setAdapter(fragmentPagerAdapter);
         mViewPager.setOffscreenPageLimit(1);
         refreshData(null);
+
+        List<SmCode_DateModel> list=IglPreferences.getList(this);
+        if (list!=null){
+            for (int i=0;i<list.size();i++) {
+                if (isTwoDaysOlder(list.get(i).getTranDate())){
+                    IglPreferences.removeItem(this,list.get(i).getSmcode());
+                }
+            }
+        }
     }
 
+    public static boolean isTwoDaysOlder(String dateString) {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+        try {
+            Date parsedDate = sdf.parse(dateString);
+            Calendar currentDate = Calendar.getInstance();
+            Calendar twoDaysAgo = Calendar.getInstance();
+            twoDaysAgo.add(Calendar.DAY_OF_MONTH, -2);
+            // Compare dates
+            return parsedDate.before(twoDaysAgo.getTime());
+        } catch (ParseException e) {
+            e.printStackTrace();
+            // Handle parsing exception
+            return false;
+        }
+    }
     public void refreshData(final AbsCollectionFragment fragmentCollection) {
         DataAsyncResponseHandler asyncResponseHandler = new DataAsyncResponseHandler(this, "Loan Collection", "Fetching Dues Data") {
             @Override
@@ -114,7 +143,6 @@ public class ActivityCollection extends AppCompatActivity {
         RequestParams params = new RequestParams();
         params.add("gdate", DateUtils.getFormatedDate(new Date(), "yyyy-MM-dd"));
         params.add("CityCode", manager.AreaCd);
-
         //String queryDB = BuildConfig.APPLICATION_ID == "com.softeksol.paisalo.jlgsourcing" ? "POSDATA" : BuildConfig.DATABASE_NAME;
         String queryDB = BuildConfig.APPLICATION_ID == "com.softeksol.paisalo.jlgsourcing" ? "POSDATA" : IglPreferences.getPrefString(ActivityCollection.this, SEILIGL.DATABASE_NAME, "")+"";
         (new WebOperations()).getEntity(this, queryDB, "instcollection", "getdueinstallments", params, asyncResponseHandler);

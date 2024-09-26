@@ -58,7 +58,6 @@ public class ActivityLoanDetails extends AppCompatActivity implements View.OnCli
         ((TextView) findViewById(R.id.tvLoanDetailAmount)).setText(String.valueOf(eSignBorrower.SanctionedAmt));
         ((TextView) findViewById(R.id.tvLoanDetailPeriod)).setText(String.valueOf(eSignBorrower.Period));
         ((TextView) findViewById(R.id.tvLoanDetailInterestRate)).setText(String.valueOf(eSignBorrower.IntRate));
-
         Button btnDownloadDoc = (Button) findViewById(R.id.btnLoanDetailsDownloadDoc);
         btnDownloadDoc.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -150,11 +149,22 @@ public class ActivityLoanDetails extends AppCompatActivity implements View.OnCli
         UnsignedDocRequest unsignedDocRequest = new UnsignedDocRequest();
         unsignedDocRequest.FiCreator = eSignBorrower.Creator;
         unsignedDocRequest.FiCode = eSignBorrower.FiCode;
-        unsignedDocRequest.DocName = BuildConfig.DOC_NAME + (IglPreferences.getPrefString(this, SEILIGL.IS_ACTUAL, "").equals("Y") ? "_sample" : "");
-        //unsignedDocRequest.DocName = "SBINEWDOC";//BuildConfig.DOC_NAME + (IglPreferences.getPrefString(this, SEILIGL.IS_ACTUAL, "").equals("Y") ? "_sample" : "");
-        unsignedDocRequest.UserID = IglPreferences.getPrefString(this, SEILIGL.USER_ID, "");
-        Log.d("TAG", "downloadUnsignedDoc: "+WebOperations.convertToJson(unsignedDocRequest));
-        ( new WebOperations()).postEntityESign(this, "DocsESignPvn", "downloadunsigneddoc", WebOperations.convertToJson(unsignedDocRequest), fileAsyncResponseHandler);
+        String schemeCode=eSignBorrower.KycUuid;
+          if(schemeCode.substring(0,2).equalsIgnoreCase("UC")){
+              unsignedDocRequest.UserID = IglPreferences.getPrefString(this, SEILIGL.USER_ID, "");
+              Log.d("TAG", "downloadUnsignedDoc: "+WebOperations.convertToJson(unsignedDocRequest));
+              unsignedDocRequest.DocName = BuildConfig.DOC_NAME + (IglPreferences.getPrefString(this, SEILIGL.IS_ACTUAL, "").equals("Y") ? "_sample" : "");
+              ( new WebOperations()).postEntityESign(this, "DocsESignPvn", "downloadunsigneddoc", WebOperations.convertToJson(unsignedDocRequest), fileAsyncResponseHandler);
+
+          }else{
+              unsignedDocRequest.DocName = "SBINEWDOC";//BuildConfig.DOC_NAME + (IglPreferences.getPrefString(this, SEILIGL.IS_ACTUAL, "").equals("Y") ? "_sample" : "");
+              unsignedDocRequest.UserID = IglPreferences.getPrefString(this, SEILIGL.USER_ID, "");
+              Log.d("TAG", "downloadUnsignedDoc: "+WebOperations.convertToJson(unsignedDocRequest));
+              ( new WebOperations()).postEntityESignTest(this, "DocsESignPvn", "downloadunsigneddoc", WebOperations.convertToJson(unsignedDocRequest), fileAsyncResponseHandler);
+
+          }
+       // Toast.makeText(this, schemeCode, Toast.LENGTH_SHORT).show();
+
     }
 
     private void updateEsignerList() {

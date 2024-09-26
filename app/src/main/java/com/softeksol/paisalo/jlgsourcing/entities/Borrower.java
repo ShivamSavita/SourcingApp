@@ -1013,7 +1013,7 @@ public class Borrower extends BaseModel implements Serializable {
             }
             if (this.PanNO != null && this.PanNO.length() > 0 && this.PanNO.length() != 10) {
                 messages.put("Pan No", "PAN Number should be of 10 Digits");
-                docCount++;
+                docCount+=1;
             }
         }
 

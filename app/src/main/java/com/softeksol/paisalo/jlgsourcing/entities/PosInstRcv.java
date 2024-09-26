@@ -44,6 +44,7 @@ public class PosInstRcv {
     @Expose
     private int InterestAmt;
 
+
     public static Comparator<PosInstRcv> InstRcvName = new Comparator<PosInstRcv>() {
         public int compare(PosInstRcv dueData1, PosInstRcv dueData2) {
 

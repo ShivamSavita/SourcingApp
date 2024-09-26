@@ -42,12 +42,26 @@
         tools:ignore="LockedOrientationActivity"
         tools:replace="android:allowBackup,android:supportsRtl">
         <activity
+            android:name="com.softeksol.paisalo.jlgsourcing.activities.Upload_Payslip_page"
+            android:exported="true" >
+
+        </activity>
+        <activity
             android:name="com.softeksol.paisalo.jlgsourcing.activities.QrPayments"
             android:exported="false">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
+        <activity
+            android:name="com.softeksol.paisalo.jlgsourcing.collectionreport.CollectionReportActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+
+
         <activity
             android:name="com.softeksol.paisalo.jlgsourcing.homevisit.HomeVisitManagerList"
             android:exported="false">
@@ -105,6 +119,8 @@
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
+
+
         <activity
             android:name=".activities.CrifScore"
             android:exported="false">
